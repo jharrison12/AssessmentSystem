@@ -1,12 +1,13 @@
 from django.conf.urls import patterns, include, url
+from rubricapp import views
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [ 
     # Examples:
-    # url(r'^$', 'assessmenttool.views.home', name='home'),
+     url(r'^$', views.home_page, name='home'),
     # url(r'^assessmenttool/', include('assessmenttool.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
@@ -14,4 +15,4 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
-)
+]
