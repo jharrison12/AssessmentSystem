@@ -13,10 +13,12 @@ class NewVisitorTest(FunctionalTest):
 		self.assertIn('Assessment System', self.browser.title)
 
 		# Dr. is given the option to choose a class
-		header_text = self.browser.find_element_by_tag_name('h1').text
+		header_text = self.browser.find_element_by_tag_name('h3').text
 		self.assertIn("Choose a Class!", header_text)
 
 		#Dr. Chooses a class from a list of classes
+		dropdown_list = self.browser.find_element_by_tag_name('select')
+		self.assertEqual(dropdown_list.get_attribute('name'), "Class Name")
 		#Dr. clicks on a "Choose" button and is taken to a new page
 
 
