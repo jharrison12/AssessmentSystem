@@ -6,11 +6,12 @@
 		<h1>Assessment System</h1>
 		<h3 id="semester">Choose a Semester!</h3>
 		
-		<form>
+		<form method="POST">
 			<select name="semester" id="semesterdropdown">
 				<option name="201530">201530</option>
 			</select>
 			<input type="submit" value="Submit" id="semestersubmit">
+			{% csrf_token %}
 		</form>
 			<!---		
 		<h3 id="class">Choose a Class!</h3>

@@ -23,10 +23,11 @@ class NewVisitorTest(FunctionalTest):
 		#Dr. clicks submit to send a post request to a server
 		submitbutton = self.browser.find_element_by_id('semestersubmit')
 		self.assertEqual(submitbutton.get_attribute('value'), "Submit")
+		submitbutton.send_keys(Keys.ENTER)
 
 		##Future funtional test for choosing a semester
 		# Dr. is given the option to choose a class
-		#header_text = self.browser.find_element_by_id('class').text
+		header_text = self.browser.find_element_by_id('class').text
 		#self.assertIn("Choose a Class!", header_text)
 
 		#Dr. Chooses a class from a list of classes
