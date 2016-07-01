@@ -20,18 +20,23 @@ class NewVisitorTest(FunctionalTest):
 		semesterchoice = self.browser.find_elements_by_tag_name('option')
 		self.assertIn('201530', [i.text for i in semesterchoice])
 
+		#Dr. clicks submit to send a post request to a server
+		submitbutton = self.browser.find_element_by_id('semestersubmit')
+		self.assertEqual(submitbutton.get_attribute('value'), "Submit")
+
+		##Future funtional test for choosing a semester
 		# Dr. is given the option to choose a class
-		header_text = self.browser.find_element_by_id('class').text
-		self.assertIn("Choose a Class!", header_text)
+		#header_text = self.browser.find_element_by_id('class').text
+		#self.assertIn("Choose a Class!", header_text)
 
 		#Dr. Chooses a class from a list of classes
-		dropdown_list = self.browser.find_element_by_id('classdropdown')
-		self.assertEqual(dropdown_list.get_attribute('name'), "Class Name")
-		classchoice = self.browser.find_elements_by_tag_name('option')
-		self.assertIn("EG 5000", [i.text for i in classchoice])
+		#dropdown_list = self.browser.find_element_by_id('classdropdown')
+		#self.assertEqual(dropdown_list.get_attribute('name'), "Class Name")
+		#classchoice = self.browser.find_elements_by_tag_name('option')
+		#self.assertIn("EG 5000", [i.text for i in classchoice])
 
 		#Dr. clicks on a "Choose" button and is taken to a new page
-
+		#submitbutton = self.browser.find_element_by_tag_name	
 
 		#Dr. chooses a student name from a drop down list of student names
 		
