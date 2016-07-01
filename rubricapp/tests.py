@@ -1,3 +1,4 @@
+from rubricapp.models import Semester
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
@@ -28,3 +29,22 @@ class HomePageTest(TestCase):
 			{'semestercode': '201530'}
 			)
 		self.assertEqual(response.content.decode(), expected_html)
+
+class SemesterModelTest(TestCase):
+	
+	def test_model_for_semesters(self):
+		first_semester = Semester()
+		first_semester.text = '201530'
+		first_semester.save()
+
+		second_semester = Semester()
+		second_semester.text = '201610'
+		second_semester.save()
+
+		saved_items = Semester.objects.all()
+		self.assertEqual(saved_items.count(), 2)
+
+		first_saved_semester = saved_items[0]
+		second_saved_semester = saved_items[1]
+		self.assertEqual(first_saved_semester.text, '201530')
+		self.assertEqual(second_saved_semester.text, '201610')
