@@ -8,9 +8,9 @@
 		
 		<form method="POST">
 			<select name="semester" id="semesterdropdown">
-				<option name="201530">201530</option>
+				<option name="{{ semestercode }}">{{ semstercode }}</option>
 			</select>
-			<input type="submit" value="Submit" id="semestersubmit">
+			<input type="submit" name="submit" value="Submit" id="semestersubmit">
 			{% csrf_token %}
 		</form>
 			<!---		
