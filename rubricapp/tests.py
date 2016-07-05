@@ -6,6 +6,7 @@ from rubricapp.views import home_page
 from django.core.urlresolvers import resolve
 
 class HomePageTest(TestCase):
+	maxDiff = None
 	
 	def test_home_url_resolves_to_home_page_view(self):
 		found = resolve('/')
@@ -14,9 +15,12 @@ class HomePageTest(TestCase):
 	def test_home_page_returns_correct_html(self):
 		request = HttpRequest()
 		response = home_page(request)
-		expected_html = render_to_string('home.html')
-		self.assertEqual(response.content.decode(), expected_html)
+		semesters = Semester.objects.all()
+		expected_html = render_to_string('home.html', { 'semestercode': semesters })
+		self.assertMultiLineEqual(response.content.decode(), expected_html)
 
+	@skip
+	#test below will not be used until the page creates a post request
 	def test_home_page_can_save_a_Post_request(self):
 		request = HttpRequest()
 		request.method = 'POST'
@@ -29,6 +33,18 @@ class HomePageTest(TestCase):
 			{'semestercode': '201530'}
 			)
 		self.assertEqual(response.content.decode(), expected_html)
+
+	def test_home_page_shows_two_semesters(self):
+		request = HttpRequest()
+		response = home_page(request)
+		self.assertEqual(Semester.objects.count(), 2)
+
+	def test_home_page_template_has_two_semesters(self):
+		request = HttpRequest()
+		response = home_page(request)
+		self.assertIn('201530', response.content.decode())
+		self.assertIn('201610', response.content.decode())
+
 
 class SemesterModelTest(TestCase):
 	
