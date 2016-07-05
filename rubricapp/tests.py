@@ -47,7 +47,7 @@ class HomePageTest(TestCase):
 		self.assertIn('201610', response.content.decode())
 
 
-class SemesterModelTest(TestCase):
+class ClassAndSemesterModelTest(TestCase):
 	
 	def test_model_for_semesters(self):
 		first_semester = Semester()
@@ -66,9 +66,10 @@ class SemesterModelTest(TestCase):
 		self.assertEqual(first_saved_semester.text, '201530')
 		self.assertEqual(second_saved_semester.text, '201610')
 	
-	def test_mode_for_classes(self):
-		EdClasses.objects.create(name='EG 5000')
-		EdClasses.objects.create(name='EG 6000')
+	def test_model_for_classes(self):
+		first_semester = Semester.objects.create(text='201530')
+		EdClasses.objects.create(name='EG 5000', semester=first_semester)
+		EdClasses.objects.create(name='EG 6000', semester=first_semester)
 
 		saved_classes = EdClasses.objects.all()
 		self.assertEqual(saved_classes.count(), 2)
@@ -78,3 +79,21 @@ class SemesterModelTest(TestCase):
 
 		self.assertEqual(first_saved_class.name, 'EG 5000')
 		self.assertEqual(second_saved_class.name, 'EG 6000')
+	
+	def test_classes_link_to_semester(self):
+		first_semester = Semester.objects.create(text='201530')
+		edClass = EdClasses.objects.create(name='EG 5000', semester=first_semester)
+		edClass2 = EdClasses.objects.create(name='EG 6000', semester=first_semester)
+
+		edClass.semester = first_semester
+		edClass.save()
+		
+		edClass2.semester = first_semester
+		edClass2.save()
+		
+		saved_classes = EdClasses.objects.all()
+		first_saved_class = saved_classes[0]
+		second_saved_class = saved_classes[1]
+
+		self.assertEqual(first_saved_class.semester, first_semester)
+		self.assertEqual(second_saved_class.semester, first_semester)
