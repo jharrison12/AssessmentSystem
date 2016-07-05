@@ -3,3 +3,4 @@ __pycache
 __pycache__
 *.pyc
 todo.txt
+db.sqlite3

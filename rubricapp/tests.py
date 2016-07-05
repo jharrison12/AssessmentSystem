@@ -1,4 +1,5 @@
-from rubricapp.models import Semester
+from unittest import skip
+from rubricapp.models import Semester, EdClasses
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
@@ -64,3 +65,16 @@ class SemesterModelTest(TestCase):
 		second_saved_semester = saved_items[1]
 		self.assertEqual(first_saved_semester.text, '201530')
 		self.assertEqual(second_saved_semester.text, '201610')
+	
+	def test_mode_for_classes(self):
+		EdClasses.objects.create(name='EG 5000')
+		EdClasses.objects.create(name='EG 6000')
+
+		saved_classes = EdClasses.objects.all()
+		self.assertEqual(saved_classes.count(), 2)
+
+		first_saved_class = saved_classes[0]
+		second_saved_class = saved_classes[1]
+
+		self.assertEqual(first_saved_class.name, 'EG 5000')
+		self.assertEqual(second_saved_class.name, 'EG 6000')
