@@ -8,6 +8,10 @@ from django.core.urlresolvers import resolve
 
 class HomePageTest(TestCase):
 	maxDiff = None
+
+	def create_two_semesters_for_unit_tests(self):
+		Semester.objects.create(text="201530")
+		Semester.objects.create(text="201610")
 	
 	def test_home_url_resolves_to_home_page_view(self):
 		found = resolve('/')
@@ -20,27 +24,24 @@ class HomePageTest(TestCase):
 		expected_html = render_to_string('home.html', { 'semestercode': semesters })
 		self.assertMultiLineEqual(response.content.decode(), expected_html)
 
-	@skip
-	#test below will not be used until the page creates a post request
+	
 	def test_home_page_can_save_a_Post_request(self):
+		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
 		request.method = 'POST'
-		request.POST['submit'] = '201530' 
+		request.POST['submitbutton'] = '{{ semester.text }}' 
 
 		response = home_page(request)
 		self.assertIn('201530', response.content.decode())
-		expected_html = render_to_string(
-			'home.html',
-			{'semestercode': '201530'}
-			)
-		self.assertEqual(response.content.decode(), expected_html)
 
 	def test_home_page_shows_two_semesters(self):
+		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
 		response = home_page(request)
 		self.assertEqual(Semester.objects.count(), 2)
 
 	def test_home_page_template_has_two_semesters(self):
+		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
 		response = home_page(request)
 		self.assertIn('201530', response.content.decode())
