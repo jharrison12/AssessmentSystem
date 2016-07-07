@@ -12,7 +12,7 @@
 		<h3 id="edclass">Choose a Class!</h3>
 		<form method="POST" action=#TODO>
 			<select name="Class Name" id="classdropdown">
-				{% for class in classlist %}
+				{% for class in summerclasses %}
 				<option name="{{ class.name }}">{{ class.name }}</option>
 				{% endfor %}
 			</select>

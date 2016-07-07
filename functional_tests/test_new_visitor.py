@@ -1,13 +1,21 @@
 from .base import FunctionalTest
 from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
+from rubricapp.models import Semester, EdClasses
 
 class NewVisitorTest(FunctionalTest):
 
+	def create_two_classes_for_unit_tests(self):
+		semester = Semester.objects.create(text="201530")
+		EdClasses.objects.create(name="EG 5000", semester=semester)
+		EdClasses.objects.create(name="EG 6000", semester=semester)
+		
 	
 	def test_user_visits_inital_page(self):
 
 		# Dr. visits the webpage
+		self.create_two_classes_for_unit_tests()
 		self.browser.get(self.live_server_url)
 		# Dr. Makes sure that it is titled correctly
 		self.assertIn('Assessment System', self.browser.title)

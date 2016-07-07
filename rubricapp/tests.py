@@ -75,6 +75,14 @@ class SemesterClassViewTest(TestCase):
 		semester = Semester.objects.get(text="201530")
 		response = self.client.get('/'+ semester.text +'/')
 		self.assertContains(response, "EG 6000")
+		self.assertContains(response, "EG 5000")
+		
+	def test_semester_view_returns_correct_templates(self):
+		self.create_two_semesters_for_unit_tests()
+		self.create_two_classes_for_unit_tests()
+		semester = Semester.objects.get(text="201530")
+		response = self.client.get('/'+ semester.text +'/')
+		self.assertTemplateUsed(response, 'semester.html')
 		
 	def test_home_page_can_visit_201610_in_url(self):
 		self.create_two_semesters_for_unit_tests()
