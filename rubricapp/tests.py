@@ -29,12 +29,13 @@ class HomePageTest(TestCase):
 		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
 		request.method = 'POST'
-		request.POST['submitbutton'] = '{{ semester.text }}'
+		semester = Semester.objects.get(text="201530")
+		request.POST['semester'] = semester.text
 
 		response = home_page(request)
 		
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response['location'], '201530/')
+		self.assertEqual(response['location'], '/201530/')
 		
 	def test_home_page_shows_two_semesters(self):
 		self.create_two_semesters_for_unit_tests()
@@ -58,6 +59,34 @@ class SemesterClassViewTest(TestCase):
 		response = self.client.get('/'+semester.text+'/')
 
 		self.assertContains(response, 'EG 5000') 
+	
+	def create_two_classes_for_unit_tests(self):
+		semester = Semester.objects.get(text="201530")
+		EdClasses.objects.create(name="EG 5000", semester=semester)
+		EdClasses.objects.create(name="EG 6000", semester=semester)
+	
+	def create_two_semesters_for_unit_tests(self):
+		Semester.objects.create(text="201530")
+		Semester.objects.create(text="201610")
+		
+	def test_displays_two_classes(self):
+		self.create_two_semesters_for_unit_tests()
+		self.create_two_classes_for_unit_tests()
+		semester = Semester.objects.get(text="201530")
+		response = self.client.get('/'+ semester.text +'/')
+		self.assertContains(response, "EG 6000")
+		
+	def test_home_page_can_visit_201610_in_url(self):
+		self.create_two_semesters_for_unit_tests()
+		request = HttpRequest()
+		request.method = 'POST'
+		semester = Semester.objects.get(text="201610")
+		request.POST['semester'] = semester.text
+
+		response = home_page(request)
+		
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response['location'], '/201610/')	
 
 class ClassAndSemesterModelTest(TestCase):
 	

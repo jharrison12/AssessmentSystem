@@ -4,22 +4,25 @@
 	</head>
 	<body>
 		<h1>Assessment System</h1>
+		<!--
 		<h3 id="semester">Choose a Semester!</h3>
 		
-		<form method="POST">
-			<select name="semester" id="semesterdropdown">
-				{% for semester in semestercode %}
-				<option name="{{ semester.text }}">{{ semester }}</option>
+
+		-->			
+		<h3 id="edclass">Choose a Class!</h3>
+		<form method="POST" action=#TODO>
+			<select name="Class Name" id="classdropdown">
+				{% for class in classlist %}
+				<option name="{{ class.name }}">{{ class.name }}</option>
 				{% endfor %}
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="semestersubmit">
 			{% csrf_token %}
 		</form>
-					
-		<h3 id="edclass">Choose a Class!</h3>
-		<select name="Class Name" id="classdropdown">
-			<option name="EG 5000">EG 5000</option>
-		</select>
+						
+			<!--<option name="EG 5000">EG 5000</option>
+			<option name="EG 6000">EG 6000</option>-->
+
 	</body>
 	
 </html>

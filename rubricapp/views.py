@@ -14,10 +14,10 @@ def home_page(request):
 		Semester.objects.create(text="201610")
 	bob = Semester.objects.get(text="201530")
 	if request.method == "POST":
-		return redirect(bob.text+'/')
+		return redirect('/' + request.POST['semester'] +'/')
 	return render(request, 'home.html', {'semestercode': semester })
 
-def semester_page(request):
+def semester_page(request, semester):
 	return render(request, 'semester.html')
 
 
