@@ -6,7 +6,7 @@ from django.test import LiveServerTestCase
 class FunctionalTest(LiveServerTestCase):
 	
 	def setUp(self):
-		self.browser = webdriver.Firefox()
+		self.browser = webdriver.Chrome()
 		self.browser.implicitly_wait(4)
 	
 	def tearDown(self):

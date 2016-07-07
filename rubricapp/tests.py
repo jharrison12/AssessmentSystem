@@ -25,15 +25,17 @@ class HomePageTest(TestCase):
 		self.assertMultiLineEqual(response.content.decode(), expected_html)
 
 	
-	def test_home_page_can_save_a_Post_request(self):
+	def test_home_page_can_redirects_after_Post_request(self):
 		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
 		request.method = 'POST'
-		request.POST['submitbutton'] = '{{ semester.text }}' 
+		request.POST['submitbutton'] = '{{ semester.text }}'
 
 		response = home_page(request)
-		self.assertIn('201530', response.content.decode())
-
+		
+		self.assertEqual(response.status_code, 302)
+		self.assertEqual(response['location'], '201530/')
+		
 	def test_home_page_shows_two_semesters(self):
 		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
@@ -47,6 +49,15 @@ class HomePageTest(TestCase):
 		self.assertIn('201530', response.content.decode())
 		self.assertIn('201610', response.content.decode())
 
+class SemesterClassViewTest(TestCase):
+	
+	def test_displays_all_classes(self):
+		semester = Semester.objects.create(text="201530")
+		EdClasses.objects.create(name="EG 5000", semester=semester)
+
+		response = self.client.get('/'+semester.text+'/')
+
+		self.assertContains(response, 'EG 5000') 
 
 class ClassAndSemesterModelTest(TestCase):
 	

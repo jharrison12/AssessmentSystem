@@ -8,6 +8,7 @@ from rubricapp import views
 urlpatterns = [ 
     # Examples:
      url(r'^$', views.home_page, name='home'),
+     url(r'^\d+/$', views.semester_page, name='semester'),
     # url(r'^assessmenttool/', include('assessmenttool.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
