@@ -54,17 +54,20 @@ class SemesterClassViewTest(TestCase):
 	
 	def test_displays_all_classes(self):
 		semester = Semester.objects.create(text="201530")
-		EdClasses.objects.create(name="EG 5000", semester=semester)
-
+		edclass1 = EdClasses.objects.create(name="EG 5000")
+		semester.classes.add(edclass1)
+		
 		response = self.client.get('/'+semester.text+'/')
 
 		self.assertContains(response, 'EG 5000') 
 	
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.get(text="201530")
-		EdClasses.objects.create(name="EG 5000", semester=semester)
-		EdClasses.objects.create(name="EG 6000", semester=semester)
-	
+		class1 = EdClasses.objects.create(name="EG 5000")
+		class2 = EdClasses.objects.create(name="EG 6000")
+		semester.classes.add(class1)
+		semester.classes.add(class2)
+		
 	def create_two_semesters_for_unit_tests(self):
 		Semester.objects.create(text="201530")
 		Semester.objects.create(text="201610")
@@ -112,8 +115,10 @@ class StudentViewTest(TestCase):
 
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.get(text="201530")
-		EdClasses.objects.create(name="EG 5000", semester=semester)
-		EdClasses.objects.create(name="EG 6000", semester=semester)
+		class1 = EdClasses.objects.create(name="EG 5000")
+		class2 = EdClasses.objects.create(name="EG 6000")
+		semester.classes.add(class1)
+		semester.classes.add(class2)
 	
 	def create_two_semesters_for_unit_tests(self):
 		Semester.objects.create(text="201530")
@@ -141,6 +146,14 @@ class StudentViewTest(TestCase):
 
 class ClassAndSemesterModelTest(TestCase):
 	
+	def create_two_classes_add_to_semester(self):
+		first_semester = Semester.objects.create(text='201530')
+		edClass = EdClasses.objects.create(name='EG 5000') 
+		edClass2 = EdClasses.objects.create(name='EG 6000')
+		
+		first_semester.classes.add(edClass)
+		first_semester.classes.add(edClass2)
+	
 	def test_model_for_semesters(self):
 		first_semester = Semester()
 		first_semester.text = '201530'
@@ -159,9 +172,7 @@ class ClassAndSemesterModelTest(TestCase):
 		self.assertEqual(second_saved_semester.text, '201610')
 	
 	def test_model_for_classes(self):
-		first_semester = Semester.objects.create(text='201530')
-		EdClasses.objects.create(name='EG 5000', semester=first_semester)
-		EdClasses.objects.create(name='EG 6000', semester=first_semester)
+		self.create_two_classes_add_to_semester()
 
 		saved_classes = EdClasses.objects.all()
 		self.assertEqual(saved_classes.count(), 2)
@@ -173,19 +184,12 @@ class ClassAndSemesterModelTest(TestCase):
 		self.assertEqual(second_saved_class.name, 'EG 6000')
 	
 	def test_classes_link_to_semester(self):
-		first_semester = Semester.objects.create(text='201530')
-		edClass = EdClasses.objects.create(name='EG 5000', semester=first_semester)
-		edClass2 = EdClasses.objects.create(name='EG 6000', semester=first_semester)
-
-		edClass.semester = first_semester
-		edClass.save()
-		
-		edClass2.semester = first_semester
-		edClass2.save()
+		self.create_two_classes_add_to_semester()
+		first_semester = Semester.objects.get(text='201530')
 		
 		saved_classes = EdClasses.objects.all()
 		first_saved_class = saved_classes[0]
 		second_saved_class = saved_classes[1]
 
-		self.assertEqual(first_saved_class.semester, first_semester)
-		self.assertEqual(second_saved_class.semester, first_semester)
+		self.assertQuerysetEqual(first_semester.classes.filter(name="EG 5000"),[repr(first_saved_class)] )
+		self.assertQuerysetEqual(first_semester.classes.filter(name="EG 6000"), [repr(second_saved_class)] )

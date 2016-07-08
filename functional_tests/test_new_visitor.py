@@ -8,8 +8,10 @@ class NewVisitorTest(FunctionalTest):
 
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.create(text="201530")
-		EdClasses.objects.create(name="EG 5000", semester=semester)
-		EdClasses.objects.create(name="EG 6000", semester=semester)
+		edclass1 = EdClasses.objects.create(name="EG 5000")
+		edclass2 = EdClasses.objects.create(name="EG 6000")
+		semester.classes.add(edclass1)
+		semester.classes.add(edclass2)
 		
 	
 	def test_user_visits_inital_page(self):
