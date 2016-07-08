@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from rubricapp.models import Semester, EdClasses
+import re
 
 def home_page(request):
 	
@@ -20,10 +21,15 @@ def home_page(request):
 def semester_page(request, semester):
 	summerclasses = EdClasses.objects.filter(semester__text=semester)
 	if summerclasses.exists():
-		return render(request, 'semester.html', {'summerclasses': summerclasses} ) 
+		pass
 	else:
 		return redirect('/')
+	if request.method == "POST":
+		return redirect('/'+ re.sub('[\s+]', '', request.POST['edClass']) + '/') #removes whitespace from inside the class name
+	return render(request, 'semester.html', {'summerclasses': summerclasses} ) 
 	
 
-
+def student_page(request, edclass):
+	student = {"name": "Bob DaBuilder"}
+	return render(request, 'student.html', student)
 # Create your views here.

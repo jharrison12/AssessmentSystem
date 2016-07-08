@@ -40,12 +40,15 @@ class NewVisitorTest(FunctionalTest):
 
 		#Dr. Chooses a class from a list of classes
 		dropdown_list = self.browser.find_element_by_id('classdropdown')
-		self.assertEqual(dropdown_list.get_attribute('name'), "Class Name")
+		self.assertEqual(dropdown_list.get_attribute('name'), "edClass")
 		classchoice = self.browser.find_elements_by_tag_name('option')
 		self.assertIn("EG 5000", [i.text for i in classchoice])
 
 		#Dr. clicks on a "Choose" button and is taken to a new page
-		#submitbutton = self.browser.find_element_by_tag_name	
+		submitbutton = self.browser.find_element_by_id('classubmit')
+		submitbutton.send_keys(Keys.ENTER)
+		chooseAStudent = self.browser.find_element_by_id('choosename')
+
 
 		#Dr. chooses a student name from a drop down list of student names
 		

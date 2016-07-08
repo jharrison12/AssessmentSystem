@@ -9,12 +9,10 @@
 		
 
 		-->			
-		<h3 id="edclass">Choose a Class!</h3>
+		<h3 id="choosename">Choose a name</h3>
 		<form method="POST" action={{ class.name }}>
 			<select name="edClass" id="classdropdown">
-				{% for class in summerclasses %}
-				<option name="{{ class.name }}">{{ class.name }}</option>
-				{% endfor %}
+				<option name="{{ name }}">{{ name }}</option>
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="classubmit">
 			{% csrf_token %}

@@ -1,9 +1,9 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses
+from rubricapp.models import Semester, EdClasses, Student
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
-from rubricapp.views import home_page
+from rubricapp.views import home_page, semester_page
 from django.core.urlresolvers import resolve
 
 class HomePageTest(TestCase):
@@ -95,6 +95,49 @@ class SemesterClassViewTest(TestCase):
 		
 		self.assertEqual(response.status_code, 302)
 		self.assertEqual(response['location'], '/201610/')	
+	
+	def test_semester_page_can_take_post_request(self):
+		self.create_two_semesters_for_unit_tests()
+		self.create_two_classes_for_unit_tests()
+		request = HttpRequest()
+		request.method = "POST"
+		edClass = EdClasses.objects.get(name="EG 5000")
+		request.POST['edClass'] = edClass.name
+
+		response = semester_page(request, "201530")
+
+		self.assertEqual(response.status_code, 302)
+
+class StudentViewTest(TestCase):
+
+	def create_two_classes_for_unit_tests(self):
+		semester = Semester.objects.get(text="201530")
+		EdClasses.objects.create(name="EG 5000", semester=semester)
+		EdClasses.objects.create(name="EG 6000", semester=semester)
+	
+	def create_two_semesters_for_unit_tests(self):
+		Semester.objects.create(text="201530")
+		Semester.objects.create(text="201610")
+
+	def test_semester_page_redirects_to_student_url(self):
+		self.create_two_semesters_for_unit_tests()
+		self.create_two_classes_for_unit_tests()
+		request = HttpRequest()
+		request.method = "POST"
+		edClass = EdClasses.objects.get(name="EG 5000")
+		request.POST['edClass'] = edClass.name
+
+		response = semester_page(request, "201530")
+
+		self.assertEqual(response['location'], '/EG5000/')
+	
+	def test_semester_page_can_show_without_redirecting(self):
+		Student.objects.create(name="Bob DaBuilder")
+		#TODO setup semester/class/ url
+		response = self.client.get("/EG5000/")
+
+		self.assertContains(response, 'Bob DaBuilder')
+
 
 class ClassAndSemesterModelTest(TestCase):
 	

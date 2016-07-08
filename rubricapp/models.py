@@ -13,4 +13,5 @@ class EdClasses(models.Model):
 	def __str__(self):
 		return self.name
 
-# Create your models here.
+class Student(models.Model):
+	name = models.TextField(default="")	
