@@ -113,47 +113,63 @@ class SemesterClassViewTest(TestCase):
 
 class StudentViewTest(TestCase):
 
-	def create_two_classes_for_unit_tests(self):
-		semester = Semester.objects.get(text="201530")
-		class1 = EdClasses.objects.create(name="EG 5000")
-		class2 = EdClasses.objects.create(name="EG 6000")
-		semester.classes.add(class1)
-		semester.classes.add(class2)
-	
-	def create_two_semesters_for_unit_tests(self):
-		Semester.objects.create(text="201530")
-		Semester.objects.create(text="201610")
-
-	def test_semester_page_redirects_to_student_url(self):
-		self.create_two_semesters_for_unit_tests()
-		self.create_two_classes_for_unit_tests()
-		request = HttpRequest()
-		request.method = "POST"
-		edClass = EdClasses.objects.get(name="EG 5000")
-		request.POST['edClass'] = edClass.name
-
-		response = semester_page(request, "201530")
-
-		self.assertEqual(response['location'], '/EG5000/')
-	
-	def test_semester_page_can_show_without_redirecting(self):
-		Student.objects.create(name="Bob DaBuilder")
-		#TODO setup semester/class/ url
-		response = self.client.get("/EG5000/")
-
-		self.assertContains(response, 'Bob DaBuilder')
-
-
-class ClassAndSemesterModelTest(TestCase):
-	
-	def create_two_classes_add_to_semester(self):
+	def add_two_classes_to_semester_add_two_students_to_class(self):
 		first_semester = Semester.objects.create(text='201530')
 		edClass = EdClasses.objects.create(name='EG 5000') 
 		edClass2 = EdClasses.objects.create(name='EG 6000')
 		
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
+		
+		bob = Student.objects.create(name="Bob DaBuilder")
+		jane = Student.objects.create(name="Jane Doe")
+
+		edClass.students.add(bob)
+		edClass.students.add(jane)
+		edClass2.students.add(bob)
 	
+	def create_two_semesters_for_unit_tests(self):
+		Semester.objects.create(text="201530")
+		Semester.objects.create(text="201610")
+
+	def test_semester_page_redirects_to_student_url(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		request = HttpRequest()
+		request.method = "POST"
+		edClass = EdClasses.objects.get(name="EG 5000")
+		request.POST['edClass'] = edClass.name
+
+		response = semester_page(request, "201530")
+		
+		self.assertEqual(response['location'], '/EG5000/')
+	
+	def test_semester_page_can_show_without_redirecting(self):
+		#TODO setup semester/class/ url
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		response = self.client.get("/EG5000/")
+		print(response.content)
+
+		self.assertContains(response, 'Bob DaBuilder')
+
+
+class ClassAndSemesterModelTest(TestCase):
+	
+	def add_two_classes_to_semester_add_two_students_to_class(self):
+		first_semester = Semester.objects.create(text='201530')
+		edClass = EdClasses.objects.create(name='EG 5000') 
+		edClass2 = EdClasses.objects.create(name='EG 6000')
+		
+		first_semester.classes.add(edClass)
+		first_semester.classes.add(edClass2)
+		
+		bob = Student.objects.create(name="Bob DaBuilder")
+		jane = Student.objects.create(name="Jane Doe")
+
+		edClass.students.add(bob)
+		edClass.students.add(jane)
+		edClass2.students.add(bob)
+	
+		
 	def test_model_for_semesters(self):
 		first_semester = Semester()
 		first_semester.text = '201530'
@@ -172,7 +188,7 @@ class ClassAndSemesterModelTest(TestCase):
 		self.assertEqual(second_saved_semester.text, '201610')
 	
 	def test_model_for_classes(self):
-		self.create_two_classes_add_to_semester()
+		self.add_two_classes_to_semester_add_two_students_to_class()
 
 		saved_classes = EdClasses.objects.all()
 		self.assertEqual(saved_classes.count(), 2)
@@ -184,7 +200,7 @@ class ClassAndSemesterModelTest(TestCase):
 		self.assertEqual(second_saved_class.name, 'EG 6000')
 	
 	def test_classes_link_to_semester(self):
-		self.create_two_classes_add_to_semester()
+		self.add_two_classes_to_semester_add_two_students_to_class()
 		first_semester = Semester.objects.get(text='201530')
 		
 		saved_classes = EdClasses.objects.all()
@@ -193,3 +209,14 @@ class ClassAndSemesterModelTest(TestCase):
 
 		self.assertQuerysetEqual(first_semester.classes.filter(name="EG 5000"),[repr(first_saved_class)] )
 		self.assertQuerysetEqual(first_semester.classes.filter(name="EG 6000"), [repr(second_saved_class)] )
+	
+	def test_students_link_to_class(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		
+		oneclass = EdClasses.objects.get(name="EG 5000")
+		twoclass = EdClasses.objects.get(name="EG 6000")
+		
+		jane = Student.objects.get(name="Jane Doe")
+		bob = Student.objects.get(name="Bob DaBuilder")
+		self.assertQuerysetEqual(oneclass.students.filter(name="Jane Doe"), [repr(jane)])
+		self.assertQuerysetEqual(twoclass.students.filter(name="Bob DaBuilder"), [repr(bob)])
