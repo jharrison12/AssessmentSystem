@@ -128,10 +128,18 @@ class StudentViewTest(TestCase):
 		edClass.students.add(jane)
 		edClass2.students.add(bob)
 	
+	
 	def create_two_semesters_for_unit_tests(self):
 		Semester.objects.create(text="201530")
 		Semester.objects.create(text="201610")
 
+	
+	def test_student_page_returns_correct_template(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		response = self.client.get("/EG5000/")
+
+		self.assertTemplateUsed(response, 'student.html')
+		
 	def test_semester_page_redirects_to_student_url(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		request = HttpRequest()
@@ -147,7 +155,6 @@ class StudentViewTest(TestCase):
 		#TODO setup semester/class/ url
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		response = self.client.get("/EG5000/")
-		print(response.content)
 
 		self.assertContains(response, 'Bob DaBuilder')
 

@@ -1,15 +1,7 @@
-<html>
-	<head>
-	<title>Assessment System</title>
-	</head>
-	<body>
-		<h1>Assessment System</h1>
-		<!--
-		<h3 id="semester">Choose a Semester!</h3>
+{% extends 'base.html' %}
+		{% block headerid%}edclass{% endblock %}{% block header_text %}Choose a Class!{% endblock %}
 		
-
-		-->			
-		<h3 id="edclass">Choose a Class!</h3>
+		{% block form %}
 		<form method="POST" action={{ class.name }}>
 			<select name="edClass" id="classdropdown">
 				{% for class in summerclasses %}
@@ -19,7 +11,4 @@
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="classubmit">
 			{% csrf_token %}
 		</form>
-						
-	</body>
-	
-</html>
+		{% endblock %}

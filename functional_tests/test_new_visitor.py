@@ -2,7 +2,7 @@ from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from rubricapp.models import Semester, EdClasses
+from rubricapp.models import Semester, EdClasses, Student
 
 class NewVisitorTest(FunctionalTest):
 
@@ -12,6 +12,11 @@ class NewVisitorTest(FunctionalTest):
 		edclass2 = EdClasses.objects.create(name="EG 6000")
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
+		
+		bob = Student.objects.create(name="Bob DaBuilder")
+		edclass1.students.add(bob)
+		jane = Student.objects.create(name="Jane Doe")
+		edclass1.students.add(jane)
 		
 	
 	def test_user_visits_inital_page(self):
@@ -53,7 +58,17 @@ class NewVisitorTest(FunctionalTest):
 
 
 		#Dr. chooses a student name from a drop down list of student names
+		studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
+		self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
+		studentname = self.browser.find_elements_by_tag_name('option')
+		self.assertIn("Bob DaBuilder", [i.text for i in studentname])
+		self.assertIn("Jane Doe", [i.text for i in studentname])
+		submitbutton = self.browser.find_element_by_id('studentsubmit')
+		submitbutton.send_keys(Keys.ENTER) 
+		
+		#A new page should appear with the students name 
+		studentnameheader = self.browser.find_element_by_id('studentheader')
 		
 		#A rubric should appear based upon the key assignment 
-		#The rubric should allow the student to click on a matrix of rows
+		#The rubric should allow the professor to click on a matrix of rows
 		#The dr. clicks on "submit" the student data is submited to a database

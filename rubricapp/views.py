@@ -30,7 +30,6 @@ def semester_page(request, semester):
 	
 
 def student_page(request, edclass):
-	#TODO fix the regex to change EG5000 (i.e. edclass) to EG 5000"
 	#REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the 
 	#course code
 	edclass = re.sub('([A-Z]+)', r'\1 ', edclass )
