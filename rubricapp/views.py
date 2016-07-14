@@ -32,7 +32,14 @@ def semester_page(request, semester):
 def student_page(request, edclass):
 	#REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the 
 	#course code
-	edclass = re.sub('([A-Z]+)', r'\1 ', edclass )
-	students = Student.objects.filter(edclasses__name=edclass)
+	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
+	students = Student.objects.filter(edclasses__name=edClassSpaceAdded)
+	if request.method == 'POST':
+		#Why is adding the forward slash unneccessary?
+		return redirect(edclass +re.sub('[\s+]', '', request.POST['studentnames']).lower() + '/')
 	return render(request, 'student.html', {'students': students})
-# Create your views here.
+# Create your views here
+
+def rubric_page(request, edclass, studentname):
+	student = Student.objects.get(name="Bob DaBuilder")
+	return render(request, 'rubric.html', {'studentname': studentname})

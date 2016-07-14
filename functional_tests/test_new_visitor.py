@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from rubricapp.models import Semester, EdClasses, Student
+from time import sleep
 
 class NewVisitorTest(FunctionalTest):
 
@@ -67,6 +68,7 @@ class NewVisitorTest(FunctionalTest):
 		submitbutton.send_keys(Keys.ENTER) 
 		
 		#A new page should appear with the students name 
+		sleep(4)
 		studentnameheader = self.browser.find_element_by_id('studentheader')
 		
 		#A rubric should appear based upon the key assignment 

@@ -3,7 +3,7 @@ from rubricapp.models import Semester, EdClasses, Student
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
-from rubricapp.views import home_page, semester_page
+from rubricapp.views import home_page, semester_page, student_page
 from django.core.urlresolvers import resolve
 
 class HomePageTest(TestCase):
@@ -111,7 +111,7 @@ class SemesterClassViewTest(TestCase):
 
 		self.assertEqual(response.status_code, 302)
 
-class StudentViewTest(TestCase):
+class ClassViewTest(TestCase):
 
 	def add_two_classes_to_semester_add_two_students_to_class(self):
 		first_semester = Semester.objects.create(text='201530')
@@ -137,10 +137,9 @@ class StudentViewTest(TestCase):
 	def test_student_page_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		response = self.client.get("/EG5000/")
-
 		self.assertTemplateUsed(response, 'student.html')
 		
-	def test_semester_page_redirects_to_student_url(self):
+	def test_semester_page_redirects_to_class_url(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		request = HttpRequest()
 		request.method = "POST"
@@ -157,7 +156,59 @@ class StudentViewTest(TestCase):
 		response = self.client.get("/EG5000/")
 
 		self.assertContains(response, 'Bob DaBuilder')
+	
+	def test_class_page_can_take_post_request(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		request = HttpRequest()
+		request.method = "POST"
+		bob = Student.objects.get(name="Bob DaBuilder")
+		request.POST['studentnames'] = bob.name
 
+		response = student_page(request, "/EG5000/")
+
+		self.assertEqual(response.status_code, 302)
+		
+	def test_class_page_redirects_to_student_url(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		request = HttpRequest()
+		request.method = 'POST'
+		student = Student.objects.get(name="Bob DaBuilder")
+		request.POST['studentnames'] = student.name
+
+		response = student_page(request, "/EG5000/")
+		
+		self.assertEqual(response.status_code, 302)
+		
+		self.assertEqual(response['location'], '/EG5000/bobdabuilder/')	
+
+class StudentandRubricViewTest(TestCase):
+
+	def add_two_classes_to_semester_add_two_students_to_class(self):
+		first_semester = Semester.objects.create(text='201530')
+		edClass = EdClasses.objects.create(name='EG 5000') 
+		edClass2 = EdClasses.objects.create(name='EG 6000')
+		
+		first_semester.classes.add(edClass)
+		first_semester.classes.add(edClass2)
+		
+		bob = Student.objects.create(name="Bob DaBuilder")
+		jane = Student.objects.create(name="Jane Doe")
+
+		edClass.students.add(bob)
+		edClass.students.add(jane)
+		edClass2.students.add(bob)
+	
+	def test_studentandrubric_view_returns_correct_template(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		response = self.client.get("/EG5000/bobdabuilder/")
+		self.assertTemplateUsed(response, 'rubric.html')
+		
+	def test_student_and_rubric_view_shows_student_name(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		response = self.client.get("/EG5000/bobdabuilder/")
+		self.assertContains(response, "Bob DaBuilder")
+		
+		
 
 class ClassAndSemesterModelTest(TestCase):
 	
