@@ -36,10 +36,11 @@ def student_page(request, edclass):
 	students = Student.objects.filter(edclasses__name=edClassSpaceAdded)
 	if request.method == 'POST':
 		#Why is adding the forward slash unneccessary?
-		return redirect(edclass +re.sub('[\s+]', '', request.POST['studentnames']).lower() + '/')
+		#Why does the redirect no need the edclass added to the beginning?
+		return redirect(re.sub('[\s+]', '', request.POST['studentnames']).lower() + '/')
 	return render(request, 'student.html', {'students': students})
 # Create your views here
 
 def rubric_page(request, edclass, studentname):
 	student = Student.objects.get(name="Bob DaBuilder")
-	return render(request, 'rubric.html', {'studentname': studentname})
+	return render(request, 'rubric.html', {'studentname': student.name})
