@@ -2,7 +2,7 @@ from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from rubricapp.models import Semester, EdClasses, Student
+from rubricapp.models import Semester, EdClasses, Student, Enrollment
 from time import sleep
 
 class NewVisitorTest(FunctionalTest):
@@ -15,10 +15,12 @@ class NewVisitorTest(FunctionalTest):
 		semester.classes.add(edclass2)
 		
 		bob = Student.objects.create(name="Bob DaBuilder")
-		edclass1.students.add(bob)
 		jane = Student.objects.create(name="Jane Doe")
-		edclass1.students.add(jane)
 		
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
+		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)
+		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)
+		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
 	
 	def test_user_visits_inital_page(self):
 

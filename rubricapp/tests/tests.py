@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student
+from rubricapp.models import Semester, EdClasses, Student, Enrollment
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
@@ -121,12 +121,14 @@ class ClassViewTest(TestCase):
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
 		
+		
 		bob = Student.objects.create(name="Bob DaBuilder")
 		jane = Student.objects.create(name="Jane Doe")
 
-		edClass.students.add(bob)
-		edClass.students.add(jane)
-		edClass2.students.add(bob)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
+		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
+		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
+		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)
 	
 	
 	def create_two_semesters_for_unit_tests(self):
@@ -191,12 +193,14 @@ class StudentandRubricViewTest(TestCase):
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
 		
+		
 		bob = Student.objects.create(name="Bob DaBuilder")
 		jane = Student.objects.create(name="Jane Doe")
 
-		edClass.students.add(bob)
-		edClass.students.add(jane)
-		edClass2.students.add(bob)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
+		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
+		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
+		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)
 	
 	def test_studentandrubric_view_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
@@ -220,13 +224,15 @@ class ClassAndSemesterModelTest(TestCase):
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
 		
+		
 		bob = Student.objects.create(name="Bob DaBuilder")
 		jane = Student.objects.create(name="Jane Doe")
 
-		edClass.students.add(bob)
-		edClass.students.add(jane)
-		edClass2.students.add(bob)
-	
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
+		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
+		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
+		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)
+		
 		
 	def test_model_for_semesters(self):
 		first_semester = Semester()
@@ -276,5 +282,6 @@ class ClassAndSemesterModelTest(TestCase):
 		
 		jane = Student.objects.get(name="Jane Doe")
 		bob = Student.objects.get(name="Bob DaBuilder")
+		
 		self.assertQuerysetEqual(oneclass.students.filter(name="Jane Doe"), [repr(jane)])
 		self.assertQuerysetEqual(twoclass.students.filter(name="Bob DaBuilder"), [repr(bob)])

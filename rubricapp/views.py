@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from rubricapp.models import Semester, EdClasses, Student
+from rubricapp.forms import RubricForm
 import re
 
 def home_page(request):
@@ -42,5 +43,6 @@ def student_page(request, edclass):
 # Create your views here
 
 def rubric_page(request, edclass, studentname):
+	form = RubricForm()
 	student = Student.objects.get(name="Bob DaBuilder")
-	return render(request, 'rubric.html', {'studentname': student.name})
+	return render(request, 'rubric.html', {'studentname': student.name, 'form':form})

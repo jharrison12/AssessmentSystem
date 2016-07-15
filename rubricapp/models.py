@@ -6,7 +6,7 @@ class Student(models.Model):
 
 class EdClasses(models.Model):
 	name = models.TextField(default='')
-	students = models.ManyToManyField(Student)
+	students = models.ManyToManyField(Student, through="Enrollment")
 	def __str__(self):
 		return self.name
 		
@@ -16,4 +16,6 @@ class Semester(models.Model):
 	def __str__(self):
 		return self.text
 
-
+class Enrollment(models.Model):
+	student = models.ForeignKey(Student)
+	edclass = models.ForeignKey(EdClasses)
