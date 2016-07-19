@@ -125,7 +125,7 @@ class ClassViewTest(TestCase):
 		bob = Student.objects.create(name="Bob DaBuilder")
 		jane = Student.objects.create(name="Jane Doe")
 
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, grade="Excellent")
 		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
 		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
 		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)
@@ -211,7 +211,16 @@ class StudentandRubricViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		response = self.client.get("/EG5000/bobdabuilder/")
 		self.assertContains(response, "Bob DaBuilder")
-		
+	
+	def test_student_and_rubric_view_has_excellent_grade(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		response = self.client.get("/EG5000/bobdabuilder/")
+		self.assertContains(response, "Excellent")
+	
+	def test_rubric_shows_a_cell_under_excellent(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		response = self.client.get("/EG5000/bobdabuilder/")
+		self.assertContains(response, "Greatest writing ever")
 		
 
 class ClassAndSemesterModelTest(TestCase):
@@ -228,7 +237,7 @@ class ClassAndSemesterModelTest(TestCase):
 		bob = Student.objects.create(name="Bob DaBuilder")
 		jane = Student.objects.create(name="Jane Doe")
 
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, grade="Excellent")
 		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
 		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
 		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)
@@ -285,3 +294,16 @@ class ClassAndSemesterModelTest(TestCase):
 		
 		self.assertQuerysetEqual(oneclass.students.filter(name="Jane Doe"), [repr(jane)])
 		self.assertQuerysetEqual(twoclass.students.filter(name="Bob DaBuilder"), [repr(bob)])
+	
+	def test_enrollment_model_creates_correct_number_of_enrollments(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		enrollments = Enrollment.objects.all()
+
+		self.assertEqual(enrollments.count(),4)
+	
+	def test_students_link_to_enrollments(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		edclass1 = EdClasses.objects.get(name="EG 5000")
+		bob = Student.objects.get(name="Bob DaBuilder")
+		bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
+		self.assertEqual(bobenrollment.grade, "Excellent")

@@ -2,6 +2,9 @@ from django.db import models
 
 class Student(models.Model):
 	name = models.TextField(default="")	
+	
+	def __str__(self):
+		return self.name
 	#TODO add models
 
 class EdClasses(models.Model):
@@ -19,3 +22,5 @@ class Semester(models.Model):
 class Enrollment(models.Model):
 	student = models.ForeignKey(Student)
 	edclass = models.ForeignKey(EdClasses)
+	grade = models.TextField(default='') 
+	

@@ -74,5 +74,6 @@ class NewVisitorTest(FunctionalTest):
 		studentnameheader = self.browser.find_element_by_id('studentheader')
 		
 		#A rubric should appear based upon the key assignment 
+		rubricheader = self.browser.find_element_by_id('rubricheader')
 		#The rubric should allow the professor to click on a matrix of rows
 		#The dr. clicks on "submit" the student data is submited to a database
