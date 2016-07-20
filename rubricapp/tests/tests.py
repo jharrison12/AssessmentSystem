@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
@@ -221,6 +221,32 @@ class StudentandRubricViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		response = self.client.get("/EG5000/bobdabuilder/")
 		self.assertContains(response, "Greatest writing ever")
+
+class TestRubricModel(TestCase):
+			
+	def create_rubric_and_rows_connect_to_class(self):
+		first_semester = Semester.objects.create(text='201530')
+		edClass = EdClasses.objects.create(name='EG 5000') 
+		first_semester.classes.add(edClass)
+		writingrubric = Rubric.objects.create(name="writingrubric")
+		
+		bob = Student.objects.create(name="Bob DaBuilder")
+		row1 = Row.objects.create(excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+	
+		
+		
+		#writingrubric.add(row1)
+
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
+		bobenrollment.keyrubric.add(writingrubric)
+		
+	def test_rubric_connected_with_enrollment_class(self):
+		self.create_rubric_and_rows_connect_to_class()
+		rubrics = Rubric.objects.all()
+		self.assertEqual(rubrics.count(), 1)
 		
 
 class ClassAndSemesterModelTest(TestCase):
@@ -307,3 +333,7 @@ class ClassAndSemesterModelTest(TestCase):
 		bob = Student.objects.get(name="Bob DaBuilder")
 		bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
 		self.assertEqual(bobenrollment.grade, "Excellent")
+	
+	def test_grade_model_links_to_enrollments(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		#gradeForClass = Enrollment.objects.get
