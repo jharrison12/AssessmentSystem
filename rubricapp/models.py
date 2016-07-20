@@ -40,6 +40,9 @@ class Row(models.Model):
 	satisfactorytext = models.TextField(default="")
 	unsatisfactorytext = models.TextField(default="")
 	
+	def __str__(self):
+		return self.row_choice
+	
 		
 class Enrollment(models.Model):
 	student = models.ForeignKey(Student)

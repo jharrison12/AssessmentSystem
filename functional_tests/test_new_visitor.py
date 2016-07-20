@@ -2,7 +2,7 @@ from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from rubricapp.models import Semester, EdClasses, Student, Enrollment
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row
 from time import sleep
 
 class NewVisitorTest(FunctionalTest):
@@ -21,7 +21,20 @@ class NewVisitorTest(FunctionalTest):
 		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)
 		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)
 		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
+		writingrubric = Rubric.objects.create(name="writingrubric")
+		
+		row1 = Row.objects.create(excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
 	
+		
+		
+		#Many to many relationship must be added after creation of objects
+		#because the manyto-many relationship is not a column in the database
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
+		bobenrollment.keyrubric.add(writingrubric)
+		
 	def test_user_visits_inital_page(self):
 
 		# Dr. visits the webpage

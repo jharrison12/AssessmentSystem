@@ -1,17 +1,11 @@
 from django import forms
+from django.forms import ModelForm
+from rubricapp.models import Rubric, Row
 
-class RubricForm(forms.Form):
-	CHOICES = (('1', 'Excellent',), ('2', 'Quite Awful',),('3', "Abysmal",),("4", "No"))
-	name = "Writing Rubric"
-	row1 = forms.ChoiceField(
-		widget=forms.Select, choices=CHOICES
-		)
-	row2 = forms.ChoiceField(
-		widget=forms.Select, choices=CHOICES
-		)
-	row3 = forms.ChoiceField(
-		widget=forms.Select, choices=CHOICES
-		)
-	row4 = forms.ChoiceField(
-		widget=forms.Select, choices=CHOICES
-		)
+
+class RubricForm(ModelForm):
+	rows = forms.ModelChoiceField(queryset=Row.objects.all())
+	
+	class Meta:
+		model = Rubric
+		fields = ['rows']

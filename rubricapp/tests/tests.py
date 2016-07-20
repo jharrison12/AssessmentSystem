@@ -238,8 +238,8 @@ class TestRubricModel(TestCase):
 	
 		
 		
-		#writingrubric.add(row1)
-
+		#Many to many relationship must be added after creation of objects
+		#because the manyto-many relationship is not a column in the database
 		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
 		bobenrollment.keyrubric.add(writingrubric)
 		
