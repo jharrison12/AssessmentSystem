@@ -1,10 +1,12 @@
 from django.db import models
 
 class Student(models.Model):
-	name = models.TextField(default="")	
+	firstname = models.TextField(default="")	
+	lastname = models.TextField(default="")
+	lnumber = models.TextField(default="")
 	
 	def __str__(self):
-		return self.name
+		return self.lnumber
 	#TODO add models
 
 class EdClasses(models.Model):
@@ -20,21 +22,22 @@ class Semester(models.Model):
 		return self.text
 		
 class Rubric(models.Model):
-	name = models.TextField(default="Basic Rubric", null=True)
+	name = models.TextField(default="Basic Rubric")
 	
 	def __str__(self):
-		return self.text
+		return self.name
 	
 	
 class Row(models.Model):
 	CHOICES = (
-	(1, 'Excellent'),
-	(2, 'Proficient'),
-	(3, 'Awful'),
-	(4, 'The worst ever'),
+	(None, 'Your string for display'),
+	(1,'Excellent'),
+	(2,'Proficient'),
+	(3,'Awful'),
+	(4,'The worst ever'),
 	)
 	rubric = models.ForeignKey(Rubric)
-	row_choice = models.CharField(max_length=4,choices=CHOICES, default=1,)
+	row_choice = models.CharField(max_length=20,choices=CHOICES)
 	excellenttext = models.TextField(default="")
 	proficienttext = models.TextField(default="")
 	satisfactorytext = models.TextField(default="")

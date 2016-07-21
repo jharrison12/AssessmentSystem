@@ -3,10 +3,10 @@
 		{% block headerid%}choosename{% endblock %}{% block header_text %}Choose a Name{% endblock %}
 		
 		{% block form %}
-		<form method="POST" action={{ student.name }}>
+		<form method="POST" action={{ student.lnumber }}>
 			<select name="studentnames" id="studentdropdown">
 				{% for student in students %}
-				<option name="{{ student.name }}">{{ student.name }}</option>
+				<option value="{{ student.lnumber }}" id={{ student.lnumber }}>{{ student.firstname }} {{ student.lastname }}</option>
 				{% endfor %}
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="studentsubmit">

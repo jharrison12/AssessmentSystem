@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from rubricapp.models import Semester, EdClasses, Student
-from rubricapp.forms import RubricForm
+from rubricapp.models import Semester, EdClasses, Student, Enrollment
+from rubricapp.forms import RowForm
 import re
 
 def home_page(request):
@@ -38,11 +38,11 @@ def student_page(request, edclass):
 	if request.method == 'POST':
 		#Why is adding the forward slash unneccessary?
 		#Why does the redirect no need the edclass added to the beginning?
-		return redirect(re.sub('[\s+]', '', request.POST['studentnames']).lower() + '/')
+		return redirect(re.sub('[\s+]', '', request.POST['studentnames']) + '/')
 	return render(request, 'student.html', {'students': students})
-# Create your views here
 
 def rubric_page(request, edclass, studentname):
-	form = RubricForm()
-	student = Student.objects.get(name="Bob DaBuilder")
-	return render(request, 'rubric.html', {'studentname': student.name, 'form':form})
+	form = RowForm()
+	#enrollmentObj = Enrollment.objects.filter(edclass__name=edclass,student__lnumber=studentname)
+	student = Student.objects.get(lnumber="21743148")
+	return render(request, 'rubric.html', {'studentname': student.lastname + ", " + student.firstname, 'form':form})

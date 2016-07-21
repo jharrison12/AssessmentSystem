@@ -14,8 +14,8 @@ class NewVisitorTest(FunctionalTest):
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
-		bob = Student.objects.create(name="Bob DaBuilder")
-		jane = Student.objects.create(name="Jane Doe")
+		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
+		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
 		
 		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
 		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)

@@ -122,9 +122,8 @@ class ClassViewTest(TestCase):
 		first_semester.classes.add(edClass2)
 		
 		
-		bob = Student.objects.create(name="Bob DaBuilder")
-		jane = Student.objects.create(name="Jane Doe")
-
+		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
+		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
 		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, grade="Excellent")
 		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
 		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
@@ -163,8 +162,8 @@ class ClassViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		request = HttpRequest()
 		request.method = "POST"
-		bob = Student.objects.get(name="Bob DaBuilder")
-		request.POST['studentnames'] = bob.name
+		bob = Student.objects.get(lnumber="21743148")
+		request.POST['studentnames'] = bob.lnumber
 
 		response = student_page(request, "/EG5000/")
 
@@ -174,14 +173,14 @@ class ClassViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		request = HttpRequest()
 		request.method = 'POST'
-		student = Student.objects.get(name="Bob DaBuilder")
-		request.POST['studentnames'] = student.name
+		student = Student.objects.get(lnumber="21743148")
+		request.POST['studentnames'] = student.lnumber
 
 		response = student_page(request, "/EG5000/")
 		
 		self.assertEqual(response.status_code, 302)
 		
-		self.assertEqual(response['location'], 'bobdabuilder/')	
+		self.assertEqual(response['location'], '21743148/')	
 
 class StudentandRubricViewTest(TestCase):
 
@@ -194,8 +193,8 @@ class StudentandRubricViewTest(TestCase):
 		first_semester.classes.add(edClass2)
 		
 		
-		bob = Student.objects.create(name="Bob DaBuilder")
-		jane = Student.objects.create(name="Jane Doe")
+		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
+		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
 
 		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
 		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
@@ -204,23 +203,23 @@ class StudentandRubricViewTest(TestCase):
 	
 	def test_studentandrubric_view_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		response = self.client.get("/EG5000/bobdabuilder/")
+		response = self.client.get("/EG5000/21743148/")
 		self.assertTemplateUsed(response, 'rubric.html')
 		
 	def test_student_and_rubric_view_shows_student_name(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		response = self.client.get("/EG5000/bobdabuilder/")
-		self.assertContains(response, "Bob DaBuilder")
+		response = self.client.get("/EG5000/21743148/")
+		self.assertContains(response, "DaBuilder, Bob")
 	
 	def test_student_and_rubric_view_has_excellent_grade(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		response = self.client.get("/EG5000/bobdabuilder/")
+		response = self.client.get("/EG5000/21743148/")
 		self.assertContains(response, "Excellent")
 	
 	def test_rubric_shows_a_cell_under_excellent(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		response = self.client.get("/EG5000/bobdabuilder/")
-		self.assertContains(response, "Greatest writing ever")
+		response = self.client.get("/EG5000/21743148/")
+		self.assertContains(response, "Greatest Writing Ever")
 
 class TestRubricModel(TestCase):
 			
@@ -230,7 +229,9 @@ class TestRubricModel(TestCase):
 		first_semester.classes.add(edClass)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 		
-		bob = Student.objects.create(name="Bob DaBuilder")
+		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
+		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
+		
 		row1 = Row.objects.create(excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
@@ -248,7 +249,32 @@ class TestRubricModel(TestCase):
 		rubrics = Rubric.objects.all()
 		self.assertEqual(rubrics.count(), 1)
 		
-
+	def test_to_make_sure_enrollment_object_matches_with_rubric(self):
+		self.create_rubric_and_rows_connect_to_class()
+		bob = Student.objects.get(lnumber="21743148")
+		edClass = EdClasses.objects.get(name='EG 5000')
+		enrollmentObj = Enrollment.objects.get(student=bob, edclass=edClass)
+		#should get the only rubric attached to the object
+		writingrubric = enrollmentObj.keyrubric.get()
+		self.assertEqual(writingrubric.name, "writingrubric")
+	
+	def test_rubric_object_only_has_one_row(self):
+		self.create_rubric_and_rows_connect_to_class()
+		writingrubric = Rubric.objects.get(name="writingrubric")
+		rows = Row.objects.filter(rubric=writingrubric)
+		self.assertEqual(rows.count(), 1)
+	
+	def test_rubric_object_connects_with_multiple_rows(self):
+		#This test is more for the developer than the application.
+		self.create_rubric_and_rows_connect_to_class()
+		writingrubric = Rubric.objects.get(name="writingrubric")
+		row2 = Row.objects.create(excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+		rows = Row.objects.filter(rubric=writingrubric)
+		self.assertEqual(rows.count(), 2)
+		
 class ClassAndSemesterModelTest(TestCase):
 	
 	def add_two_classes_to_semester_add_two_students_to_class(self):
@@ -260,8 +286,8 @@ class ClassAndSemesterModelTest(TestCase):
 		first_semester.classes.add(edClass2)
 		
 		
-		bob = Student.objects.create(name="Bob DaBuilder")
-		jane = Student.objects.create(name="Jane Doe")
+		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
+		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
 
 		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, grade="Excellent")
 		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
@@ -315,11 +341,11 @@ class ClassAndSemesterModelTest(TestCase):
 		oneclass = EdClasses.objects.get(name="EG 5000")
 		twoclass = EdClasses.objects.get(name="EG 6000")
 		
-		jane = Student.objects.get(name="Jane Doe")
-		bob = Student.objects.get(name="Bob DaBuilder")
+		jane = Student.objects.get(lnumber="21743149")
+		bob = Student.objects.get(lnumber="21743148")
 		
-		self.assertQuerysetEqual(oneclass.students.filter(name="Jane Doe"), [repr(jane)])
-		self.assertQuerysetEqual(twoclass.students.filter(name="Bob DaBuilder"), [repr(bob)])
+		self.assertQuerysetEqual(oneclass.students.filter(lnumber="21743149"), [repr(jane)])
+		self.assertQuerysetEqual(twoclass.students.filter(lnumber="21743148"), [repr(bob)])
 	
 	def test_enrollment_model_creates_correct_number_of_enrollments(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
@@ -330,10 +356,10 @@ class ClassAndSemesterModelTest(TestCase):
 	def test_students_link_to_enrollments(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		edclass1 = EdClasses.objects.get(name="EG 5000")
-		bob = Student.objects.get(name="Bob DaBuilder")
+		bob = Student.objects.get(lnumber="21743148")
 		bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
 		self.assertEqual(bobenrollment.grade, "Excellent")
 	
 	def test_grade_model_links_to_enrollments(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		#gradeForClass = Enrollment.objects.get
+		
