@@ -27,6 +27,12 @@ class NewVisitorTest(FunctionalTest):
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
 								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+								  
+		row2 = Row.objects.create(excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+		
 	
 		
 		

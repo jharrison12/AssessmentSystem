@@ -37,7 +37,7 @@ class Row(models.Model):
 	(4,'The worst ever'),
 	)
 	rubric = models.ForeignKey(Rubric)
-	row_choice = models.CharField(max_length=20,choices=CHOICES)
+	row_choice = models.CharField(max_length=20,choices=CHOICES, default="None", blank=True)
 	excellenttext = models.TextField(default="")
 	proficienttext = models.TextField(default="")
 	satisfactorytext = models.TextField(default="")

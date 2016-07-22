@@ -48,4 +48,9 @@ def rubric_page(request, edclass, studentname):
 	rubricForClass = enrollmentObj.keyrubric.get()
 	rows = Row.objects.filter(rubric=rubricForClass)
 	student = Student.objects.get(lnumber=studentname)
+	if request.method == 'POST':
+		form = RowForm(request.POST)
+		if form.is_valid():
+			form.save()
+		return redirect('/'+'edclass' + '/')
 	return render(request, 'rubric.html', {'studentname': student.lastname + ", " + student.firstname, 'form':form, 'rows':rows})

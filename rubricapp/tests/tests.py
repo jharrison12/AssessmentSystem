@@ -3,7 +3,7 @@ from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, R
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
-from rubricapp.views import home_page, semester_page, student_page
+from rubricapp.views import home_page, semester_page, student_page, rubric_page
 from django.core.urlresolvers import resolve
 
 class HomePageTest(TestCase):
@@ -232,6 +232,36 @@ class StudentandRubricViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		response = self.client.get("/EG5000/21743148/")
 		self.assertContains(response, "THE BEST!")
+	
+	def test_rubric_page_can_take_post_request(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		#response = self.client.get("/EG5000/21743148/")
+		request = HttpRequest()
+		request.method = 'POST'
+		request.POST['id_row_choice'] = 1
+		
+		response = rubric_page(request, "EG5000", "21743148" )
+		self.assertEqual(response.status_code, 302)
+		#TODO finish this
+		
+	def test_post_request_updates_correct_model(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		request = HttpRequest()
+		request.method = 'POST'
+		request.POST['id_row_choice'] = 2
+		
+		response = rubric_page(request, "EG5000", "21743148")
+		edClass = EdClasses.objects.get(name='EG 5000') 
+		bob = Student.objects.get(lnumber="21743148")
+		bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
+		writingrubric = bobenrollment.keyrubric.get(name="writingrubric")
+		row = Row.objects.get(rubric=writingrubric)
+		
+		#row.row_choice = 1
+		
+		self.assertEqual(row.row_choice, 2)
+
+		
 
 class TestRubricModel(TestCase):
 			
@@ -288,7 +318,7 @@ class TestRubricModel(TestCase):
 		self.assertEqual(rows.count(), 2)
 	
 	def test_query_to_pull_rubric_and_check_text(self):
-		#Check that row object can be filted based upon text
+		#Check that row object can be filtered based upon text
 		self.create_rubric_and_rows_connect_to_class()
 		writingrubric = Rubric.objects.get(name="writingrubric")
 		row2 = Row.objects.create(excellenttext="THE GREATEST!", 
