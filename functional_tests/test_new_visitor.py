@@ -32,7 +32,6 @@ class NewVisitorTest(FunctionalTest):
 		
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
 		bobenrollment.keyrubric.add(writingrubric)
 		
 	def test_user_visits_inital_page(self):
@@ -83,9 +82,9 @@ class NewVisitorTest(FunctionalTest):
 		submitbutton.send_keys(Keys.ENTER) 
 		
 		#A new page should appear with the students name 
-		sleep(4)
+		sleep(20)
 		studentnameheader = self.browser.find_element_by_id('studentheader')
-		
+			
 		#A rubric should appear based upon the key assignment 
 		rubricheader = self.browser.find_element_by_id('rubricheader')
 		#The rubric should allow the professor to click on a matrix of rows

@@ -188,7 +188,7 @@ class StudentandRubricViewTest(TestCase):
 		first_semester = Semester.objects.create(text='201530')
 		edClass = EdClasses.objects.create(name='EG 5000') 
 		edClass2 = EdClasses.objects.create(name='EG 6000')
-		
+		writingrubric = Rubric.objects.create(name="writingrubric")
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
 		
@@ -200,6 +200,18 @@ class StudentandRubricViewTest(TestCase):
 		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
 		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
 		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)
+		
+		row1 = Row.objects.create(excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+	
+		
+		
+		#Many to many relationship must be added after creation of objects
+		#because the manyto-many relationship is not a column in the database
+
+		bobenrollment.keyrubric.add(writingrubric)
 	
 	def test_studentandrubric_view_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
@@ -219,7 +231,7 @@ class StudentandRubricViewTest(TestCase):
 	def test_rubric_shows_a_cell_under_excellent(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		response = self.client.get("/EG5000/21743148/")
-		self.assertContains(response, "Greatest Writing Ever")
+		self.assertContains(response, "THE BEST!")
 
 class TestRubricModel(TestCase):
 			
@@ -274,6 +286,17 @@ class TestRubricModel(TestCase):
 								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
 		rows = Row.objects.filter(rubric=writingrubric)
 		self.assertEqual(rows.count(), 2)
+	
+	def test_query_to_pull_rubric_and_check_text(self):
+		#Check that row object can be filted based upon text
+		self.create_rubric_and_rows_connect_to_class()
+		writingrubric = Rubric.objects.get(name="writingrubric")
+		row2 = Row.objects.create(excellenttext="THE GREATEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+		rows = Row.objects.get(excellenttext="THE GREATEST!")
+		self.assertIn(rows.proficienttext, "THE SECOND BEST!")
 		
 class ClassAndSemesterModelTest(TestCase):
 	
@@ -360,6 +383,5 @@ class ClassAndSemesterModelTest(TestCase):
 		bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
 		self.assertEqual(bobenrollment.grade, "Excellent")
 	
-	def test_grade_model_links_to_enrollments(self):
-		self.add_two_classes_to_semester_add_two_students_to_class()
+
 		

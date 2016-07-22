@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from rubricapp.models import Semester, EdClasses, Student, Enrollment
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row
 from rubricapp.forms import RowForm
 import re
 
@@ -43,6 +43,9 @@ def student_page(request, edclass):
 
 def rubric_page(request, edclass, studentname):
 	form = RowForm()
-	#enrollmentObj = Enrollment.objects.filter(edclass__name=edclass,student__lnumber=studentname)
-	student = Student.objects.get(lnumber="21743148")
-	return render(request, 'rubric.html', {'studentname': student.lastname + ", " + student.firstname, 'form':form})
+	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
+	enrollmentObj = Enrollment.objects.get(edclass__name=edClassSpaceAdded, student__lnumber=studentname)
+	rubricForClass = enrollmentObj.keyrubric.get()
+	rows = Row.objects.filter(rubric=rubricForClass)
+	student = Student.objects.get(lnumber=studentname)
+	return render(request, 'rubric.html', {'studentname': student.lastname + ", " + student.firstname, 'form':form, 'rows':rows})

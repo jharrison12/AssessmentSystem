@@ -8,16 +8,17 @@
 		<!-- TODO fix this so that it pulls from forms.py -->
 			<tr>
 				<th></th>
-				<th></th>
 				<th>Excellent</th>
 				<th>Proficient</th>
 				<th>Sub-par</th>
 				<th>Abysmal</th>
 			</tr>
-			{{ form }}
-			{{ form }}
-			{{ form }}
-			{{ form }}
+			{% for row in rows %}
+				<tr>
+					<td>{{ form.row_choice }}</td><td>{{ row.excellenttext }}</td><td>{{ row.proficienttext }}</td><td>{{ row.satisfactorytext }}<td>{{ row.unsatisfactorytext }}</td>
+				</tr>
+			{% endfor %}
+
 		</table>
 
 		{% endblock %}
