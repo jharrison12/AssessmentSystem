@@ -4,6 +4,7 @@
 		{% block header_text %}Student name: {{ studentname }}{% endblock %}
 		{% block form %}
 		<h3 id="rubricheader">TODO Pull model into view</h3>
+		<form method="POST" action= {% url 'rubricpage' edclass=edclass studentname=studentlnumber %}>
 		<table border="1">
 		<!-- TODO fix this so that it pulls from forms.py -->
 			<tr>
@@ -13,14 +14,17 @@
 				<th>Sub-par</th>
 				<th>Abysmal</th>
 			</tr>
-			{% for row in rows %}
-				<tr>
-					<td>{{ form.row_choice }}</td><td>{{ row.excellenttext }}</td><td>{{ row.proficienttext }}</td><td>{{ row.satisfactorytext }}<td>{{ row.unsatisfactorytext }}</td>
-				</tr>
-			{% endfor %}
-
+			{{ formset.management_form }}
+				{% for form in formset %}
+					{{ form.id }}
+					<tr>
+						<td>{{ form.row_choice }}</td><td>{{ form.excellenttext }}</td><td>{{ form.proficienttext }}</td><td>{{ form.satisfactorytext }}<td>{{ form.unsatisfactorytext }}</td>
+					</tr>
+				{% endfor %}
 		</table>
-
+			<input name="submitbutton" type="submit" name="submit" value="Submit" id="rubricsubmit">
+		{% csrf_token %}
+		</form>
 		{% endblock %}
 		
 	

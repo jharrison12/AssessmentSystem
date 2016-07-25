@@ -1,6 +1,7 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, formset_factory, modelformset_factory, inlineformset_factory
 from rubricapp.models import Rubric, Row
+
 
 class RowForm(ModelForm):
 	class Meta:
@@ -11,3 +12,5 @@ class RubricForm(ModelForm):
 	class Meta:
 		model = Rubric
 		fields = ['name']
+
+RowFormSet = modelformset_factory(Row, fields=('row_choice',))

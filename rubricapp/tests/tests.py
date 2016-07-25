@@ -184,7 +184,7 @@ class ClassViewTest(TestCase):
 
 class StudentandRubricViewTest(TestCase):
 
-	def add_two_classes_to_semester_add_two_students_to_class(self):
+	def add_two_classes_to_semester_add_two_students_to_class_add_one_row(self):
 		first_semester = Semester.objects.create(text='201530')
 		edClass = EdClasses.objects.create(name='EG 5000') 
 		edClass2 = EdClasses.objects.create(name='EG 6000')
@@ -214,27 +214,27 @@ class StudentandRubricViewTest(TestCase):
 		bobenrollment.keyrubric.add(writingrubric)
 	
 	def test_studentandrubric_view_returns_correct_template(self):
-		self.add_two_classes_to_semester_add_two_students_to_class()
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/EG5000/21743148/")
 		self.assertTemplateUsed(response, 'rubric.html')
 		
 	def test_student_and_rubric_view_shows_student_name(self):
-		self.add_two_classes_to_semester_add_two_students_to_class()
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/EG5000/21743148/")
 		self.assertContains(response, "DaBuilder, Bob")
 	
 	def test_student_and_rubric_view_has_excellent_grade(self):
-		self.add_two_classes_to_semester_add_two_students_to_class()
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/EG5000/21743148/")
 		self.assertContains(response, "Excellent")
 	
 	def test_rubric_shows_a_cell_under_excellent(self):
-		self.add_two_classes_to_semester_add_two_students_to_class()
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/EG5000/21743148/")
 		self.assertContains(response, "THE BEST!")
 	
 	def test_rubric_page_can_take_post_request(self):
-		self.add_two_classes_to_semester_add_two_students_to_class()
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		#response = self.client.get("/EG5000/21743148/")
 		request = HttpRequest()
 		request.method = 'POST'
@@ -244,20 +244,36 @@ class StudentandRubricViewTest(TestCase):
 		self.assertEqual(response.status_code, 302)
 		#TODO finish this
 		
-	def test_post_request_updates_correct_model(self):
-		self.add_two_classes_to_semester_add_two_students_to_class()
+	def test_post_request_does_not_create_new_row(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		request = HttpRequest()
+		edClass = EdClasses.objects.get(name='EG 5000') 
+		bob = Student.objects.get(lnumber="21743148")
+		bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
+		writingrubric = bobenrollment.keyrubric.get(name="writingrubric")
+		
+		row = Row.objects.filter(rubric=writingrubric)
+		self.assertEqual(row.count(), 1)
 		request.method = 'POST'
 		request.POST['id_row_choice'] = 2
-		
 		response = rubric_page(request, "EG5000", "21743148")
+		
+		self.assertEqual(row.count(), 1)
+	
+	def test_post_request_updates_correct_model(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+		
 		edClass = EdClasses.objects.get(name='EG 5000') 
 		bob = Student.objects.get(lnumber="21743148")
 		bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
 		writingrubric = bobenrollment.keyrubric.get(name="writingrubric")
 		row = Row.objects.get(rubric=writingrubric)
 		
-		#row.row_choice = 1
+		request = HttpRequest()
+		request.method = 'POST'
+		request.POST['id_1-row_choice'] = 2
+		
+		response = rubric_page(request, "EG5000", "21743148")
 		
 		self.assertEqual(row.row_choice, 2)
 

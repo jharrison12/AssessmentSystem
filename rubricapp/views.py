@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row
-from rubricapp.forms import RowForm
+from rubricapp.forms import RowForm, RowFormSet
 import re
 
 def home_page(request):
@@ -41,16 +41,18 @@ def student_page(request, edclass):
 		return redirect(re.sub('[\s+]', '', request.POST['studentnames']) + '/')
 	return render(request, 'student.html', {'students': students})
 
+#TODO fix studentname variable.  Change to studentlnumber
 def rubric_page(request, edclass, studentname):
-	form = RowForm()
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
 	enrollmentObj = Enrollment.objects.get(edclass__name=edClassSpaceAdded, student__lnumber=studentname)
 	rubricForClass = enrollmentObj.keyrubric.get()
 	rows = Row.objects.filter(rubric=rubricForClass)
 	student = Student.objects.get(lnumber=studentname)
 	if request.method == 'POST':
-		form = RowForm(request.POST)
-		if form.is_valid():
-			form.save()
-		return redirect('/'+'edclass' + '/')
-	return render(request, 'rubric.html', {'studentname': student.lastname + ", " + student.firstname, 'form':form, 'rows':rows})
+		formset = RowFormSet(request.POST, queryset=Row.objects.filter(rubric=rubricForClass))
+		if formset.is_valid():
+			formset.save()
+		return redirect('/'+ edclass + '/')
+	else:
+		formset = RowFormSet(queryset=Row.objects.filter(rubric=rubricForClass))
+		return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'formset':formset, 'rows':rows, 'edclass':edclass})
