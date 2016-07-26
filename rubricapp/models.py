@@ -31,10 +31,10 @@ class Rubric(models.Model):
 class Row(models.Model):
 	CHOICES = (
 	(None, 'Your string for display'),
-	(1,'Excellent'),
-	(2,'Proficient'),
-	(3,'Awful'),
-	(4,'The worst ever'),
+	('1','Excellent'),
+	('2','Proficient'),
+	('3','Awful'),
+	('4','The worst ever'),
 	)
 	rubric = models.ForeignKey(Rubric)
 	row_choice = models.CharField(max_length=20,choices=CHOICES, default="None", blank=True)
@@ -53,4 +53,5 @@ class Enrollment(models.Model):
 	grade = models.TextField(default='') 
 	keyrubric = models.ManyToManyField(Rubric)
 	
+
 

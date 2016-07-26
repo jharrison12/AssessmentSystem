@@ -49,10 +49,17 @@ def rubric_page(request, edclass, studentname):
 	rows = Row.objects.filter(rubric=rubricForClass)
 	student = Student.objects.get(lnumber=studentname)
 	if request.method == 'POST':
-		formset = RowFormSet(request.POST, queryset=Row.objects.filter(rubric=rubricForClass))
-		if formset.is_valid():
-			formset.save()
-		return redirect('/'+ edclass + '/')
+		RowFormSetWeb = RowFormSet(request.POST, queryset=Row.objects.filter(rubric=rubricForClass))
+		RowFormSetWeb.clean()
+		if RowFormSetWeb.is_valid():
+			savedFormset = RowFormSetWeb.save(commit=False)
+			for i in savedFormset:
+				i.rubric = rubricForClass
+			RowFormSetWeb.save()
+			return redirect('/'+ edclass + '/')
+		else:
+			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
+			
 	else:
-		formset = RowFormSet(queryset=Row.objects.filter(rubric=rubricForClass))
-		return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'formset':formset, 'rows':rows, 'edclass':edclass})
+		RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricForClass))
+		return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})

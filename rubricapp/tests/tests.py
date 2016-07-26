@@ -238,7 +238,7 @@ class StudentandRubricViewTest(TestCase):
 		#response = self.client.get("/EG5000/21743148/")
 		request = HttpRequest()
 		request.method = 'POST'
-		request.POST['id_row_choice'] = 1
+		request.POST['id_form-0-row_choice'] = "1"
 		
 		response = rubric_page(request, "EG5000", "21743148" )
 		self.assertEqual(response.status_code, 302)
@@ -254,8 +254,8 @@ class StudentandRubricViewTest(TestCase):
 		
 		row = Row.objects.filter(rubric=writingrubric)
 		self.assertEqual(row.count(), 1)
-		request.method = 'POST'
-		request.POST['id_row_choice'] = 2
+		#request.method = 'POST'
+		#request.POST['id_form-0-row_choice'] = 2
 		response = rubric_page(request, "EG5000", "21743148")
 		
 		self.assertEqual(row.count(), 1)
@@ -269,9 +269,11 @@ class StudentandRubricViewTest(TestCase):
 		writingrubric = bobenrollment.keyrubric.get(name="writingrubric")
 		row = Row.objects.get(rubric=writingrubric)
 		
+		
+		
 		request = HttpRequest()
-		request.method = 'POST'
-		request.POST['id_1-row_choice'] = 2
+		#request.method = 'POST'
+		#request.POST['id_form-1-id'] = 2
 		
 		response = rubric_page(request, "EG5000", "21743148")
 		
