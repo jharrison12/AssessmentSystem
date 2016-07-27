@@ -13,4 +13,4 @@ class RubricForm(ModelForm):
 		model = Rubric
 		fields = ['name']
 
-RowFormSet = modelformset_factory(Row, fields=('row_choice',))
+RowFormSet = modelformset_factory(Row, fields=('row_choice',), extra=0) #extra=0 keeps the formset from creating new form

@@ -5,11 +5,10 @@ from rubricapp.forms import RowForm, RowFormSet
 import re
 
 def home_page(request):
-	
 	semester = Semester.objects.all()
 	#TODO CHANGE So that the view doesn't need to check for semester
 	#Objects
-	if (Semester.objects.all().exists()):
+	if Semester.objects.all().exists():
 		pass
 	else:
 		Semester.objects.create(text="201530")
@@ -43,23 +42,22 @@ def student_page(request, edclass):
 
 #TODO fix studentname variable.  Change to studentlnumber
 def rubric_page(request, edclass, studentname):
-	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
+	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass)
 	enrollmentObj = Enrollment.objects.get(edclass__name=edClassSpaceAdded, student__lnumber=studentname)
 	rubricForClass = enrollmentObj.keyrubric.get()
 	rows = Row.objects.filter(rubric=rubricForClass)
 	student = Student.objects.get(lnumber=studentname)
 	if request.method == 'POST':
-		RowFormSetWeb = RowFormSet(request.POST, queryset=Row.objects.filter(rubric=rubricForClass))
+		RowFormSetWeb = RowFormSet(request.POST)#, queryset=Row.objects.filter(rubric=rubricForClass))
 		RowFormSetWeb.clean()
 		if RowFormSetWeb.is_valid():
 			savedFormset = RowFormSetWeb.save(commit=False)
 			for i in savedFormset:
-				i.rubric = rubricForClass
+				i.rubric = rubricForClass 
 			RowFormSetWeb.save()
 			return redirect('/'+ edclass + '/')
 		else:
 			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
-			
 	else:
 		RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricForClass))
 		return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})

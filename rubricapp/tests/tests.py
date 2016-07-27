@@ -232,18 +232,17 @@ class StudentandRubricViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/EG5000/21743148/")
 		self.assertContains(response, "THE BEST!")
-	
+	#TODO FINISH THE THREE TESTS BELOW
+	@skip
 	def test_rubric_page_can_take_post_request(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		#response = self.client.get("/EG5000/21743148/")
 		request = HttpRequest()
-		request.method = 'POST'
-		request.POST['id_form-0-row_choice'] = "1"
-		
-		response = rubric_page(request, "EG5000", "21743148" )
+		request.method = "POST"
+		response = rubric_page(request, "EG5000", "21743148")
+
 		self.assertEqual(response.status_code, 302)
-		#TODO finish this
-		
+
+	@skip
 	def test_post_request_does_not_create_new_row(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		request = HttpRequest()
@@ -254,12 +253,12 @@ class StudentandRubricViewTest(TestCase):
 		
 		row = Row.objects.filter(rubric=writingrubric)
 		self.assertEqual(row.count(), 1)
-		#request.method = 'POST'
-		#request.POST['id_form-0-row_choice'] = 2
-		response = rubric_page(request, "EG5000", "21743148")
-		
+		response = self.client.get("/EG5000/21743148/")
+		response['id_form-0-row_choice'] = '2'
+
 		self.assertEqual(row.count(), 1)
-	
+
+	@skip
 	def test_post_request_updates_correct_model(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		
@@ -269,14 +268,14 @@ class StudentandRubricViewTest(TestCase):
 		writingrubric = bobenrollment.keyrubric.get(name="writingrubric")
 		row = Row.objects.get(rubric=writingrubric)
 		
-		
-		
-		request = HttpRequest()
+		#request = HttpRequest()
 		#request.method = 'POST'
 		#request.POST['id_form-1-id'] = 2
-		
-		response = rubric_page(request, "EG5000", "21743148")
-		
+		#response = rubric_page(request, "EG5000", "21743148")
+
+
+		response = self.client.get('/EG5000/21743148/', {'id_form-0-row_choice':"2"}, follow=True)
+		print(response.content)
 		self.assertEqual(row.row_choice, 2)
 
 		
