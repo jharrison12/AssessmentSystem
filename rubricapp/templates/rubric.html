@@ -15,20 +15,27 @@
 					<th>Sub-par</th>
 					<th>Abysmal</th>
 				</tr>
-					{{ RowFormSetWeb.management_form }}
-					{% for form in RowFormSetWeb %}
+
+						{{ RowFormSetWeb.management_form }}
+						{% for form in RowFormSetWeb %}
 						{{ form.id }}
 					<tr>
-						<td>{{ form.row_choice }}</td><td>{{ form.excellenttext }}</td><td>{{ form.proficienttext }}</td><td>{{ form.satisfactorytext }}<td>{{ form.unsatisfactorytext }}</td>
+						<td>{{ form.row_choice|default:"fail" }}</td>
+						<td>{{ form.excellenttext.value|default:"fail" }}</td>
+						<td>{{ form.proficienttext.value }}</td>
+						<td>{{ form.satisfactorytext.value }}</td>
+						<td>{{ form.unsatisfactorytext.value }}</td>
+
 					</tr>
 					{{ RowFormSetWeb.errors }}
 					{% endfor %}
+
 				
 			</table>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="rubricsubmit">
 		{% csrf_token %}
 		</form>
-		<p>THE BEST!</p>
+
 		{% endblock %}
 		
 	

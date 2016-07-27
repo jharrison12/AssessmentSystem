@@ -6,11 +6,11 @@ from rubricapp.models import Rubric, Row
 class RowForm(ModelForm):
 	class Meta:
 		model = Row
-		fields = ['row_choice']
-		
+		fields = ['row_choice', 'excellenttext','proficienttext', 'satisfactorytext','unsatisfactorytext']
+
 class RubricForm(ModelForm):
 	class Meta:
 		model = Rubric
 		fields = ['name']
 
-RowFormSet = modelformset_factory(Row, fields=('row_choice',), extra=0) #extra=0 keeps the formset from creating new form
+RowFormSet = modelformset_factory(Row, fields=('row_choice','excellenttext','proficienttext','satisfactorytext', 'unsatisfactorytext'), extra=0) #extra=0 keeps the formset from creating new form
