@@ -38,10 +38,10 @@ class Row(models.Model):
 	)
 	rubric = models.ForeignKey(Rubric)
 	row_choice = models.CharField(max_length=20,choices=CHOICES, default="None", blank=True)
-	excellenttext = models.TextField(default="")
-	proficienttext = models.TextField(default="")
-	satisfactorytext = models.TextField(default="")
-	unsatisfactorytext = models.TextField(default="")
+	excellenttext = models.TextField(default="", blank=True)
+	proficienttext = models.TextField(default="", blank=True)
+	satisfactorytext = models.TextField(default="", blank=True)
+	unsatisfactorytext = models.TextField(default="", blank=True)
 	
 	def __str__(self):
 		return self.row_choice

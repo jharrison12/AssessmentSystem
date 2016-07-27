@@ -20,8 +20,8 @@
 						{% for form in RowFormSetWeb %}
 						{{ form.id }}
 					<tr>
-						<td>{{ form.row_choice|default:"fail" }}</td>
-						<td>{{ form.excellenttext.value|default:"fail" }}</td>
+						<td>{{ form.row_choice }}</td>
+						<td>{{ form.excellenttext.value }}</td>
 						<td>{{ form.proficienttext.value }}</td>
 						<td>{{ form.satisfactorytext.value }}</td>
 						<td>{{ form.unsatisfactorytext.value }}</td>

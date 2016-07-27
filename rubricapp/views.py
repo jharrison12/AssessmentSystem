@@ -48,13 +48,16 @@ def rubric_page(request, edclass, studentname):
 	rows = Row.objects.filter(rubric=rubricForClass)
 	student = Student.objects.get(lnumber=studentname)
 	if request.method == 'POST':
-		RowFormSetWeb = RowFormSet(request.POST)#, queryset=Row.objects.filter(rubric=rubricForClass))
+		RowFormSetWeb = RowFormSet(request.POST, queryset=Row.objects.filter(rubric=rubricForClass))
 		RowFormSetWeb.clean()
 		if RowFormSetWeb.is_valid():
 			savedFormset = RowFormSetWeb.save(commit=False)
+			#Not sure if the below is necessary.  But it works!
 			for i in savedFormset:
 				i.rubric = rubricForClass 
-			RowFormSetWeb.save()
+				#instead of saving entire formset, this will only update row_choice
+				#this keeps the form.text fields from disappearing
+				i.save(update_fields=['row_choice'])
 			return redirect('/'+ edclass + '/')
 		else:
 			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
