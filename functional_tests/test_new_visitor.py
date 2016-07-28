@@ -9,13 +9,17 @@ class NewVisitorTest(FunctionalTest):
 
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.create(text="201530")
+		semester2 = Semester.objects.create(text="201610")
 		edclass1 = EdClasses.objects.create(name="EG 5000")
+		falledclass = EdClasses.objects.create(name="EG 5000")
 		edclass2 = EdClasses.objects.create(name="EG 6000")
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
+		semester2.classes.add(falledclass)
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
+		jake = Student.objects.create(lastname="The Snake", firstname="Jake", lnumber="0000")
 		
 		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
 		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)
@@ -48,6 +52,7 @@ class NewVisitorTest(FunctionalTest):
 		self.browser.get(self.live_server_url)
 		# Dr. Makes sure that it is titled correctly
 		self.assertIn('Assessment System', self.browser.title)
+		sleep(60)
 		
 		# Dr. chooses a semester from a drop down list
 		semester_header_text = self.browser.find_element_by_id('semester').text
@@ -127,6 +132,7 @@ class NewVisitorTest(FunctionalTest):
 		excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
 		
 		#First choice should not be excellent it should be null
+		sleep(60)
 		self.assertNotEqual(excellent.get_attribute("selected"), "true")
 		
 		sleep(60)

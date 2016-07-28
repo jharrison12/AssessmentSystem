@@ -53,5 +53,8 @@ class Enrollment(models.Model):
 	grade = models.TextField(default='') 
 	keyrubric = models.ManyToManyField(Rubric)
 	
+#class EnrollmenRubric(models.Model):
+	
+	
 
 

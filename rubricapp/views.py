@@ -25,11 +25,11 @@ def semester_page(request, semester):
 	else:
 		return redirect('/')
 	if request.method == "POST":
-		return redirect('/'+ re.sub('[\s+]', '', request.POST['edClass']) + '/') #removes whitespace from inside the class name
+		return redirect(re.sub('[\s+]', '', request.POST['edClass']) + '/') #removes whitespace from inside the class name
 	return render(request, 'semester.html', {'summerclasses': summerclasses} ) 
 	
 
-def student_page(request, edclass):
+def student_page(request, edclass, semester):
 	#REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the 
 	#course code
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
@@ -41,7 +41,7 @@ def student_page(request, edclass):
 	return render(request, 'student.html', {'students': students})
 
 #TODO fix studentname variable.  Change to studentlnumber
-def rubric_page(request, edclass, studentname):
+def rubric_page(request, edclass, studentname,semester):
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass)
 	enrollmentObj = Enrollment.objects.get(edclass__name=edClassSpaceAdded, student__lnumber=studentname)
 	rubricForClass = enrollmentObj.keyrubric.get()
@@ -58,10 +58,10 @@ def rubric_page(request, edclass, studentname):
 				#instead of saving entire formset, this will only update row_choice
 				#this keeps the form.text fields from disappearing
 				i.save(update_fields=['row_choice'])
-			return redirect('/'+ edclass + '/')
+			return redirect('/'+ semester +'/'+ edclass + '/')
 		else:
 			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
 	else:
 		RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricForClass))
 		rubricForClassText = re.sub('rubric', ' rubric', rubricForClass.name)
-		return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass, 'rubricForClass': rubricForClassText.title()})
+		return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass, 'rubricForClass': rubricForClassText.title(), 'semester': semester})

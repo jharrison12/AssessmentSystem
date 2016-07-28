@@ -8,9 +8,9 @@ admin.autodiscover()
 urlpatterns = [ 
     # Examples:
      url(r'^$', views.home_page, name='home'),
-     url(r'^(\d+)/$', 'rubricapp.views.semester_page', name='semester'),
-     url(r'^(?P<edclass>EG[0-9]{4})/$', 'rubricapp.views.student_page', name='student'),
-	 url(r'^(?P<edclass>EG[0-9]{4})/(?P<studentname>[0-9]+)/$', views.rubric_page, name="rubricpage"),
+     url(r'^(?P<semester>\d+)/$', 'rubricapp.views.semester_page', name='semester'),
+     url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{4})/$', 'rubricapp.views.student_page', name='student'),
+	 url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{4})/(?P<studentname>[0-9]+)/$', views.rubric_page, name="rubricpage"),
     # url(r'^assessmenttool/', include('assessmenttool.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
