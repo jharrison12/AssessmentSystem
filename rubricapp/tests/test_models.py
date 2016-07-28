@@ -11,7 +11,6 @@ class RubricModel(TestCase):
 	def create_rubric_and_rows_connect_to_class(self):
 		semester = Semester.objects.create(text="201530")
 		edclass1 = EdClasses.objects.create(name="EG 5000")
-		falledclass1 = EdClasses.objects.create(name="EG 5000")
 		edclass2 = EdClasses.objects.create(name="EG 6000")
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)

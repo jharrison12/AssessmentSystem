@@ -10,7 +10,7 @@ class Student(models.Model):
 	#TODO add models
 
 class EdClasses(models.Model):
-	name = models.TextField(default='')
+	name = models.TextField(default='', unique=True)
 	students = models.ManyToManyField(Student, through="Enrollment")
 	def __str__(self):
 		return self.name
