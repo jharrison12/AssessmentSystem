@@ -88,10 +88,12 @@ class NewVisitorTest(FunctionalTest):
 		submitbutton.send_keys(Keys.ENTER) 
 		
 		#A new page should appear with the students name 
-		sleep(20)
+		sleep(5)
 		studentnameheader = self.browser.find_element_by_id('studentheader')
+		self.assertIn("DaBuilder, Bob",studentnameheader.text )
 			
 		#A rubric should appear based upon the key assignment 
 		rubricheader = self.browser.find_element_by_id('rubricheader')
+		self.assertIn("Writing Rubric", rubricheader.text)
 		#The rubric should allow the professor to click on a matrix of rows
 		#The dr. clicks on "submit" the student data is submited to a database

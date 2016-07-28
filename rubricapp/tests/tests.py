@@ -233,6 +233,12 @@ class StudentandRubricViewTest(TestCase):
 		response = self.client.get("/EG5000/21743148/")
 		self.assertContains(response, "THE BEST!")
 	#TODO FINISH THE THREE TESTS BELOW
+	
+	def test_rubric_page_shows_rubric_name(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+		response = self.client.get("/EG5000/21743148/")
+		self.assertContains(response, "Writing Rubric")
+	
 	@skip
 	def test_rubric_page_can_take_post_request(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
