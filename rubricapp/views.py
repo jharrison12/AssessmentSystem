@@ -33,7 +33,8 @@ def student_page(request, edclass, semester):
 	#REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the 
 	#course code
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
-	students = Student.objects.filter(edclasses__name=edClassSpaceAdded)
+	edclassesPulled = EdClasses.objects.filter(semester__text=semester, name=edClassSpaceAdded)
+	students = Student.objects.filter(edclasses=edclassesPulled)
 	if request.method == 'POST':
 		#Why is adding the forward slash unneccessary?
 		#Why does the redirect no need the edclass added to the beginning?
