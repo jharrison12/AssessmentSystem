@@ -39,6 +39,7 @@ class NewVisitorTest(FunctionalTest):
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
 		bobenrollment.keyrubric.add(writingrubric)
+		janeenrollment.keyrubric.add(writingrubric)
 		
 	def test_user_visits_inital_page(self):
 
@@ -84,11 +85,11 @@ class NewVisitorTest(FunctionalTest):
 		studentname = self.browser.find_elements_by_tag_name('option')
 		self.assertIn("Bob DaBuilder", [i.text for i in studentname])
 		self.assertIn("Jane Doe", [i.text for i in studentname])
-		submitbutton = self.browser.find_element_by_id('studentsubmit')
-		submitbutton.send_keys(Keys.ENTER) 
+		submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
+		submitbuttonstudent.send_keys(Keys.ENTER) 
 		
 		#A new page should appear with the students name 
-		sleep(5)
+
 		studentnameheader = self.browser.find_element_by_id('studentheader')
 		self.assertIn("DaBuilder, Bob",studentnameheader.text )
 			
@@ -96,4 +97,38 @@ class NewVisitorTest(FunctionalTest):
 		rubricheader = self.browser.find_element_by_id('rubricheader')
 		self.assertIn("Writing Rubric", rubricheader.text)
 		#The rubric should allow the professor to click on a matrix of rows
+		
+		row1dropdown = self.browser.find_element_by_id('id_form-0-row_choice')
+		row2dropdown = self.browser.find_element_by_id('id_form-1-row_choice')
+		self.assertEqual(row1dropdown.get_attribute('name'), 'form-0-row_choice')
+		self.assertEqual(row2dropdown.get_attribute('name'), 'form-1-row_choice')
+		
+		rubricoptions = self.browser.find_elements_by_tag_name('option')
+		
+		self.assertIn("Excellent", [option.text for option in rubricoptions])
+		excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
+		excellent.click()
+		sleep(2)
+
 		#The dr. clicks on "submit" the student data is submited to a database
+		submitbutton = self.browser.find_element_by_id('rubricsubmit')
+		submitbutton.send_keys(Keys.ENTER)
+		
+		#Clicking submit should save rubric and return to the main student page
+		studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
+		self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
+		
+		#Dr. chooses a different name and fills out a COMPLETELY new rubric 
+		studentnames = self.browser.find_elements_by_tag_name('option')
+		janedoe = self.browser.find_element_by_id('21743149')
+		janedoe.click()
+		submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
+		submitbuttonstudent.send_keys(Keys.ENTER) 
+		excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
+		
+		#First choice should not be excellent it should be null
+		self.assertNotEqual(excellent.get_attribute("selected"), "true")
+		
+		sleep(60)
+		self.fail("Should not reach")
+		
