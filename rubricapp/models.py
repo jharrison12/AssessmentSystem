@@ -9,24 +9,26 @@ class Student(models.Model):
 		return self.lnumber
 	#TODO add models
 
+
+class Rubric(models.Model):
+	name = models.TextField(default="Basic Rubric", unique=True)
+	
+	def __str__(self):
+		return self.name
+
 class EdClasses(models.Model):
 	name = models.TextField(default='', unique=True)
 	students = models.ManyToManyField(Student, through="Enrollment")
+	keyrubric = models.ManyToManyField(Rubric)
 	def __str__(self):
-		return self.name
+		return self.name		
+		
 		
 class Semester(models.Model):
 	text = models.TextField(default='201530')
 	classes = models.ManyToManyField(EdClasses)	
 	def __str__(self):
 		return self.text
-		
-class Rubric(models.Model):
-	name = models.TextField(default="Basic Rubric")
-	
-	def __str__(self):
-		return self.name
-	
 	
 class Row(models.Model):
 	CHOICES = (
@@ -51,9 +53,12 @@ class Enrollment(models.Model):
 	student = models.ForeignKey(Student)
 	edclass = models.ForeignKey(EdClasses)
 	grade = models.TextField(default='') 
-	keyrubric = models.ManyToManyField(Rubric)
+	completedrubric = models.OneToOneField(Rubric, null=True)
 	
-#class EnrollmenRubric(models.Model):
+
+"""	
+class EnrollmenRubric(models.Model):
+	"""
 	
 	
 

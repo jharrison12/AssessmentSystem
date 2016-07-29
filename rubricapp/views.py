@@ -33,6 +33,7 @@ def student_page(request, edclass, semester):
 	#REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the 
 	#course code
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
+	#Filter the class basedupon semester and name of the class
 	edclassesPulled = EdClasses.objects.filter(semester__text=semester, name=edClassSpaceAdded)
 	students = Student.objects.filter(edclasses=edclassesPulled)
 	if request.method == 'POST':
@@ -44,8 +45,8 @@ def student_page(request, edclass, semester):
 #TODO fix studentname variable.  Change to studentlnumber
 def rubric_page(request, edclass, studentname,semester):
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass)
-	enrollmentObj = Enrollment.objects.get(edclass__name=edClassSpaceAdded, student__lnumber=studentname)
-	rubricForClass = enrollmentObj.keyrubric.get()
+	edClassEnrolled = EdClasses.objects.get(name=edClassSpaceAdded)
+	rubricForClass = edClassEnrolled.keyrubric.get()
 	rows = Row.objects.filter(rubric=rubricForClass)
 	student = Student.objects.get(lnumber=studentname)
 	if request.method == 'POST':

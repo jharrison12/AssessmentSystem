@@ -31,22 +31,21 @@ class RubricModel(TestCase):
 							
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		bobenrollment.keyrubric.add(writingrubric)
-		janeenrollment.keyrubric.add(writingrubric)
+		edclass1.keyrubric.add(writingrubric)
+		edclass1.keyrubric.add(writingrubric)
 		
 	def test_rubric_connected_with_enrollment_class(self):
 		self.create_rubric_and_rows_connect_to_class()
 		rubrics = Rubric.objects.all()
 		self.assertEqual(rubrics.count(), 1)
 		
-	def test_to_make_sure_enrollment_object_matches_with_rubric(self):
+	def test_to_make_sure_class_object_matches_with_rubric(self):
 		self.create_rubric_and_rows_connect_to_class()
 		bob = Student.objects.get(lnumber="21743148")
-		edClass = EdClasses.objects.filter(name='EG 5000')#, semester="201530")
+		edClass = EdClasses.objects.get(name='EG 5000')#, semester="201530")
 		enrollmentObj = Enrollment.objects.get(student=bob, edclass=edClass)
 		#should get the only rubric attached to the object
-		print(enrollmentObj, edClass)
-		writingrubric = enrollmentObj.keyrubric.get()
+		writingrubric = edClass.keyrubric.get()
 		self.assertEqual(writingrubric.name, "writingrubric")
 	
 	def test_rubric_object_only_has_one_row(self):

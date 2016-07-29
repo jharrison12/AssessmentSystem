@@ -215,10 +215,10 @@ class StudentandRubricViewTest(TestCase):
 		
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		bobenrollment.keyrubric.add(writingrubric)
-		janeenrollment.keyrubric.add(writingrubric)
+		edclass1.keyrubric.add(writingrubric)
+		edclass2.keyrubric.add(writingrubric)
 	
-	def test_studentandrubric_view_returns_correct_template(self):
+	def test_student_and_rubric_view_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/201530/EG5000/21743148/")
 		self.assertTemplateUsed(response, 'rubric.html')
