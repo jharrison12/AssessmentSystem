@@ -26,6 +26,8 @@ class NewVisitorTest(FunctionalTest):
 		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 		
+		
+		
 		row1 = Row.objects.create(excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",

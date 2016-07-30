@@ -3,7 +3,7 @@ from django.db import models
 class Student(models.Model):
 	firstname = models.TextField(default="")	
 	lastname = models.TextField(default="")
-	lnumber = models.TextField(default="")
+	lnumber = models.TextField(default="", unique=True)
 	
 	def __str__(self):
 		return self.lnumber
@@ -11,10 +11,12 @@ class Student(models.Model):
 
 
 class Rubric(models.Model):
-	name = models.TextField(default="Basic Rubric", unique=True)
+	name = models.TextField(default="Basic Rubric")
 	
 	def __str__(self):
 		return self.name
+	
+	#def __deepcopy__():
 
 class EdClasses(models.Model):
 	name = models.TextField(default='', unique=True)
@@ -54,6 +56,7 @@ class Enrollment(models.Model):
 	edclass = models.ForeignKey(EdClasses)
 	grade = models.TextField(default='') 
 	completedrubric = models.OneToOneField(Rubric, null=True)
+	rubriccompleted = models.BooleanField(default=False)
 	
 
 """	

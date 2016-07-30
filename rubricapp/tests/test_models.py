@@ -84,8 +84,8 @@ class RubricModel(TestCase):
 		janeenrollmentobj = Enrollment.objects.get(student=jane, edclass=edClass)
 		bobenrollmentobj = Enrollment.objects.get(student=bob, edclass=edClass)
 		
-		janerubric = janeenrollmentobj.keyrubric.get()
-		bobrubric = bobenrollmentobj.keyrubric.get()
+		janerubric = janeenrollmentobj.completedrubric
+		bobrubric = bobenrollmentobj.completedrubric
 		
 		self.assertNotEqual(bobrubric, janerubric)
 		

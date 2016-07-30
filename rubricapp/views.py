@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row
 from rubricapp.forms import RowForm, RowFormSet
 import re
+from copy import deepcopy
 
 def home_page(request):
 	semester = Semester.objects.all()
@@ -35,7 +36,7 @@ def student_page(request, edclass, semester):
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
 	#Filter the class basedupon semester and name of the class
 	edclassesPulled = EdClasses.objects.filter(semester__text=semester, name=edClassSpaceAdded)
-	students = Student.objects.filter(edclasses=edclassesPulled)
+	students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False)
 	if request.method == 'POST':
 		#Why is adding the forward slash unneccessary?
 		#Why does the redirect no need the edclass added to the beginning?
@@ -43,23 +44,42 @@ def student_page(request, edclass, semester):
 	return render(request, 'student.html', {'students': students})
 
 #TODO fix studentname variable.  Change to studentlnumber
+#TODO add system log
+
+#def rubric_page_post(request,edclass,studentname,semester):
+
+
+
 def rubric_page(request, edclass, studentname,semester):
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass)
 	edClassEnrolled = EdClasses.objects.get(name=edClassSpaceAdded)
+	student = Student.objects.get(lnumber=studentname)
 	rubricForClass = edClassEnrolled.keyrubric.get()
 	rows = Row.objects.filter(rubric=rubricForClass)
-	student = Student.objects.get(lnumber=studentname)
+	print("Rubric: " + str(rubricForClass.pk) + " " + str(type(rubricForClass))+ " " + str([row for row in rows]) +"\n")
+	#Problem is here.  How do I deep copy all of the models in the rubric?
+	rubricForClass.pk = None
+	rubricForClass.save()
+	for row in rows:
+		row.pk = None
+		row.rubric = rubricForClass
+		row.save()
+	print("Did the rubric change? Rubric: " + str(rubricForClass.pk) + " "+ str(type(rubricForClass))+"\n")
+	Enrollment.objects.update_or_create(student=student, edclass=edClassEnrolled, completedrubric=rubricForClass)
+	#ENDPROBLEM
 	if request.method == 'POST':
-		RowFormSetWeb = RowFormSet(request.POST, queryset=Row.objects.filter(rubric=rubricForClass))
+		RowFormSetWeb = RowFormSet(request.POST)#, queryset=Row.objects.filter(rubric=rubricForClass))
 		RowFormSetWeb.clean()
 		if RowFormSetWeb.is_valid():
 			savedFormset = RowFormSetWeb.save(commit=False)
 			#Not sure if the below is necessary.  But it works!
 			for i in savedFormset:
-				i.rubric = rubricForClass 
+				i.rubric = rubricForClass
 				#instead of saving entire formset, this will only update row_choice
 				#this keeps the form.text fields from disappearing
 				i.save(update_fields=['row_choice'])
+			student.enrollment.update(rubriccompleted = True)
+			print(student.enrollment.rubriccompleted)
 			return redirect('/'+ semester +'/'+ edclass + '/')
 		else:
 			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
