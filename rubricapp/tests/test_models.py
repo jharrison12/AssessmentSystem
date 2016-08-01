@@ -80,12 +80,18 @@ class RubricModel(TestCase):
 		self.create_rubric_and_rows_connect_to_class()
 		jane = Student.objects.get(lnumber="21743149")
 		bob = Student.objects.get(lnumber="21743148")
-		edClass = EdClasses.objects.filter(name='EG 5000', semester__text="201530")
-		janeenrollmentobj = Enrollment.objects.get(student=jane, edclass=edClass)
-		bobenrollmentobj = Enrollment.objects.get(student=bob, edclass=edClass)
-		
-		janerubric = janeenrollmentobj.completedrubric
-		bobrubric = bobenrollmentobj.completedrubric
+		edClass = EdClasses.objects.get(name='EG 5000', semester__text="201530")
+		writingrubric = Rubric.objects.create(name="writingrubric2")
+		writingrubric1 = Rubric.objects.create(name="writingrubric1")
+		bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
+		janeenrollment = Enrollment.objects.get(student=jane, edclass=edClass)
+		bobenrollment.completedrubric = writingrubric
+		bobenrollment.save()
+		janeenrollment.completedrubric = writingrubric1
+		janeenrollment.save()
+
+		janerubric = Rubric.objects.get(enrollment__student=jane)
+		bobrubric = Rubric.objects.get(enrollment__student=bob)
 		
 		self.assertNotEqual(bobrubric, janerubric)
 		

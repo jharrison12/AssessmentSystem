@@ -16,8 +16,6 @@ class Rubric(models.Model):
 	
 	def __str__(self):
 		return self.name
-	
-	#def __deepcopy__():
 
 class EdClasses(models.Model):
 	name = models.TextField(default='', unique=True)

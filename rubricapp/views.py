@@ -36,7 +36,7 @@ def student_page(request, edclass, semester):
 	#course code
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
 	#Filter the class basedupon semester and name of the class
-	edclassesPulled = EdClasses.objects.filter(semester__text=semester, name=edClassSpaceAdded)
+	edclassesPulled = EdClasses.objects.get(semester__text=semester, name=edClassSpaceAdded)
 	students = Student.objects.filter(edclasses=edclassesPulled).filter(enrollment__rubriccompleted=False)
 	for i in students:
 		logging.info("Students are %s" % i.lnumber)
