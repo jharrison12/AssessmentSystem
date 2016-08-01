@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib import admin
 
 class Student(models.Model):
 	firstname = models.TextField(default="")	
@@ -52,11 +53,24 @@ class Row(models.Model):
 	
 		
 class Enrollment(models.Model):
+	name = models.TextField()
 	student = models.ForeignKey(Student)
 	edclass = models.ForeignKey(EdClasses)
 	grade = models.TextField(default='') 
 	completedrubric = models.OneToOneField(Rubric, null=True)
 	rubriccompleted = models.BooleanField(default=False)
+
+	def __str__(self):
+		return self.name
+
+#For admin page
+class EnrollmentAdmin(admin.TabularInline):
+	model = Enrollment
+	extra = 1
+
+class EdClassAdmin(admin.ModelAdmin):
+		inlines = (EnrollmentAdmin,)
+
 	
 
 """	

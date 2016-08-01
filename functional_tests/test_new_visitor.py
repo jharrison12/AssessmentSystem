@@ -15,7 +15,6 @@ class NewVisitorTest(FunctionalTest):
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
-		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
 		jake = Student.objects.create(lastname="The Snake", firstname="Jake", lnumber="0000")
@@ -25,9 +24,7 @@ class NewVisitorTest(FunctionalTest):
 		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)
 		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
 		writingrubric = Rubric.objects.create(name="writingrubric")
-		
-		
-		
+
 		row1 = Row.objects.create(excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
@@ -53,7 +50,7 @@ class NewVisitorTest(FunctionalTest):
 		self.browser.get(self.live_server_url)
 		# Dr. Makes sure that it is titled correctly
 		self.assertIn('Assessment System', self.browser.title)
-		#sleep(60)
+		sleep(60)
 		
 		# Dr. chooses a semester from a drop down list
 		semester_header_text = self.browser.find_element_by_id('semester').text
