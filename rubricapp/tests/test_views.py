@@ -5,6 +5,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from rubricapp.views import home_page, semester_page, student_page, rubric_page
 from django.core.urlresolvers import resolve
+from bs4 import BeautifulSoup
 
 class HomePageTest(TestCase):
 	maxDiff = None
@@ -165,7 +166,7 @@ class ClassViewTest(TestCase):
 		bob = Student.objects.get(lnumber="21743148")
 		request.POST['studentnames'] = bob.lnumber
 
-		response = student_page(request, "/EG5000/", "201530")
+		response = student_page(request, "EG5000", "201530")
 
 		self.assertEqual(response.status_code, 302)
 		
@@ -176,11 +177,23 @@ class ClassViewTest(TestCase):
 		student = Student.objects.get(lnumber="21743148")
 		request.POST['studentnames'] = student.lnumber
 
-		response = student_page(request, "/EG5000/", "201530")
+		response = student_page(request, "EG5000", "201530")
 		
 		self.assertEqual(response.status_code, 302)
 		
 		self.assertEqual(response['location'], '21743148/')	
+		
+	def test_class_page_shows_url_if_no_students(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__name="EG 5000")
+		bobenrollment.rubriccompleted = True
+		bobenrollment.save()
+		janeenrollment = Enrollment.objects.get(student__lastname="Doe", edclass__name="EG 5000")
+		janeenrollment.rubriccompleted = True
+		janeenrollment.save()
+		
+		response = self.client.get("/201530/EG5000/")
+		self.assertIn("Return to the semester page", response.content.decode())
 
 class StudentandRubricViewTest(TestCase):
 
@@ -243,13 +256,15 @@ class StudentandRubricViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/201530/EG5000/21743148/")
 		self.assertContains(response, "Writing Rubric")
-	
 	@skip
 	def test_rubric_page_can_take_post_request(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		request = HttpRequest()
-		request.method = "POST"
-		response = rubric_page(request, "EG5000", "21743148")
+		
+		response = self.client.get("/201530/EG5000/21743148/")
+		soup = BeautifulSoup(response.content)
+		#form = soup.find('form')
+
+		response = self.client.post("/201530/EG5000/21743148/", {"id_form-0-row_choice":"1", "id_form-1-row_choice":"2"})
 
 		self.assertEqual(response.status_code, 302)
 
