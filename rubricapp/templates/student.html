@@ -3,14 +3,19 @@
 		{% block headerid%}choosename{% endblock %}{% block header_text %}Choose a Name{% endblock %}
 		
 		{% block form %}
+		{% if students|length > 0 %}
 		<form method="POST" action={{ student.lnumber }}>
 			<select name="studentnames" id="studentdropdown">
-				{% for student in students %}
-				<option value="{{ student.lnumber }}" id={{ student.lnumber }}>{{ student.firstname }} {{ student.lastname }}</option>
-				{% endfor %}
+					{% for student in students %}
+					<option value="{{ student.lnumber }}" id={{ student.lnumber }}>{{ student.firstname }} {{ student.lastname }}</option>
+					{% endfor %}	
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="studentsubmit">
 			{% csrf_token %}
 		</form>
+				{% else %}
+				<p>There are no more students</p>
+				<a href={% url 'semester' semester=semester %}>Return to the semester page</a>
+				{% endif %}
 		{% endblock %}
 						

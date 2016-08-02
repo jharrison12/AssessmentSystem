@@ -46,7 +46,7 @@ def student_page(request, edclass, semester):
 		#Why is adding the forward slash unneccessary?
 		#Why does the redirect no need the edclass added to the beginning?
 		return redirect(re.sub('[\s+]', '', request.POST['studentnames']) + '/')
-	return render(request, 'student.html', {'students': students})
+	return render(request, 'student.html', {'students': students, 'semester':semester})
 
 #TODO fix studentname variable.  Change to studentlnumber
 #TODO add system log
