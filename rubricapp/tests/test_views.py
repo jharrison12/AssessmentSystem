@@ -256,53 +256,76 @@ class StudentandRubricViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/201530/EG5000/21743148/")
 		self.assertContains(response, "Writing Rubric")
-	@skip
+	
 	def test_rubric_page_can_take_post_request(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		
 		response = self.client.get("/201530/EG5000/21743148/")
-		soup = BeautifulSoup(response.content)
+		#soup = BeautifulSoup(response.content)
 		#form = soup.find('form')
-
-		response = self.client.post("/201530/EG5000/21743148/", {"id_form-0-row_choice":"1", "id_form-1-row_choice":"2"})
+		#print(form)
+		data ={"form-TOTAL_FORMS": "2",
+			   "form-INITIAL_FORMS": "2",
+			   "form-MIN_NUM_FORMS": "0",
+			   "form-MAX_NUM_FORMS": "1000",
+			   "form-0-row_choice":"1", 
+			   "form-1-row_choice":"2", 
+			   "form-0-id": "3",
+			   "form-1-id": "4"}
+		response = self.client.post("/201530/EG5000/21743148/", data)
 
 		self.assertEqual(response.status_code, 302)
-
-	@skip
-	def test_post_request_does_not_create_new_row(self):
+	
+	def test_post_request_creates_new_rubric_for_the_enrollment(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		request = HttpRequest()
-		edClass = EdClasses.objects.get(name='EG 5000') 
-		bob = Student.objects.get(lnumber="21743148")
-		bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
-		writingrubric = bobenrollment.keyrubric.get(name="writingrubric")
+
+		writingrubric = Rubric.objects.get(name="writingrubric")
 		
 		row = Row.objects.filter(rubric=writingrubric)
-		self.assertEqual(row.count(), 1)
-		response = self.client.get("/EG5000/21743148/")
-		response['id_form-0-row_choice'] = '2'
-
-		self.assertEqual(row.count(), 1)
-
-	@skip
+		self.assertEqual(row.count(), 2)
+		#Why do you need to get the response before you can post it?????
+		response = self.client.get("/201530/EG5000/21743148/")
+		data ={"form-TOTAL_FORMS": "2",
+			   "form-INITIAL_FORMS": "2",
+			   "form-MIN_NUM_FORMS": "0",
+			   "form-MAX_NUM_FORMS": "1000",
+			   "form-0-row_choice":"1", 
+			   "form-1-row_choice":"2", 
+			   "form-0-id": "3",
+			   "form-1-id": "4"}
+			   
+		response = self.client.post("/201530/EG5000/21743148/", data)
+		student = Student.objects.get(lnumber="21743148")
+		edclass = EdClasses.objects.get(name="EG 5000")
+		
+		bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
+		
+		self.assertEqual(bobenrollment.completedrubric.name, "EG5000 21743148 201530")
+		
+	
 	def test_post_request_updates_correct_model(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		
-		edClass = EdClasses.objects.get(name='EG 5000') 
-		bob = Student.objects.get(lnumber="21743148")
-		bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
-		writingrubric = bobenrollment.keyrubric.get(name="writingrubric")
-		row = Row.objects.get(rubric=writingrubric)
-		
-		#request = HttpRequest()
-		#request.method = 'POST'
-		#request.POST['id_form-1-id'] = 2
-		#response = rubric_page(request, "EG5000", "21743148")
 
-
-		response = self.client.get('/EG5000/21743148/', {'id_form-0-row_choice':"2"}, follow=True)
-		print(response.content)
-		self.assertEqual(row.row_choice, 2)
+		#Why do you need to get the response before you can post it?????
+		response = self.client.get("/201530/EG5000/21743148/")
+		data ={"form-TOTAL_FORMS": "2",
+			   "form-INITIAL_FORMS": "2",
+			   "form-MIN_NUM_FORMS": "0",
+			   "form-MAX_NUM_FORMS": "1000",
+			   "form-0-row_choice":"1", 
+			   "form-1-row_choice":"2", 
+			   "form-0-id": "3",
+			   "form-1-id": "4"}
+			   
+		response = self.client.post("/201530/EG5000/21743148/", data)
+		student = Student.objects.get(lnumber="21743148")
+		edclass = EdClasses.objects.get(name="EG 5000")
+		
+		bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
+		row = Row.objects.get(excellenttext="THE BEST!", rubric__name=bobenrollment.completedrubric.name)
+		print(row.row_choice)
+		self.assertEqual(row.row_choice, "1")
+		
 
 		
 

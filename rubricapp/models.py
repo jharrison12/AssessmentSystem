@@ -51,15 +51,16 @@ class Row(models.Model):
 	
 		
 class Enrollment(models.Model):
-	name = models.TextField()
+	#name = models.TextField()
 	student = models.ForeignKey(Student)
 	edclass = models.ForeignKey(EdClasses)
 	grade = models.TextField(default='') 
-	completedrubric = models.OneToOneField(Rubric, null=True)
+	#Will need to change completedrubric editable to False
+	completedrubric = models.OneToOneField(Rubric, null=True, editable=True)
 	rubriccompleted = models.BooleanField(default=False)
-
+	
 	def __str__(self):
-		return self.name
+		return 'Enrollment %s: %s' % (self.student, self.edclass)
 
 #For admin page
 class EnrollmentAdmin(admin.TabularInline):

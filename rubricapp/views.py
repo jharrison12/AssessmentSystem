@@ -4,7 +4,7 @@ from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubr
 from rubricapp.forms import RowForm, RowFormSet
 import re, logging
 from copy import deepcopy
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 def home_page(request):
 	semester = Semester.objects.all()
@@ -61,11 +61,11 @@ def rubric_page(request, edclass, studentname,semester):
 	rubricforclass = edclassenrolled.keyrubric.get()
 	#this returns the rows associated with the magic rubric
 	rows = Row.objects.filter(rubric=rubricforclass)
-	#this should return a single Enrollment object
 	if request.method == 'POST':
+		#this should return a single Enrollment object
 		greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled)
 		logging.info("Posting")
-		#rubricafterpost = Rubric.objects.get(enrollment=greatEnrollment)
+		#rubricafterpost = greatEnrollment.completedrubric
 		#logging.info("Rubric afterpost id: %s" % rubricafterpost.id)
 		RowFormSetWeb = RowFormSet(request.POST)#, queryset=Row.objects.filter(rubric=rubricForClass))
 		RowFormSetWeb.clean()
@@ -78,7 +78,9 @@ def rubric_page(request, edclass, studentname,semester):
 				#this keeps the form.text fields from disappearing
 				i.save(update_fields=['row_choice'])
 				logging.info("The rubric associated with the row is %d" % i.rubric.id)
+				rubricid = i.rubric.id
 			greatEnrollment.rubriccompleted=True
+			greatEnrollment.completedrubric = Rubric.objects.get(pk=rubricid)
 			greatEnrollment.save()
 			logging.info("Great enrollment rubric completed  is %s" % greatEnrollment.rubriccompleted)
 			logging.info("Great enrollment id is %d" % greatEnrollment.pk)
@@ -89,9 +91,11 @@ def rubric_page(request, edclass, studentname,semester):
 		#This view returns a brandnew copy of the rubric based upon
 		#the rubric associated with the edclass
 		rubricforclass = edclassenrolled.keyrubric.get()
+		oldrubricname = rubricforclass.name
 		rows = Row.objects.filter(rubric=rubricforclass)
 		logging.info("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass))+ " " + str([row for row in rows]) +"\n")
 		rubricforclass.pk = None
+		rubricforclass.name= "%s %s %s" %(edclass, studentname, semester)
 		rubricforclass.save()
 		logging.info("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
 		for row in rows:
@@ -100,6 +104,6 @@ def rubric_page(request, edclass, studentname,semester):
 			logging.info("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
 			row.save()
 		RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
-		rubricForClassText = re.sub('rubric', ' rubric', rubricforclass.name)
+		rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)
 		logging.info("At the end of the long view, the rubric is %s" % rubricforclass.pk)
 		return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass, 'rubricForClass': rubricForClassText.title(), 'semester': semester})
