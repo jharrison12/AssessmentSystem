@@ -39,6 +39,7 @@ class Row(models.Model):
 	('3','Awful'),
 	('4','The worst ever'),
 	)
+	name = models.CharField(default="None", max_length=30)
 	rubric = models.ForeignKey(Rubric)
 	row_choice = models.CharField(max_length=20,choices=CHOICES, default="None", blank=True)
 	excellenttext = models.TextField(default="", blank=True)
@@ -56,11 +57,14 @@ class Enrollment(models.Model):
 	edclass = models.ForeignKey(EdClasses)
 	grade = models.TextField(default='') 
 	#Will need to change completedrubric editable to False
-	completedrubric = models.OneToOneField(Rubric, null=True, editable=True)
+	completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
 	rubriccompleted = models.BooleanField(default=False)
 	
 	def __str__(self):
 		return 'Enrollment %s: %s' % (self.student, self.edclass)
+	
+	class Meta:
+		unique_together = (("student", "edclass"))
 
 #For admin page
 class EnrollmentAdmin(admin.TabularInline):
