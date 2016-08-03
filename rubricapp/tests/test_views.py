@@ -323,7 +323,6 @@ class StudentandRubricViewTest(TestCase):
 		
 		bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
 		row = Row.objects.get(excellenttext="THE BEST!", rubric__name=bobenrollment.completedrubric.name)
-		print(row.row_choice)
 		self.assertEqual(row.row_choice, "1")
 		
 

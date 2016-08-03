@@ -4,7 +4,7 @@ from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubr
 from rubricapp.forms import RowForm, RowFormSet
 import re, logging
 from copy import deepcopy
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 
 def home_page(request):
 	semester = Semester.objects.all()
@@ -80,6 +80,7 @@ def rubric_page(request, edclass, studentname,semester):
 				logging.info("The rubric associated with the row is %d" % i.rubric.id)
 				rubricid = i.rubric.id
 			greatEnrollment.rubriccompleted=True
+			#Set the enrollment object to the new rubric created by accessing the page
 			greatEnrollment.completedrubric = Rubric.objects.get(pk=rubricid)
 			greatEnrollment.save()
 			logging.info("Great enrollment rubric completed  is %s" % greatEnrollment.rubriccompleted)

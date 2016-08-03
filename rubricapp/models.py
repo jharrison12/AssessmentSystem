@@ -71,6 +71,12 @@ class EdClassAdmin(admin.ModelAdmin):
 		inlines = (EnrollmentAdmin,)
 
 	
+class RowAdmin(admin.TabularInline):
+	model = Row
+	extra =1
+
+class RubricAdmin(admin.ModelAdmin):
+	inlines = (RowAdmin,)
 
 """	
 class EnrollmenRubric(models.Model):
