@@ -125,7 +125,7 @@ class ClassViewTest(TestCase):
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, grade="Excellent")
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
 		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
 		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
 		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)

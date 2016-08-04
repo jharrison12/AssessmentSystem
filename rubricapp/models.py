@@ -16,6 +16,11 @@ class Rubric(models.Model):
 	
 	def __str__(self):
 		return self.name
+	
+class CompletedRubric(Rubric):
+	
+	def __str__self(self):
+		return self.name
 
 class EdClasses(models.Model):
 	name = models.TextField(default='', unique=True)
@@ -55,7 +60,7 @@ class Enrollment(models.Model):
 	#name = models.TextField()
 	student = models.ForeignKey(Student)
 	edclass = models.ForeignKey(EdClasses)
-	grade = models.TextField(default='') 
+	#grade = models.TextField(default='') 
 	#Will need to change completedrubric editable to False
 	completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
 	rubriccompleted = models.BooleanField(default=False)
@@ -65,6 +70,7 @@ class Enrollment(models.Model):
 	
 	class Meta:
 		unique_together = (("student", "edclass"))
+		
 
 #For admin page
 class EnrollmentAdmin(admin.TabularInline):
@@ -82,10 +88,7 @@ class RowAdmin(admin.TabularInline):
 class RubricAdmin(admin.ModelAdmin):
 	inlines = (RowAdmin,)
 
-"""	
-class EnrollmenRubric(models.Model):
-	"""
-	
+
 	
 
 

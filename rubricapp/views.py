@@ -65,8 +65,6 @@ def rubric_page(request, edclass, studentname,semester):
 		#this should return a single Enrollment object
 		greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled)
 		logging.info("Posting")
-		#rubricafterpost = greatEnrollment.completedrubric
-		#logging.info("Rubric afterpost id: %s" % rubricafterpost.id)
 		RowFormSetWeb = RowFormSet(request.POST)#, queryset=Row.objects.filter(rubric=rubricForClass))
 		RowFormSetWeb.clean()
 		if RowFormSetWeb.is_valid():
