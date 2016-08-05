@@ -13,6 +13,7 @@ class Student(models.Model):
 
 class Rubric(models.Model):
 	name = models.TextField(default="Basic Rubric")
+	template = models.BooleanField(default=True)
 	
 	def __str__(self):
 		return self.name
@@ -71,24 +72,6 @@ class Enrollment(models.Model):
 	class Meta:
 		unique_together = (("student", "edclass"))
 		
-
-#For admin page
-class EnrollmentAdmin(admin.TabularInline):
-	model = Enrollment
-	extra = 1
-
-class EdClassAdmin(admin.ModelAdmin):
-		inlines = (EnrollmentAdmin,)
-
-	
-class RowAdmin(admin.TabularInline):
-	model = Row
-	extra =1
-
-class RubricAdmin(admin.ModelAdmin):
-	inlines = (RowAdmin,)
-
-
 	
 
 

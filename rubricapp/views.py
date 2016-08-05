@@ -95,6 +95,7 @@ def rubric_page(request, edclass, studentname,semester):
 		logging.info("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass))+ " " + str([row for row in rows]) +"\n")
 		rubricforclass.pk = None
 		rubricforclass.name= "%s %s %s" %(edclass, studentname, semester)
+		rubricforclass.template = False
 		rubricforclass.save()
 		logging.info("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
 		for row in rows:
