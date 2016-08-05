@@ -10,6 +10,7 @@ class EnrollmentAdmin(admin.TabularInline):
 class EdClassAdmin(admin.ModelAdmin):
 	inlines = (EnrollmentAdmin,)
 	
+	#This only shows the template
 	def formfield_for_manytomany(self, db_field, request, **kwargs):
 		if db_field.name == "keyrubric":
 			kwargs["queryset"] = Rubric.objects.filter(template=True)

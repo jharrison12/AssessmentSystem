@@ -50,7 +50,7 @@ class NewVisitorTest(FunctionalTest):
 		self.browser.get(self.live_server_url)
 		# Dr. Makes sure that it is titled correctly
 		self.assertIn('Assessment System', self.browser.title)
-		sleep(60)
+		#sleep(60)
 		
 		# Dr. chooses a semester from a drop down list
 		semester_header_text = self.browser.find_element_by_id('semester').text
@@ -131,6 +131,15 @@ class NewVisitorTest(FunctionalTest):
 		
 		#First choice should not be excellent it should be null
 		self.assertNotEqual(excellent.get_attribute("selected"), "true")
+		excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
+		excellent.click()
+		submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
+		submitbuttonstudent.send_keys(Keys.ENTER) 
+		
+		#The new webpage should say "No more students"
+		bodytext = self.browser.find_element_by_tag_name('body')
+		self.assertIn("There are no more students",bodytext.text)
+
 		
 		self.fail("Should not reach")
 		
