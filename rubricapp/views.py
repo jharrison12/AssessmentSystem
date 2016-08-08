@@ -39,7 +39,7 @@ def student_page(request, edclass, semester):
 	#Filter the class basedupon semester and name of the class
 	edclassesPulled = EdClasses.objects.get(semester__text=semester, name=edClassSpaceAdded)
 	logging.info("The classes pulled are %s" % (edclassesPulled))
-	students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False)
+	students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False, enrollment__semester__text=semester)
 	for i in students:
 		logging.info("Students are %s" % (i.lnumber))
 	if request.method == 'POST':

@@ -125,11 +125,10 @@ class ClassViewTest(TestCase):
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
-		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
-		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
-		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)
-	
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, semester=first_semester)
+		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass, semester=first_semester)
+		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2, semester=first_semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2, semester=first_semester)
 	
 	def create_two_semesters_for_unit_tests(self):
 		Semester.objects.create(text="201530")
@@ -194,6 +193,17 @@ class ClassViewTest(TestCase):
 		
 		response = self.client.get("/201530/EG5000/")
 		self.assertIn("Return to the semester page", response.content.decode())
+		
+	def test_class_page_does_not_show_students_from_other_semesters(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		booritter = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
+		newsemester = Semester.objects.create(text="201610")
+		edclass = EdClasses.objects.get(name="EG 5000")
+		newsemester.classes.add(edclass)
+		booenrollment = Enrollment.objects.create(student=booritter, edclass=edclass, semester=newsemester)
+		response = self.client.get('/201530/EG5000/')
+		self.assertNotContains(response, "Elaine")
+		
 
 class StudentandRubricViewTest(TestCase):
 
@@ -207,10 +217,10 @@ class StudentandRubricViewTest(TestCase):
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
 		
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
-		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)
-		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)
-		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1, semester=semester)
+		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
+		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 		
 		row1 = Row.objects.create(excellenttext="THE BEST!", 

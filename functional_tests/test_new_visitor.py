@@ -19,10 +19,10 @@ class NewVisitorTest(FunctionalTest):
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
 		jake = Student.objects.create(lastname="The Snake", firstname="Jake", lnumber="0000")
 		
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
-		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)
-		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)
-		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1, semester=semester)
+		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
+		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 
 		row1 = Row.objects.create(excellenttext="THE BEST!", 

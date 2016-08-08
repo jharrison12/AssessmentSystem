@@ -18,10 +18,10 @@ class RubricModel(TestCase):
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
 		
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
-		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)
-		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)
-		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1, semester=semester)
+		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
+		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 		
 		row1 = Row.objects.create(excellenttext="THE BEST!", 
@@ -109,10 +109,10 @@ class ClassAndSemesterModelTest(TestCase):
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
 
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass)
-		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass)
-		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2)
-		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, semester=first_semester)
+		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass, semester=first_semester)
+		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2, semester=first_semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2,  semester=first_semester)
 		
 		
 	def test_model_for_semesters(self):
@@ -180,5 +180,35 @@ class ClassAndSemesterModelTest(TestCase):
 		bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
 		self.assertEqual(bobenrollment.rubriccompleted, False)
 	
+	def test_students_are_pulled_by_class_and_semester(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		second_semester = Semester.objects.create(text="201610")
+		edClass = EdClasses.objects.get(name='EG 5000')
+		second_semester.classes.add(edClass)
+		studentsinclass = Student.objects.filter(edclasses=edClass, enrollment__semester=second_semester)
+		self.assertEqual(studentsinclass.count(), 0)
+		
+	def test_students_can_be_added_to_class_by_semester(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		second_semester = Semester.objects.create(text="201610")
+		edclass = EdClasses.objects.get(name='EG 5000')
+		second_semester.classes.add(edclass)
+		elaine = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
+		elainenrollment = Enrollment.objects.create(student=elaine, edclass=edclass, semester=second_semester)
+		studentsinclass = Student.objects.filter(edclasses=edclass, enrollment__semester=second_semester)
+		self.assertEqual(studentsinclass.count(), 1)
+		
+	def test_students_are_not_enrolled_in_same_course_in_different_semesters(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		second_semester = Semester.objects.create(text="201610")
+		edclass = EdClasses.objects.get(name='EG 5000')
+		second_semester.classes.add(edclass)
+		elaine = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
+		elainenrollment = Enrollment.objects.create(student=elaine, edclass=edclass, semester=second_semester)
+		first_semester = Semester.objects.get(text='201530')
+		studentsinclass = Student.objects.filter(edclasses=edclass, enrollment__semester=first_semester)
+		self.assertNotIn("21743142", [i for i in studentsinclass])
+		
+		
 
 		
