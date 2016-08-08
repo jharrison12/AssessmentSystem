@@ -337,5 +337,13 @@ class StudentandRubricViewTest(TestCase):
 		
 
 		
+class UserLoginTest(TestCase):
 
-
+	def test_login_page_exists(self):
+		response  = self.client.get('/login')
+		self.assertEqual(response.status_code, 301)
+	
+	def test_login_page_takes_name(self):
+		response = self.client.get('/login/')
+		self.assertTemplateUsed(response, 'registration/login.html')
+		

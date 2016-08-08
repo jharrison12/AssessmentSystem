@@ -4,8 +4,10 @@ from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubr
 from rubricapp.forms import RowForm, RowFormSet
 import re, logging
 from copy import deepcopy
+from django.contrib.auth.decorators import login_required
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 
+@login_required
 def home_page(request):
 	semester = Semester.objects.all()
 	#TODO CHANGE So that the view doesn't need to check for semester
@@ -19,7 +21,7 @@ def home_page(request):
 		return redirect('/' + request.POST['semester'] +'/')
 	return render(request, 'home.html', {'semestercode': semester }) 
 	#context can be translated as {'html template django variable': variable created in view}
-
+@login_required
 def semester_page(request, semester):
 	summerclasses = EdClasses.objects.filter(semester__text=semester)
 	if summerclasses.exists():
@@ -30,7 +32,7 @@ def semester_page(request, semester):
 		return redirect(re.sub('[\s+]', '', request.POST['edClass']) + '/') #removes whitespace from inside the class name
 	return render(request, 'semester.html', {'summerclasses': summerclasses} ) 
 	
-
+@login_required
 def student_page(request, edclass, semester):
 	#REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the 
 	#course code
@@ -50,7 +52,7 @@ def student_page(request, edclass, semester):
 
 #TODO fix studentname variable.  Change to studentlnumber
 #TODO add system log
-
+@login_required
 def rubric_page(request, edclass, studentname,semester):
 	edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
 	#This returns the class

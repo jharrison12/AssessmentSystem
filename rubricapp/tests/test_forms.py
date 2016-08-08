@@ -7,4 +7,4 @@ class RubricFormTest(TestCase):
 		form = RowForm()
 		#self.assertIn('placeholder="Enter a name"', form.as_p())
 		self.assertIn('Excellent', form.as_p())	
-
+	
