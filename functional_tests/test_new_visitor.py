@@ -37,7 +37,6 @@ class NewVisitorTest(FunctionalTest):
 		
 	
 		
-		
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
 		edclass1.keyrubric.add(writingrubric)
@@ -49,8 +48,13 @@ class NewVisitorTest(FunctionalTest):
 		self.create_two_classes_for_unit_tests()
 		self.browser.get(self.live_server_url)
 		# Dr. Makes sure that it is titled correctly
+		idusername = self.browser.find_element_by_id('id_username')
+		idusername.send_keys('bob') 
+		passwordbox = self.browser.find_element_by_id('id_password')
+		passwordbox.send_keys('bob')
+		submitbutton = self.browser.find_element_by_xpath('/html/body/h3[2]/form/input[2]')
+		submitbutton.send_keys(Keys.ENTER)
 		self.assertIn('Assessment System', self.browser.title)
-		#sleep(60)
 		
 		# Dr. chooses a semester from a drop down list
 		semester_header_text = self.browser.find_element_by_id('semester').text
