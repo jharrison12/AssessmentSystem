@@ -2,10 +2,11 @@ from unittest import skip
 from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row
 from django.template.loader import render_to_string
 from django.http import HttpRequest
-from django.test import TestCase
+from django.test import TestCase, Client
 from rubricapp.views import home_page, semester_page, student_page, rubric_page
 from django.core.urlresolvers import resolve
 from bs4 import BeautifulSoup
+from django.contrib.auth.models import UserManager, User
 
 class HomePageTest(TestCase):
 	maxDiff = None
@@ -13,13 +14,22 @@ class HomePageTest(TestCase):
 	def create_two_semesters_for_unit_tests(self):
 		Semester.objects.create(text="201530")
 		Semester.objects.create(text="201610")
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
 	
 	def test_home_url_resolves_to_home_page_view(self):
 		found = resolve('/')
 		self.assertEqual(found.func, home_page) 
 	
 	def test_home_page_returns_correct_html(self):
+		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
 		response = home_page(request)
 		semesters = Semester.objects.all()
 		expected_html = render_to_string('home.html', { 'semestercode': semesters })
@@ -29,6 +39,8 @@ class HomePageTest(TestCase):
 	def test_home_page_can_redirects_after_Post_request(self):
 		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
 		request.method = 'POST'
 		semester = Semester.objects.get(text="201530")
 		request.POST['semester'] = semester.text
@@ -41,17 +53,30 @@ class HomePageTest(TestCase):
 	def test_home_page_shows_two_semesters(self):
 		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
 		response = home_page(request)
 		self.assertEqual(Semester.objects.count(), 2)
 
 	def test_home_page_template_has_two_semesters(self):
 		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
 		response = home_page(request)
 		self.assertIn('201530', response.content.decode())
 		self.assertIn('201610', response.content.decode())
 
 class SemesterClassViewTest(TestCase):
+	
+	def setUp(self):
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'bob'        
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password=self.password)
+		self.assertEqual(login, True)
 	
 	def test_displays_all_classes(self):
 		semester = Semester.objects.create(text="201530")
@@ -91,6 +116,8 @@ class SemesterClassViewTest(TestCase):
 	def test_home_page_can_visit_201610_in_url(self):
 		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
 		request.method = 'POST'
 		semester = Semester.objects.get(text="201610")
 		request.POST['semester'] = semester.text
@@ -104,6 +131,8 @@ class SemesterClassViewTest(TestCase):
 		self.create_two_semesters_for_unit_tests()
 		self.create_two_classes_for_unit_tests()
 		request = HttpRequest()
+		bob = User.objects.get(username="bob")
+		request.user = bob
 		request.method = "POST"
 		edClass = EdClasses.objects.get(name="EG 5000")
 		request.POST['edClass'] = edClass.name
@@ -129,10 +158,21 @@ class ClassViewTest(TestCase):
 		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass, semester=first_semester)
 		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2, semester=first_semester)
 		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2, semester=first_semester)
-	
-	def create_two_semesters_for_unit_tests(self):
-		Semester.objects.create(text="201530")
-		Semester.objects.create(text="201610")
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
+		
+	def test_user_logs_in(self):
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
+		self.assertEqual(login, True)
 
 	
 	def test_student_page_returns_correct_template(self):
@@ -143,6 +183,8 @@ class ClassViewTest(TestCase):
 	def test_semester_page_redirects_to_class_url(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		request = HttpRequest()
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
 		request.method = "POST"
 		edClass = EdClasses.objects.get(name="EG 5000")
 		request.POST['edClass'] = edClass.name
@@ -162,6 +204,8 @@ class ClassViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		request = HttpRequest()
 		request.method = "POST"
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
 		bob = Student.objects.get(lnumber="21743148")
 		request.POST['studentnames'] = bob.lnumber
 
@@ -173,6 +217,8 @@ class ClassViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		request = HttpRequest()
 		request.method = 'POST'
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
 		student = Student.objects.get(lnumber="21743148")
 		request.POST['studentnames'] = student.lnumber
 
@@ -240,6 +286,13 @@ class StudentandRubricViewTest(TestCase):
 		#because the manyto-many relationship is not a column in the database
 		edclass1.keyrubric.add(writingrubric)
 		edclass2.keyrubric.add(writingrubric)
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
+
 	
 	def test_student_and_rubric_view_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()

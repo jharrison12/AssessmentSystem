@@ -7,7 +7,7 @@
 		<h3 id="{% block headerid %}{% endblock %}">{% block header_text %}{% endblock %}<h3>
 			{% block form %}
 			{% endblock %}
-		<a href={% url "logout" %}>Logout of Assessment App</a>
+		<a href="{% url 'logout' %}?next=/login">Logout of Assessment App</a>
 	</body>
 	
 </html>
