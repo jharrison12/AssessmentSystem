@@ -143,7 +143,12 @@ class NewVisitorTest(FunctionalTest):
 		#The new webpage should say "No more students"
 		bodytext = self.browser.find_element_by_tag_name('body')
 		self.assertIn("There are no more students",bodytext.text)
-
 		
-		self.fail("Should not reach")
+		#The mischevious professor tries to go back to a completed student url
+		
+		self.browser.get("%s%s" % (self.live_server_url, '/201530/EG5000/21743148'))
+		bodytext = self.browser.find_element_by_tag_name('body')
+		sleep(25)
+		self.assertIn("You have already created a rubric for this student.", bodytext.text)
+		
 		
