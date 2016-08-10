@@ -5,6 +5,7 @@ from rubricapp.forms import RowForm, RowFormSet
 import re, logging
 from copy import deepcopy
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 
 @login_required
@@ -94,18 +95,21 @@ def rubric_page(request, edclass, studentname,semester):
 		rubricforclass = edclassenrolled.keyrubric.get()
 		oldrubricname = rubricforclass.name
 		rows = Row.objects.filter(rubric=rubricforclass)
-		logging.info("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass))+ " " + str([row for row in rows]) +"\n")
-		rubricforclass.pk = None
-		rubricforclass.name= "%s %s %s" %(edclass, studentname, semester)
-		rubricforclass.template = False
-		rubricforclass.save()
-		logging.info("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
-		for row in rows:
-			row.pk = None
-			row.rubric = rubricforclass
-			logging.info("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
-			row.save()
-		RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
-		rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)
-		logging.info("At the end of the long view, the rubric is %s" % rubricforclass.pk)
-		return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass, 'rubricForClass': rubricForClassText.title(), 'semester': semester})
+		try:
+			logging.info("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass))+ " " + str([row for row in rows]) +"\n")
+			rubricforclass.pk = None
+			rubricforclass.name= "%s %s %s" %(edclass, studentname, semester)
+			rubricforclass.template = False
+			rubricforclass.save()
+			logging.info("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
+			for row in rows:
+				row.pk = None
+				row.rubric = rubricforclass
+				logging.info("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
+				row.save()
+			RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
+			rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)
+			logging.info("At the end of the long view, the rubric is %s" % rubricforclass.pk)
+			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass, 'rubricForClass': rubricForClassText.title(), 'semester': semester})
+		except IntegrityError:
+			return render(request, 'rubricerror.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'rows':rows, 'edclass':edclass, 'semester': semester})
