@@ -94,11 +94,13 @@ class RubricModel(TestCase):
 		bobrubric = Rubric.objects.get(enrollment__student=bob)
 		
 		self.assertNotEqual(bobrubric, janerubric)
-	
 	@skip
-	def test_rubric_objects_cannot_have_same_name(self):
+	def test_duplicate_rubric_objects_are_invalid(self):
 		self.create_rubric_and_rows_connect_to_class()
-		self.assertRaisesMessage(IntegrityError, callable=Rubric.objects.create(name="writingrubric"))
+		rubric = Rubric.objects.create(name="writingrubric")
+		with self.assertRaises(ValidationError):
+			rubric = Rubric(name="writingrubric")
+			rubric.full_clean()
 		
 class ClassAndSemesterModelTest(TestCase):
 	

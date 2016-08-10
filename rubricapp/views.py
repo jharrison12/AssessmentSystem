@@ -6,7 +6,8 @@ import re, logging
 from copy import deepcopy
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+from django.core.exceptions import ValidationError
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 @login_required
 def home_page(request):
@@ -100,7 +101,8 @@ def rubric_page(request, edclass, studentname,semester):
 		rubricforclass.pk = None
 		rubricforclass.name= "%s %s %s" %(edclass, studentname, semester)
 		rubricforclass.template = False
-		if rubricforclass.clean_fields():
+		try:
+			rubricforclass.full_clean()
 			rubricforclass.save()
 			logging.info("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
 			for row in rows:
@@ -117,7 +119,7 @@ def rubric_page(request, edclass, studentname,semester):
 													'edclass':edclass, 
 													'rubricForClass': rubricForClassText.title(), 
 													'semester': semester})
-		else:
+		except ValidationError:
 			error = "You have already completed this rubric"
 			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,
 													'studentname': student.lastname + ", " + student.firstname, 
