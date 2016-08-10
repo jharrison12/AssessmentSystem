@@ -21,14 +21,3 @@ class RubricForm(ModelForm):
 
 RowFormSet = modelformset_factory(Row, fields=('row_choice','excellenttext','proficienttext','satisfactorytext', 'unsatisfactorytext'), extra=0) #extra=0 keeps the formset from creating new form
 
-"""
-Probably don't need the form below
-
-class UserForm(ModelForm):
-	password = forms.CharField(widget=forms.PasswordInput())
-
-	class Meta:
-		model = User
-		fields = ('username', 'email', 'password')
-		
-"""

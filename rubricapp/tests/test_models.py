@@ -5,6 +5,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from rubricapp.views import home_page, semester_page, student_page, rubric_page
 from django.core.urlresolvers import resolve
+from django.db import IntegrityError
 
 class RubricModel(TestCase):
 			
@@ -31,7 +32,6 @@ class RubricModel(TestCase):
 							
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		edclass1.keyrubric.add(writingrubric)
 		edclass1.keyrubric.add(writingrubric)
 		
 	def test_rubric_connected_with_enrollment_class(self):
@@ -94,6 +94,11 @@ class RubricModel(TestCase):
 		bobrubric = Rubric.objects.get(enrollment__student=bob)
 		
 		self.assertNotEqual(bobrubric, janerubric)
+	
+	@skip
+	def test_rubric_objects_cannot_have_same_name(self):
+		self.create_rubric_and_rows_connect_to_class()
+		self.assertRaisesMessage(IntegrityError, callable=Rubric.objects.create(name="writingrubric"))
 		
 class ClassAndSemesterModelTest(TestCase):
 	

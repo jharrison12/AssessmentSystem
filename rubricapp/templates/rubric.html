@@ -8,6 +8,9 @@
 			
 			<table border="1">
 		<!-- TODO fix this so that it pulls from forms.py -->
+				{% if error %}
+						{{ error }}
+				{% else %}
 				<tr>
 					<th></th>
 					<th>Excellent</th>
@@ -27,17 +30,16 @@
 						<td>{{ form.unsatisfactorytext.value }}</td>
 
 					</tr>
-					{% if RowFormSetWeb.errors %}
-						{{ RowFormSetWeb.errors }}
-					{% endif %}
+					
 					{% endfor %}
 
 				
 			</table>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="rubricsubmit">
+				
 		{% csrf_token %}
 		</form>
-
+				{% endif %}
 		{% endblock %}
 		
 	

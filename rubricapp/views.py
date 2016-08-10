@@ -53,6 +53,7 @@ def student_page(request, edclass, semester):
 
 #TODO fix studentname variable.  Change to studentlnumber
 #TODO add system log
+
 @login_required
 def rubric_page(request, edclass, studentname,semester):
 	edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
@@ -95,11 +96,11 @@ def rubric_page(request, edclass, studentname,semester):
 		rubricforclass = edclassenrolled.keyrubric.get()
 		oldrubricname = rubricforclass.name
 		rows = Row.objects.filter(rubric=rubricforclass)
-		try:
-			logging.info("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass))+ " " + str([row for row in rows]) +"\n")
-			rubricforclass.pk = None
-			rubricforclass.name= "%s %s %s" %(edclass, studentname, semester)
-			rubricforclass.template = False
+		logging.info("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass))+ " " + str([row for row in rows]) +"\n")
+		rubricforclass.pk = None
+		rubricforclass.name= "%s %s %s" %(edclass, studentname, semester)
+		rubricforclass.template = False
+		if rubricforclass.clean_fields():
 			rubricforclass.save()
 			logging.info("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
 			for row in rows:
@@ -110,6 +111,19 @@ def rubric_page(request, edclass, studentname,semester):
 			RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
 			rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)
 			logging.info("At the end of the long view, the rubric is %s" % rubricforclass.pk)
-			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass, 'rubricForClass': rubricForClassText.title(), 'semester': semester})
-		except IntegrityError:
-			return render(request, 'rubricerror.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'rows':rows, 'edclass':edclass, 'semester': semester})
+			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,
+													'studentname': student.lastname + ", " + student.firstname, 
+													'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 
+													'edclass':edclass, 
+													'rubricForClass': rubricForClassText.title(), 
+													'semester': semester})
+		else:
+			error = "You have already completed this rubric"
+			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,
+													'studentname': student.lastname + ", " + student.firstname, 
+													'rows':rows, 
+													'edclass':edclass, 
+													'rubricForClass': oldrubricname.title(), 
+													'semester': semester,
+													'error': error})
+		
