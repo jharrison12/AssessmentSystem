@@ -47,13 +47,14 @@ class NewVisitorTest(FunctionalTest):
 		# Dr. visits the webpage
 		self.create_two_classes_for_unit_tests()
 		self.browser.get(self.live_server_url)
-		# Dr. Makes sure that it is titled correctly
+		# Dr. must first login to the assessment system
 		idusername = self.browser.find_element_by_id('id_username')
 		idusername.send_keys('bob') 
 		passwordbox = self.browser.find_element_by_id('id_password')
 		passwordbox.send_keys('bob')
 		submitbutton = self.browser.find_element_by_xpath('/html/body/h3[2]/form/input[2]')
 		submitbutton.send_keys(Keys.ENTER)
+		# Dr. Makes sure that it is titled correctly
 		self.assertIn('Assessment System', self.browser.title)
 		
 		# Dr. chooses a semester from a drop down list
@@ -148,7 +149,12 @@ class NewVisitorTest(FunctionalTest):
 		
 		self.browser.get("%s%s" % (self.live_server_url, '/201530/EG5000/21743148'))
 		bodytext = self.browser.find_element_by_tag_name('body')
-		sleep(25)
-		self.assertIn("You have already created a rubric for this student.", bodytext.text)
+		self.assertIn("You have already completed a rubric for this student.", bodytext.text)
 		
+		#nonplussed, they return home
+		home = self.browser.find_element_by_link_text("Return Home")
+		home.click()
+		semester_header_text = self.browser.find_element_by_id('semester').text
+		self.assertIn("Choose a Semester!", semester_header_text)
+
 		

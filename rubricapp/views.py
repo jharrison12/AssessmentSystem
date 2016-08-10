@@ -120,7 +120,7 @@ def rubric_page(request, edclass, studentname,semester):
 													'rubricForClass': rubricForClassText.title(), 
 													'semester': semester})
 		except ValidationError:
-			error = "You have already completed this rubric"
+			error = "You have already completed a rubric for this student."
 			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,
 													'studentname': student.lastname + ", " + student.firstname, 
 													'rows':rows, 
