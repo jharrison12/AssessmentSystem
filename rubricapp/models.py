@@ -12,7 +12,7 @@ class Student(models.Model):
 
 
 class Rubric(models.Model):
-	name = models.TextField(default="Basic Rubric")
+	name = models.TextField(default="Basic Rubric", unique=True)
 	template = models.BooleanField(default=True)
 	
 	def __str__(self):
