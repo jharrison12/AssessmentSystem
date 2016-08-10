@@ -173,7 +173,11 @@ class ClassViewTest(TestCase):
 		self.test_user = User.objects.create_user(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
 		self.assertEqual(login, True)
-
+	
+	def test_semester_page_requires_login(self):
+		#follow=True follows the redirect to the login page
+		response = self.client.get("/201530/", follow=True)
+		self.assertIn("Username", response.content.decode())
 	
 	def test_student_page_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
@@ -292,8 +296,11 @@ class StudentandRubricViewTest(TestCase):
 		self.password = 'test'
 		self.test_user = User.objects.create_user(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
+		
+	def test_class_page_requires_login(self):
+		response = self.client.get("/201530/EG5000", follow=True)
+		self.assertIn("Username", response.content.decode())
 
-	
 	def test_student_and_rubric_view_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/201530/EG5000/21743148/")
