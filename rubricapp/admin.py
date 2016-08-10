@@ -38,5 +38,5 @@ admin.site.register(Semester)
 admin.site.register(EdClasses, EdClassAdmin)
 admin.site.register(Student)
 admin.site.register(Rubric, RubricAdmin)
-admin.site.register(Row)
+#admin.site.register(Row)
 
