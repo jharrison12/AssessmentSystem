@@ -7,7 +7,7 @@ from copy import deepcopy
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 
 @login_required
 def home_page(request):
