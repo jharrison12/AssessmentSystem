@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from rubricapp import views
 from django.contrib.auth import views as auth_views
-from rubricapp.forms import ValidatingPasswordChangeForm
+from rubricapp.forms import ValidatingPasswordForm
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -20,6 +20,6 @@ urlpatterns = [
 
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-	url(r'^password_change/$', auth_views.password_change, {'password_change_form': ValidatingPasswordChangeForm}), 
+	url(r'^password_change/$', auth_views.password_change, {'password_change_form': ValidatingPasswordForm}), 
     url('^', include('django.contrib.auth.urls',)),
 ]

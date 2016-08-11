@@ -1,6 +1,11 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment
+#For user creation
+
 
 #For admin page
 class EnrollmentAdmin(admin.TabularInline):

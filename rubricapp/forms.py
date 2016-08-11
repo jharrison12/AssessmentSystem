@@ -21,9 +21,9 @@ class RubricForm(ModelForm):
 		}
 
 RowFormSet = modelformset_factory(Row, fields=('row_choice','excellenttext','proficienttext','satisfactorytext', 'unsatisfactorytext'), extra=0) #extra=0 keeps the formset from creating new form
-
-class ValidatingPasswordChangeForm(auth.forms.PasswordChangeForm):
-	MIN_LENGTH = 8
+## Form for validating password
+class ValidatingPasswordForm(object):
+	MIN_LENGTH = 10
 	
 	def clean_new_password1(self):
 		password1 = self.cleaned_data.get('new_password1')
@@ -41,3 +41,9 @@ class ValidatingPasswordChangeForm(auth.forms.PasswordChangeForm):
 		# ... any other validation you want ...
 
 		return password1
+		
+class ValidatingPasswordChangeForm(ValidatingPasswordForm, auth.forms.PasswordChangeForm):
+	pass
+
+class ValidatingSetPasswordForm(ValidatingPasswordForm, auth.forms.SetPasswordForm):
+	pass
