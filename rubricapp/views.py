@@ -21,7 +21,7 @@ def home_page(request):
 		Semester.objects.create(text="201610")
 	if request.method == "POST":
 		return redirect('/' + request.POST['semester'] +'/')
-	return render(request, 'home.html', {'semestercode': semester }) 
+	return render(request, 'rubricapp/home.html', {'semestercode': semester }) 
 	#context can be translated as {'html template django variable': variable created in view}
 @login_required
 def semester_page(request, semester):
@@ -32,7 +32,7 @@ def semester_page(request, semester):
 		return redirect('/')
 	if request.method == "POST":
 		return redirect(re.sub('[\s+]', '', request.POST['edClass']) + '/') #removes whitespace from inside the class name
-	return render(request, 'semester.html', {'summerclasses': summerclasses} ) 
+	return render(request, 'rubricapp/semester.html', {'summerclasses': summerclasses} ) 
 	
 @login_required
 def student_page(request, edclass, semester):
@@ -50,7 +50,7 @@ def student_page(request, edclass, semester):
 		#Why is adding the forward slash unneccessary?
 		#Why does the redirect no need the edclass added to the beginning?
 		return redirect(re.sub('[\s+]', '', request.POST['studentnames']) + '/')
-	return render(request, 'student.html', {'students': students, 'semester':semester})
+	return render(request, 'rubricapp/student.html', {'students': students, 'semester':semester})
 
 #TODO fix studentname variable.  Change to studentlnumber
 #TODO add system log
@@ -90,7 +90,7 @@ def rubric_page(request, edclass, studentname,semester):
 			logging.info("Great enrollment id is %d" % greatEnrollment.pk)
 			return redirect('/'+ semester +'/'+ edclass + '/')
 		else:
-			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
+			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
 	else:
 		#This view returns a brandnew copy of the rubric based upon
 		#the rubric associated with the edclass
@@ -113,7 +113,7 @@ def rubric_page(request, edclass, studentname,semester):
 			RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
 			rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)
 			logging.info("At the end of the long view, the rubric is %s" % rubricforclass.pk)
-			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,
+			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
 													'studentname': student.lastname + ", " + student.firstname, 
 													'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 
 													'edclass':edclass, 
@@ -121,7 +121,7 @@ def rubric_page(request, edclass, studentname,semester):
 													'semester': semester})
 		except ValidationError:
 			error = "You have already completed a rubric for this student."
-			return render(request, 'rubric.html', {'studentlnumber': student.lnumber,
+			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
 													'studentname': student.lastname + ", " + student.firstname, 
 													'rows':rows, 
 													'edclass':edclass, 

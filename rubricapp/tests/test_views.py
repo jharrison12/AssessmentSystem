@@ -32,7 +32,7 @@ class HomePageTest(TestCase):
 		request.user = Bob
 		response = home_page(request)
 		semesters = Semester.objects.all()
-		expected_html = render_to_string('home.html', { 'semestercode': semesters })
+		expected_html = render_to_string('rubricapp/home.html', { 'semestercode': semesters })
 		self.assertMultiLineEqual(response.content.decode(), expected_html)
 
 	
@@ -111,7 +111,7 @@ class SemesterClassViewTest(TestCase):
 		self.create_two_classes_for_unit_tests()
 		semester = Semester.objects.get(text="201530")
 		response = self.client.get('/'+ semester.text +'/')
-		self.assertTemplateUsed(response, 'semester.html')
+		self.assertTemplateUsed(response, 'rubricapp/semester.html')
 		
 	def test_home_page_can_visit_201610_in_url(self):
 		self.create_two_semesters_for_unit_tests()
@@ -182,7 +182,7 @@ class ClassViewTest(TestCase):
 	def test_student_page_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		response = self.client.get("/201530/EG5000/")
-		self.assertTemplateUsed(response, 'student.html')
+		self.assertTemplateUsed(response, 'rubricapp/student.html')
 		
 	def test_semester_page_redirects_to_class_url(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
@@ -304,7 +304,7 @@ class StudentandRubricViewTest(TestCase):
 	def test_student_and_rubric_view_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		response = self.client.get("/201530/EG5000/21743148/")
-		self.assertTemplateUsed(response, 'rubric.html')
+		self.assertTemplateUsed(response, 'rubricapp/rubric.html')
 		
 	def test_student_and_rubric_view_shows_student_name(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
@@ -400,8 +400,8 @@ class StudentandRubricViewTest(TestCase):
 class UserLoginTest(TestCase):
 
 	def test_login_page_exists(self):
-		response  = self.client.get('/login')
-		self.assertEqual(response.status_code, 301)
+		response  = self.client.get('/201530/')
+		self.assertEqual(response.status_code, 302)
 	
 	def test_login_page_takes_name(self):
 		response = self.client.get('/login/')
