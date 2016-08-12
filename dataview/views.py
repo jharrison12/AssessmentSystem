@@ -4,4 +4,4 @@ from django.shortcuts import render
 
 
 def home_page(request):
-	return render(request, 'dataviewhome.html', )
+	return render(request, 'dataview/dataviewhome.html', )
