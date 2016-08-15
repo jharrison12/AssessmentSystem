@@ -7,5 +7,5 @@ admin.autodiscover()
 app_name='dataview'
 urlpatterns = [ 
     # Examples:
-	 url(r'^$', views.home_page, name='home'),
+	 url(r'', views.home_page, name='home'),
 ]

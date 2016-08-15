@@ -41,6 +41,7 @@ class NewVisitorTest(FunctionalTest):
 		#because the manyto-many relationship is not a column in the database
 		edclass1.keyrubric.add(writingrubric)
 		edclass2.keyrubric.add(writingrubric)
+
 		
 	def test_user_visits_inital_page(self):
 

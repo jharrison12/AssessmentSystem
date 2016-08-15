@@ -6,15 +6,15 @@ from dataview.views import home_page
 # Create your tests here.
 
 class DataViewHome(TestCase):
-	@skip
-	def test_data_view_home(self):
-		response
+
+	def test_data_view_home_returns_function(self):
+		found = resolve('/data/')
 		self.assertEqual(found.func, home_page)
 		
 	def test_data_view_home(self):
-		response = self.client.get('data/')
-		self.assertEqual(response.content.decode(), '')
+		response = self.client.get('/data/')
+		self.assertContains(response, 'You', status_code=200)
 		
 	def test_data_view_home_uses_template(self):
-		response = self.client.get('data/')
-		self.assertTemplateUse(respone, 'dataviewhome.html')
+		response = self.client.get('/data/')
+		self.assertTemplateUsed(response, 'dataview/dataviewhome.html')
