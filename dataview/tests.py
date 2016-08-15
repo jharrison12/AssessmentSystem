@@ -1,7 +1,7 @@
 from django.test import TestCase
 from unittest import skip
 from django.core.urlresolvers import resolve
-from dataview.views import home_page
+from dataview.views import home_page, student_view
 
 # Create your tests here.
 
@@ -18,3 +18,13 @@ class DataViewHome(TestCase):
 	def test_data_view_home_uses_template(self):
 		response = self.client.get('/data/')
 		self.assertTemplateUsed(response, 'dataview/dataviewhome.html')
+		
+class StudentView(TestCase):
+
+	def test_student_view_uses_student_view_function(self):
+		found = resolve('/data/student/')
+		self.assertEqual(found.func, student_view)
+	
+	def test_student_view_works(self):
+		response = self.client.get('/data/student/')
+		self.assertContains(response, "Choose a student!")

@@ -57,7 +57,28 @@ class DataView(FunctionalTest):
 		#Professor pulls up the data view
 		self.create_two_classes_for_unit_tests()
 		self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+		#Prof finds several options for how to view rubrics
+		headertext = self.browser.find_element_by_id('headertext')
+		self.assertEquals(headertext.text, "Choose a data retrieval method")
+		studentchoice = self.browser.find_element_by_id('studentlink')
+		self.assertEquals(studentchoice.text, "Look at one student's rubrics")
+		classchoice = self.browser.find_element_by_id('classlink')
+		self.assertEquals(classchoice.text, "Look at aggregated class data")
+		rubricchoice = self.browser.find_element_by_id("rubriclink")
+		self.assertEquals(rubricchoice.text, "Look at aggregated rubric data")
 		
-		#
+		##TODO: Add login functionality
+		
+		#Professor Chooses the student view
+		studentchoice.click()
+		
+		#Professor Encounters a magical drop down menu with 
+		#Professor Encounters a magical drop down menu with 
+		
+		#Prof changes their minds.  They want to look at all the rubrics from a particular course
+		
+		#Prof changes mind once again.  They would rather look at the instance of all the rubrics
+		
+		#Prof 
 		
 		
