@@ -56,16 +56,18 @@ class StudentView(TestCase):
 		edclass1.keyrubric.add(writingrubric)
 		edclass2.keyrubric.add(writingrubric)
 		
-		completedrubricforbob = Rubric.objects.create(name="bobcompletedrubric", template=False)
-		row1 = Row.objects.create(excellenttext="THE BEST!", 
+		completedrubricforbob = Rubric.objects.create(name="EG500021743148201530", template=False)
+		row1 = Row.objects.create(name="Fortitude",
+								  excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
-								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=1)
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=2)
 								  
-		row2 = Row.objects.create(excellenttext="THE GREATEST!",
+		row2 = Row.objects.create(name="Excellenceisahabit",
+								  excellenttext="THE GREATEST!",
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
-								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=1)
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=4)
 		
 		bobenrollment.completedrubric = completedrubricforbob
 		bobenrollment.save()
@@ -112,9 +114,9 @@ class StudentView(TestCase):
 		
 	def test_data_view_shows_rubrics(self):
 		response = self.client.get('/data/student/21743148/')
-		self.assertIn("bobcompletedrubric", response.content.decode())
+		self.assertIn("EG500021743148201530", response.content.decode())
 		
-	def test_student_page_has_submit_button(self):
+	def test_student_data_page_has_submit_button(self):
 		response = self.client.get("/data/student/21743148/")
 		self.assertIn("Submit", response.content.decode())
 		
@@ -125,10 +127,28 @@ class StudentView(TestCase):
 		response = student_data_view(request,lnumber="21743148")
 		self.assertEqual(response.status_code, 302)
 	
-	def test_student_data_view_takes_post_request(self):
+	def test_student_data_view_redirects_to_correct_url(self):
 		request = HttpRequest()
 		request.method = "POST"
-		request.POST['rubricname'] = "bobcompletedrubric"
+		request.POST['rubricname'] = "EG5000 21743148 201530"
 		response = student_data_view(request, lnumber="21743148")
-		self.assertEqual(response['location'], 'bobcompletedrubric/')
+		self.assertEqual(response['location'], 'EG500021743148201530/')
+	
+	def test_student_rubric_view_shows_a_rubric(self):
+		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		self.assertIn("Rubric", response.content.decode())
+	
+	def test_student_rubric_view_uses_correct_template(self):
+		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		self.assertTemplateUsed(response, 'dataview/studentrubricview.html')
+		
+	def test_student_rubric_view_shows__rows(self):
+		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		self.assertIn("Excellenceisahabit", response.content.decode())
+	
+	def test_student_rubric_view_shows_scores(self):
+		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		self.assertIn("The worst ever", response.content.decode())
+		
+	
 	

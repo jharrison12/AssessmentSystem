@@ -370,7 +370,7 @@ class StudentandRubricViewTest(TestCase):
 		
 		bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
 		
-		self.assertEqual(bobenrollment.completedrubric.name, "EG5000 21743148 201530")
+		self.assertEqual(bobenrollment.completedrubric.name, "EG500021743148201530")
 		
 	
 	def test_post_request_updates_correct_model(self):

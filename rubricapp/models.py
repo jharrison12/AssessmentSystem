@@ -61,7 +61,6 @@ class Enrollment(models.Model):
 	student = models.ForeignKey(Student)
 	edclass = models.ForeignKey(EdClasses)
 	semester = models.ForeignKey(Semester)
-	#grade = models.TextField(default='') 
 	#Will need to change completedrubric editable to False
 	completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
 	rubriccompleted = models.BooleanField(default=False)

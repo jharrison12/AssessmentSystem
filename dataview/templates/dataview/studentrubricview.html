@@ -1,0 +1,13 @@
+<html>
+	<body>
+		<h1 id="rubricchoice">Rubric</h1>
+		<table border="1px">
+		{% for row in rows %}
+			<tr>
+				<td>{{ row.name }}</td>
+				<td>{{ row.get_row_choice_display }}</td>
+			</tr>
+		{% endfor %}
+		</table>
+	</body>
+</html>
