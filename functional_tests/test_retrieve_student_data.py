@@ -70,10 +70,12 @@ class DataView(FunctionalTest):
 		##TODO: Add login functionality
 		
 		#Professor Chooses the student view
-		studentchoice.click()
+		studentchoice.send_keys(Keys.ENTER)
+		studentchoiceheader = self.browser.find_element_by_id("studentchoice")
+		self.assertEqual(studentchoiceheader.text, "Choose a student!")
 		
 		#Professor Encounters a magical drop down menu with 
-		#Professor Encounters a magical drop down menu with 
+
 		
 		#Prof changes their minds.  They want to look at all the rubrics from a particular course
 		

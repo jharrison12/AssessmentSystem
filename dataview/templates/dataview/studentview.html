@@ -1,5 +1,14 @@
 <html>
 	<body>
-		<p>Choose a student!</p>
+		<h1 id="studentchoice">Choose a student!</h1>
+		<form method="POST" action="">
+			<select name="studentnames" value="studentdropdown">
+					{% for student in students %}
+					<option value="{{ student.lnumber }}" id={{ student.lnumber }}>{{ student.firstname }} {{ student.lastname }}</option>
+					{% endfor %}
+			</select>
+		<input name="submitbutton" type="submit" name="submit" value="Submit" id="rubricsubmit">
+		{% csrf_token %}
+		</form>
 	</body>
 </html>
