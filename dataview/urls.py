@@ -9,4 +9,5 @@ urlpatterns = [
     # Examples:
 	 url(r'^$', views.home_page, name='home'),
 	 url(r'^student/$', views.student_view, name='student_view'),
+	 url(r'^student/(?P<lnumber>[0-9]+)/$', views.student_data_view, name='student_data_view'),
 ]
