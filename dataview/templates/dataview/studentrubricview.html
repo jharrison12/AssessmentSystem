@@ -1,7 +1,12 @@
 <html>
 	<body>
 		<h1 id="rubricchoice">Rubric</h1>
+		<h2>{{ rubricname }}
 		<table border="1px">
+			<tr>
+				<th>Row Title</th>
+				<th>Row Score</th>
+			</tr>
 		{% for row in rows %}
 			<tr>
 				<td>{{ row.name }}</td>

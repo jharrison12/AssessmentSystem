@@ -40,7 +40,7 @@ class DataView(FunctionalTest):
 		edclass1.keyrubric.add(writingrubric)
 		edclass2.keyrubric.add(writingrubric)
 		
-		completedrubricforbob = Rubric.objects.create(name="bobcompletedrubric", template=False)
+		completedrubricforbob = Rubric.objects.create(name="EG500021743148201530", template=False)
 		row1 = Row.objects.create(excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
@@ -52,6 +52,8 @@ class DataView(FunctionalTest):
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=1)
 								  
 		bobenrollment.completedrubric = completedrubricforbob
+		
+		bobenrollment.save()
 	
 	def test_professor_visits_the_main_page(self):
 		#Professor pulls up the data view
@@ -74,9 +76,25 @@ class DataView(FunctionalTest):
 		studentchoiceheader = self.browser.find_element_by_id("studentchoice")
 		self.assertEqual(studentchoiceheader.text, "Choose a student!")
 		
-		#Professor Encounters a magical drop down menu with 
-
+		#Professor Encounters a magical drop down menu with student names
+		studentdropdown = self.browser.find_element_by_id('studentnames')
+		self.assertEqual(studentdropdown.get_attribute('name'), 'studentnames')
+		studentname = self.browser.find_elements_by_tag_name('option')
+		self.assertIn("Bob DaBuilder", [i.text for i in studentname])
+		submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
+		submitbuttonstudent.send_keys(Keys.ENTER) 
 		
+		#Professor chooses a rubric
+		studentnameheader = self.browser.find_element_by_tag_name('h1')
+		self.assertIn("Bob DaBuilder", studentnameheader.text)
+		rubricnames = self.browser.find_elements_by_tag_name('option')
+		self.assertIn("EG500021743148201530", [i.text for i in rubricnames])
+		submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
+		submitbuttonstudent.send_keys(Keys.ENTER)
+		
+		#Professor sees the rubric
+		
+
 		#Prof changes their minds.  They want to look at all the rubrics from a particular course
 		
 		#Prof changes mind once again.  They would rather look at the instance of all the rubrics

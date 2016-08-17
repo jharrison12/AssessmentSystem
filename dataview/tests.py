@@ -1,7 +1,7 @@
 from django.test import TestCase
 from unittest import skip
 from django.core.urlresolvers import resolve
-from dataview.views import home_page, student_view, student_data_view
+from dataview.views import home_page, student_view, student_data_view, ed_class_view
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row
 from django.http import HttpRequest
 
@@ -150,5 +150,70 @@ class StudentView(TestCase):
 		response = self.client.get('/data/student/21743148/EG500021743148201530/')
 		self.assertIn("The worst ever", response.content.decode())
 		
+class EdClass(TestCase):
 	
+	def setUp(self):
+		semester = Semester.objects.create(text="201530")
+		semester2 = Semester.objects.create(text="201610")
+		edclass1 = EdClasses.objects.create(name="EG 5000")
+		edclass2 = EdClasses.objects.create(name="EG 6000")
+		semester.classes.add(edclass1)
+		semester.classes.add(edclass2)
+		
+		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
+		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
+		jake = Student.objects.create(lastname="The Snake", firstname="Jake", lnumber="0000")
+		
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1, semester=semester)
+		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
+		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
+		writingrubric = Rubric.objects.create(name="writingrubric")
+
+		row1 = Row.objects.create(excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+								  
+		row2 = Row.objects.create(excellenttext="THE GREATEST!",
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+		
+		#Many to many relationship must be added after creation of objects
+		#because the manyto-many relationship is not a column in the database
+		edclass1.keyrubric.add(writingrubric)
+		edclass2.keyrubric.add(writingrubric)
+		
+		completedrubricforbob = Rubric.objects.create(name="EG500021743148201530", template=False)
+		row1 = Row.objects.create(name="Fortitude",
+								  excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=2)
+								  
+		row2 = Row.objects.create(name="Excellenceisahabit",
+								  excellenttext="THE GREATEST!",
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=4)
+		
+		bobenrollment.completedrubric = completedrubricforbob
+		bobenrollment.save()	
 	
+	def test_class_view_uses_class_view_function(self):
+		found = resolve('/data/class/')
+		self.assertEqual(found.func, ed_class_view)
+	
+	def test_class_view_works(self):
+		response = self.client.get('/data/class/')
+		self.assertContains(response, "Choose a class!")
+		
+	def test_class_view_uses_correct_template(self):
+		response = self.client.get('/data/class/')
+		self.assertTemplateUsed(response, 'dataview/classview.html')
+		
+	def test_class_page_shows_an_actual_class(self):
+		#follow=True follows the redirect to the login page
+		response = self.client.get("/data/class/")
+		self.assertIn("EG 5000", response.content.decode())

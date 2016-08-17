@@ -11,4 +11,5 @@ urlpatterns = [
 	 url(r'^student/$', views.student_view, name='student_view'),
 	 url(r'^student/(?P<lnumber>[0-9]+)/$', views.student_data_view, name='student_data_view'),
 	 url(r'^student/(?P<lnumber>[0-9]+)/(?P<rubricname>\w+)/$', views.student_rubric_data_view, name="student_rubric_data_view"),
-]
+	 url(r'^class/$', views.ed_class_view, name='edclass_view'),
+	 ]

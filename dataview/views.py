@@ -24,4 +24,7 @@ def student_data_view(request, lnumber):
 def student_rubric_data_view(request,lnumber,rubricname):
 	logging.info("The rubric name is %s " % (rubricname))
 	rows = Row.objects.filter(rubric__name=rubricname)
-	return render(request, 'dataview/studentrubricview.html', {'rows':rows})
+	return render(request, 'dataview/studentrubricview.html', {'rows':rows, 'rubricname':rubricname})
+
+def ed_class_view(request):
+	return render(request, 'dataview/classview.html')
