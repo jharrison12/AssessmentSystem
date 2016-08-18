@@ -25,7 +25,8 @@ class DataView(FunctionalTest):
 		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 
-		row1 = Row.objects.create(excellenttext="THE BEST!", 
+		row1 = Row.objects.create(name="Excellence",
+								  excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
 								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
@@ -41,7 +42,8 @@ class DataView(FunctionalTest):
 		edclass2.keyrubric.add(writingrubric)
 		
 		completedrubricforbob = Rubric.objects.create(name="EG500021743148201530", template=False)
-		row1 = Row.objects.create(excellenttext="THE BEST!", 
+		row1 = Row.objects.create(name="Excellence",
+								  excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=1)
@@ -93,9 +95,14 @@ class DataView(FunctionalTest):
 		submitbuttonstudent.send_keys(Keys.ENTER)
 		
 		#Professor sees the rubric
-		
+		bodytext = self.browser.find_element_by_tag_name('body')
+		self.assertIn("Excellence", bodytext.text)
 
 		#Prof changes their minds.  They want to look at all the rubrics from a particular course
+		self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+		classchoice = self.browser.find_element_by_id('classlink')
+		classchoice.send_keys(Keys.ENTER)
+		
 		
 		#Prof changes mind once again.  They would rather look at the instance of all the rubrics
 		

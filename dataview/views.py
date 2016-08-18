@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from rubricapp.models import Student, Enrollment, Row, Rubric
+from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses
 import re, logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 # Create your views here.
@@ -27,4 +27,10 @@ def student_rubric_data_view(request,lnumber,rubricname):
 	return render(request, 'dataview/studentrubricview.html', {'rows':rows, 'rubricname':rubricname})
 
 def ed_class_view(request):
-	return render(request, 'dataview/classview.html')
+	edclasses = EdClasses.objects.all()
+	if request.method == "POST":
+		return redirect(re.sub('[\s+]', '', request.POST['edclass'])+'/')
+	return render(request, 'dataview/classview.html', {'edclasses':edclasses})
+
+def ed_class_data_view(request, edclass):
+	return render(request, 'dataview/classdataview.html')

@@ -1,9 +1,10 @@
 from django.test import TestCase
 from unittest import skip
 from django.core.urlresolvers import resolve
-from dataview.views import home_page, student_view, student_data_view, ed_class_view
+from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row
 from django.http import HttpRequest
+import re
 
 # Create your tests here.
 
@@ -217,3 +218,32 @@ class EdClass(TestCase):
 		#follow=True follows the redirect to the login page
 		response = self.client.get("/data/class/")
 		self.assertIn("EG 5000", response.content.decode())
+	
+	def test_clas_page_has_submit_button(self):
+		response = self.client.get('/data/class/')
+		self.assertIn("Submit", response.content.decode())
+	
+	def test_clas_page_can_take_post_request(self):
+		request = HttpRequest()
+		request.method = "POST"
+		request.POST['edclass'] = "EG 5000"
+		response = ed_class_view(request)
+		self.assertEqual(response.status_code, 302)
+		
+	def test_class_page_redirects_to_proper_url(self):
+		request = HttpRequest()
+		request.method = "POST"
+		request.POST['edclass'] = "EG 5000"
+		response = ed_class_view(request)
+		self.assertEqual(response['location'],"EG5000/" )
+		
+	def test_class_data_page_returns_correct_function(self):
+		found = resolve('/data/class/EG5000/')
+		self.assertEqual(found.func, ed_class_data_view)
+	
+	def test_class_data_page_uses_correct_template(self):
+		edclass = EdClasses.objects.get(name="EG 5000")
+		edclass = re.sub('[\s+]', '', edclass.name)
+		response = self.client.get("/data/class/%s/" % (edclass))
+		self.assertTemplateUsed(response, 'dataview/classdataview.html')
+		

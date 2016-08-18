@@ -1,3 +1,14 @@
 <html>
-	Choose a class!
+	<body>
+	<h1>Choose a class!</h1>
+	<form method="POST" action=>
+		<select name="eclass" id="edlcassdropdown">	
+		{% for class in edclasses %}
+			<option name="{{class.name }}">{{ class }}</option>
+		{% endfor %}
+		</select>
+		<input name="submitbutton" type="submit" name="submit" value="Submit" id="classsubmit">
+		{% csrf_token %}
+	</form>
+	</body>
 </html>
