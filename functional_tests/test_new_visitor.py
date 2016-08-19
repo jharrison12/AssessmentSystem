@@ -47,7 +47,7 @@ class NewVisitorTest(FunctionalTest):
 
 		# Dr. visits the webpage
 		self.create_two_classes_for_unit_tests()
-		self.browser.get(self.live_server_url)
+		self.browser.get(self.live_server_url + '/assessment/')
 		# Dr. must first login to the assessment system
 		idusername = self.browser.find_element_by_id('id_username')
 		idusername.send_keys('bob') 
@@ -148,7 +148,7 @@ class NewVisitorTest(FunctionalTest):
 		
 		#The mischevious professor tries to go back to a completed student url
 		
-		self.browser.get("%s%s" % (self.live_server_url, '/201530/EG5000/21743148'))
+		self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG5000/21743148'))
 		bodytext = self.browser.find_element_by_tag_name('body')
 		self.assertIn("You have already completed a rubric for this student.", bodytext.text)
 		

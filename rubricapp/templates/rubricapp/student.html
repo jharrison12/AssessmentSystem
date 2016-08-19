@@ -15,7 +15,7 @@
 		</form>
 				{% else %}
 				<p>There are no more students</p>
-				<a href={% url 'semester' semester=semester %}>Return to the semester page</a>
+				<a href={% url 'rubricapp:semester' semester=semester %}>Return to the semester page</a>
 				{% endif %}
 		{% endblock %}
 						

@@ -20,7 +20,7 @@ def home_page(request):
 		Semester.objects.create(text="201530")
 		Semester.objects.create(text="201610")
 	if request.method == "POST":
-		return redirect('/' + request.POST['semester'] +'/')
+		return redirect(request.POST['semester'] +'/')
 	return render(request, 'rubricapp/home.html', {'semestercode': semester }) 
 	#context can be translated as {'html template django variable': variable created in view}
 @login_required
@@ -29,7 +29,7 @@ def semester_page(request, semester):
 	if summerclasses.exists():
 		pass
 	else:
-		return redirect('/')
+		return redirect('/assessment/')
 	if request.method == "POST":
 		return redirect(re.sub('[\s+]', '', request.POST['edClass']) + '/') #removes whitespace from inside the class name
 	return render(request, 'rubricapp/semester.html', {'summerclasses': summerclasses} ) 
@@ -66,9 +66,9 @@ def rubric_page(request, edclass, studentname,semester):
 	rubricforclass = edclassenrolled.keyrubric.get()
 	#this returns the rows associated with the magic rubric
 	rows = Row.objects.filter(rubric=rubricforclass)
+	greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled)
 	if request.method == 'POST':
 		#this should return a single Enrollment object
-		greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled)
 		logging.info("Posting")
 		RowFormSetWeb = RowFormSet(request.POST)#, queryset=Row.objects.filter(rubric=rubricForClass))
 		RowFormSetWeb.clean()
@@ -88,7 +88,7 @@ def rubric_page(request, edclass, studentname,semester):
 			greatEnrollment.save()
 			logging.info("Great enrollment rubric completed  is %s" % greatEnrollment.rubriccompleted)
 			logging.info("Great enrollment id is %d" % greatEnrollment.pk)
-			return redirect('/'+ semester +'/'+ edclass + '/')
+			return redirect('/assessment/'+ semester +'/'+ edclass + '/')
 		else:
 			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
 	else:
@@ -121,6 +121,8 @@ def rubric_page(request, edclass, studentname,semester):
 													'semester': semester})
 		except ValidationError:
 			error = "You have already completed a rubric for this student."
+			greatEnrollment.rubriccompleted=True
+			greatEnrollment.save()
 			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
 													'studentname': student.lastname + ", " + student.firstname, 
 													'rows':rows, 

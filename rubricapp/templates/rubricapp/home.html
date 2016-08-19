@@ -7,7 +7,7 @@
 		<form method="POST" action={{ semester.text }}>
 			<select name="semester" id="semesterdropdown">
 				{% for semester in semestercode %}
-				<option name="{{ semester.text }}">{{ semester }}</option>
+				<option name="{{ semester.text }}" value="{{ semester.text }}">{{ semester }}</option>
 				{% endfor %}
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="semestersubmit">

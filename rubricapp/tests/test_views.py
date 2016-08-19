@@ -22,7 +22,7 @@ class HomePageTest(TestCase):
 		login = self.client.login(username=self.username, password = self.password)
 	
 	def test_home_url_resolves_to_home_page_view(self):
-		found = resolve('/')
+		found = resolve('/assessment/')
 		self.assertEqual(found.func, home_page) 
 	
 	def test_home_page_returns_correct_html(self):
@@ -48,7 +48,7 @@ class HomePageTest(TestCase):
 		response = home_page(request)
 		
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response['location'], '/201530/')
+		self.assertEqual(response['location'], '201530/')
 		
 	def test_home_page_shows_two_semesters(self):
 		self.create_two_semesters_for_unit_tests()
@@ -83,7 +83,7 @@ class SemesterClassViewTest(TestCase):
 		edclass1 = EdClasses.objects.create(name="EG 5000")
 		semester.classes.add(edclass1)
 		
-		response = self.client.get('/'+semester.text+'/')
+		response = self.client.get('/assessment/'+semester.text+'/')
 
 		self.assertContains(response, 'EG 5000') 
 	
@@ -102,7 +102,7 @@ class SemesterClassViewTest(TestCase):
 		self.create_two_semesters_for_unit_tests()
 		self.create_two_classes_for_unit_tests()
 		semester = Semester.objects.get(text="201530")
-		response = self.client.get('/'+ semester.text +'/')
+		response = self.client.get('/assessment/'+ semester.text +'/')
 		self.assertContains(response, "EG 6000")
 		self.assertContains(response, "EG 5000")
 		
@@ -110,7 +110,7 @@ class SemesterClassViewTest(TestCase):
 		self.create_two_semesters_for_unit_tests()
 		self.create_two_classes_for_unit_tests()
 		semester = Semester.objects.get(text="201530")
-		response = self.client.get('/'+ semester.text +'/')
+		response = self.client.get('/assessment/'+ semester.text +'/')
 		self.assertTemplateUsed(response, 'rubricapp/semester.html')
 		
 	def test_home_page_can_visit_201610_in_url(self):
@@ -125,7 +125,7 @@ class SemesterClassViewTest(TestCase):
 		response = home_page(request)
 		
 		self.assertEqual(response.status_code, 302)
-		self.assertEqual(response['location'], '/201610/')	
+		self.assertEqual(response['location'], '201610/')	
 	
 	def test_semester_page_can_take_post_request(self):
 		self.create_two_semesters_for_unit_tests()
@@ -176,12 +176,12 @@ class ClassViewTest(TestCase):
 	
 	def test_semester_page_requires_login(self):
 		#follow=True follows the redirect to the login page
-		response = self.client.get("/201530/", follow=True)
+		response = self.client.get("/assessment/201530/", follow=True)
 		self.assertIn("Username", response.content.decode())
 	
 	def test_student_page_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		response = self.client.get("/201530/EG5000/")
+		response = self.client.get("/assessment/201530/EG5000/")
 		self.assertTemplateUsed(response, 'rubricapp/student.html')
 		
 	def test_semester_page_redirects_to_class_url(self):
@@ -200,7 +200,7 @@ class ClassViewTest(TestCase):
 	def test_semester_page_can_show_without_redirecting(self):
 		#TODO setup semester/class/ url
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		response = self.client.get("/201530/EG5000/")
+		response = self.client.get("/assessment/201530/EG5000/")
 
 		self.assertContains(response, 'Bob DaBuilder')
 	
@@ -241,7 +241,7 @@ class ClassViewTest(TestCase):
 		janeenrollment.rubriccompleted = True
 		janeenrollment.save()
 		
-		response = self.client.get("/201530/EG5000/")
+		response = self.client.get("/assessment/201530/EG5000/")
 		self.assertIn("Return to the semester page", response.content.decode())
 		
 	def test_class_page_does_not_show_students_from_other_semesters(self):
@@ -251,7 +251,7 @@ class ClassViewTest(TestCase):
 		edclass = EdClasses.objects.get(name="EG 5000")
 		newsemester.classes.add(edclass)
 		booenrollment = Enrollment.objects.create(student=booritter, edclass=edclass, semester=newsemester)
-		response = self.client.get('/201530/EG5000/')
+		response = self.client.get('/assessment/201530/EG5000/')
 		self.assertNotContains(response, "Elaine")
 		
 
@@ -298,39 +298,39 @@ class StudentandRubricViewTest(TestCase):
 		login = self.client.login(username=self.username, password = self.password)
 		
 	def test_class_page_requires_login(self):
-		response = self.client.get("/201530/EG5000", follow=True)
+		response = self.client.get("/assessment/201530/EG5000", follow=True)
 		self.assertIn("Username", response.content.decode())
 
 	def test_student_and_rubric_view_returns_correct_template(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		response = self.client.get("/201530/EG5000/21743148/")
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
 		self.assertTemplateUsed(response, 'rubricapp/rubric.html')
 		
 	def test_student_and_rubric_view_shows_student_name(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		response = self.client.get("/201530/EG5000/21743148/")
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
 		self.assertContains(response, "DaBuilder, Bob")
 	
 	def test_student_and_rubric_view_has_excellent_grade(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		response = self.client.get("/201530/EG5000/21743148/")
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
 		self.assertContains(response, "Excellent")
 	
 	def test_rubric_shows_a_cell_under_excellent(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		response = self.client.get("/201530/EG5000/21743148/")
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
 		self.assertContains(response, "THE BEST!")
 	#TODO FINISH THE THREE TESTS BELOW
 	
 	def test_rubric_page_shows_rubric_name(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		response = self.client.get("/201530/EG5000/21743148/")
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
 		self.assertContains(response, "Writing Rubric")
 	
 	def test_rubric_page_can_take_post_request(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 		
-		response = self.client.get("/201530/EG5000/21743148/")
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
 		#soup = BeautifulSoup(response.content)
 		#form = soup.find('form')
 		#print(form)
@@ -342,7 +342,7 @@ class StudentandRubricViewTest(TestCase):
 			   "form-1-row_choice":"2", 
 			   "form-0-id": "3",
 			   "form-1-id": "4"}
-		response = self.client.post("/201530/EG5000/21743148/", data)
+		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
 
 		self.assertEqual(response.status_code, 302)
 	
@@ -354,7 +354,7 @@ class StudentandRubricViewTest(TestCase):
 		row = Row.objects.filter(rubric=writingrubric)
 		self.assertEqual(row.count(), 2)
 		#Why do you need to get the response before you can post it?????
-		response = self.client.get("/201530/EG5000/21743148/")
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
 		data ={"form-TOTAL_FORMS": "2",
 			   "form-INITIAL_FORMS": "2",
 			   "form-MIN_NUM_FORMS": "0",
@@ -364,7 +364,7 @@ class StudentandRubricViewTest(TestCase):
 			   "form-0-id": "3",
 			   "form-1-id": "4"}
 			   
-		response = self.client.post("/201530/EG5000/21743148/", data)
+		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
 		student = Student.objects.get(lnumber="21743148")
 		edclass = EdClasses.objects.get(name="EG 5000")
 		
@@ -372,12 +372,31 @@ class StudentandRubricViewTest(TestCase):
 		
 		self.assertEqual(bobenrollment.completedrubric.name, "EG500021743148201530")
 		
+	def test_rubric_page_redirects_correct_page(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+		
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
+		#soup = BeautifulSoup(response.content)
+		#form = soup.find('form')
+		#print(form)
+		data ={"form-TOTAL_FORMS": "2",
+			   "form-INITIAL_FORMS": "2",
+			   "form-MIN_NUM_FORMS": "0",
+			   "form-MAX_NUM_FORMS": "1000",
+			   "form-0-row_choice":"1", 
+			   "form-1-row_choice":"2", 
+			   "form-0-id": "3",
+			   "form-1-id": "4"}
+		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
+
+		self.assertEqual(response['location'], 'http://testserver/assessment/201530/EG5000/')	
+		
 	
 	def test_post_request_updates_correct_model(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 
 		#Why do you need to get the response before you can post it?????
-		response = self.client.get("/201530/EG5000/21743148/")
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
 		data ={"form-TOTAL_FORMS": "2",
 			   "form-INITIAL_FORMS": "2",
 			   "form-MIN_NUM_FORMS": "0",
@@ -387,7 +406,7 @@ class StudentandRubricViewTest(TestCase):
 			   "form-0-id": "3",
 			   "form-1-id": "4"}
 			   
-		response = self.client.post("/201530/EG5000/21743148/", data)
+		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
 		student = Student.objects.get(lnumber="21743148")
 		edclass = EdClasses.objects.get(name="EG 5000")
 		
@@ -400,7 +419,7 @@ class StudentandRubricViewTest(TestCase):
 class UserLoginTest(TestCase):
 
 	def test_login_page_exists(self):
-		response  = self.client.get('/201530/')
+		response  = self.client.get('/assessment/201530/')
 		self.assertEqual(response.status_code, 302)
 	
 	def test_login_page_takes_name(self):

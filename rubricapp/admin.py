@@ -11,18 +11,22 @@ from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment
 
 class EnrollmentAdmin(admin.ModelAdmin):
 	model = Enrollment
-	fields = ('student', 'rubriccompleted', 'semester')
+	fields = ('student', 'rubriccompleted', 'semester', 'edclass')
 	# The method below turns a readonly field if the user is editing the semester instance
 	def get_readonly_fields(self, request, obj=None):
 		if obj:
 			return self.readonly_fields + ('semester',)
 		return self.readonly_fields
 
-class EnrollmentAdmin1(admin.TabularInline):
-	model = Enrollment
-	readonly_fields = ('semester',)
-	fields = ('student', 'rubriccompleted', 'semester')
-	extra = 1
+# The inline enrollment form for EdClass does not work because you can
+# change the semester after creating the enrollment (do not want)
+# You can edit out this functionality if the Enrollment is included in the Admin page
+# but not as inline
+#class EnrollmentAdmin1(admin.TabularInline):
+#	model = Enrollment
+#	readonly_fields = ('semester',)
+#	fields = ('student', 'rubriccompleted', 'semester')
+#	extra = 1
 	
 
 

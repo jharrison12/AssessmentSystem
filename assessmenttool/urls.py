@@ -10,10 +10,10 @@ admin.autodiscover()
 app_name = 'assessment'
 urlpatterns = [ 
     # Examples:
-	 url(r'^$', views.home_page, name='home'),
-	 url(r'^(?P<semester>\d+)/$', views.semester_page, name='semester'),
-	 url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{4})/$', views.student_page, name='student'),
-	 url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{4})/(?P<studentname>[0-9]+)/$', views.rubric_page, name="rubricpage"),
+	 url(r'^assessment/', include('rubricapp.urls',namespace="rubricapp")), 
+	 #url(r'^(?P<semester>\d+)/$', views.semester_page, name='semester'),
+	 #url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{4})/$', views.student_page, name='student'),
+	 #url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{4})/(?P<studentname>[0-9]+)/$', views.rubric_page, name="rubricpage"),
 	 url(r'^data/', include('dataview.urls',namespace="dataview")),
 	# url(r'^assessmenttool/', include('assessmenttool.foo.urls')),
 
