@@ -103,6 +103,17 @@ class DataView(FunctionalTest):
 		classchoice = self.browser.find_element_by_id('classlink')
 		classchoice.send_keys(Keys.ENTER)
 		
+		#Prof sees that there is a class there
+		classdropdown = self.browser.find_element_by_id('edlcassdropdown')
+		self.assertEqual(classdropdown.get_attribute('name'), 'edclass')
+		classnames = self.browser.find_elements_by_tag_name('option')
+		self.assertIn("EG 5000", [i.text for i in classnames])
+		submitbutton = self.browser.find_element_by_id('classsubmit')
+		submitbutton.send_keys(Keys.ENTER)
+		
+		#The following page should show the aggregate rubric data for the WHOLE class YAY!
+		bodytext = self.browser.find_element_by_tag_name('body')
+		self.assertIn("Excellence", bodytext.text)
 		
 		#Prof changes mind once again.  They would rather look at the instance of all the rubrics
 		

@@ -201,6 +201,22 @@ class EdClass(TestCase):
 		
 		bobenrollment.completedrubric = completedrubricforbob
 		bobenrollment.save()	
+		
+		completedrubricforjane = Rubric.objects.create(name="EG500021743149201530", template=False)
+		row1 = Row.objects.create(name="Fortitude",
+								  excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforjane, row_choice=1)
+								  
+		row2 = Row.objects.create(name="Excellenceisahabit",
+								  excellenttext="THE GREATEST!",
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforjane, row_choice=1)
+		
+		janeenrollment.completedrubric = completedrubricforjane
+		janeenrollment.save()	
 	
 	def test_class_view_uses_class_view_function(self):
 		found = resolve('/data/class/')
@@ -246,4 +262,8 @@ class EdClass(TestCase):
 		edclass = re.sub('[\s+]', '', edclass.name)
 		response = self.client.get("/data/class/%s/" % (edclass))
 		self.assertTemplateUsed(response, 'dataview/classdataview.html')
+		
+	def test_class_rubric_view_shows_rubric(self):
+		response = self.client.get('/data/class/EG5000/')
+		self.assertIn("Excellenceisahabit", response.content.decode())
 		

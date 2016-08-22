@@ -2,7 +2,7 @@
 	<body>
 	<h1>Choose a class!</h1>
 	<form method="POST" action=>
-		<select name="eclass" id="edlcassdropdown">	
+		<select name="edclass" id="edlcassdropdown">	
 		{% for class in edclasses %}
 			<option name="{{class.name }}">{{ class }}</option>
 		{% endfor %}
