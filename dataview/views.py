@@ -33,4 +33,10 @@ def ed_class_view(request):
 	return render(request, 'dataview/classview.html', {'edclasses':edclasses})
 
 def ed_class_data_view(request, edclass):
-	return render(request, 'dataview/classdataview.html')
+	edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
+	edclasspulled = EdClasses.objects.get(name=edclassspaceadded)
+	logging.info("EDCLASS is %s" % edclasspulled)
+	classrubric = edclasspulled.keyrubric.get()
+	rows = Row.objects.filter(rubric=classrubric)
+	logging.info("ARE THERE ROWS?" + str(rows))
+	return render(request, 'dataview/classdataview.html', {'rows':rows})

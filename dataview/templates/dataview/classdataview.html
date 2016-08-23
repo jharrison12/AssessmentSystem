@@ -1,6 +1,14 @@
 <html>
 	<body>
 	<h1>Here is your class rubric</h1>
-		<p>Excellenceisahabit</p>
+		<table>
+			<th>Name</th>
+			<th>Score</th>
+			{% for row in rows %}
+				<tr>
+					<td>{{ row.name }}</td>
+				</tr>
+			{% endfor %}
+		</table>
 	</body>
 </html>

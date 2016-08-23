@@ -171,12 +171,14 @@ class EdClass(TestCase):
 		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 
-		row1 = Row.objects.create(excellenttext="THE BEST!", 
+		row1 = Row.objects.create(name="Fortitude",
+								  excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
 								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
 								  
-		row2 = Row.objects.create(excellenttext="THE GREATEST!",
+		row2 = Row.objects.create(name="Excellenceisahabit",
+								  excellenttext="THE GREATEST!",
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
 								  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
@@ -198,6 +200,8 @@ class EdClass(TestCase):
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=4)
+		
+		
 		
 		bobenrollment.completedrubric = completedrubricforbob
 		bobenrollment.save()	
