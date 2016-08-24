@@ -1,7 +1,7 @@
 from django.test import TestCase
 from unittest import skip
 from django.core.urlresolvers import resolve
-from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view
+from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, semester_ed_class_view
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row
 from django.http import HttpRequest
 import re
@@ -224,50 +224,72 @@ class EdClass(TestCase):
 	
 	def test_class_view_uses_class_view_function(self):
 		found = resolve('/data/class/')
-		self.assertEqual(found.func, ed_class_view)
+		self.assertEqual(found.func, semester_ed_class_view)
 	
 	def test_class_view_works(self):
 		response = self.client.get('/data/class/')
-		self.assertContains(response, "Choose a class!")
+		self.assertContains(response, "Choose a semester!")
 		
 	def test_class_view_uses_correct_template(self):
 		response = self.client.get('/data/class/')
-		self.assertTemplateUsed(response, 'dataview/classview.html')
+		self.assertTemplateUsed(response, 'dataview/semesterclassview.html')
+		
+	def test_semester_class_view_has_semester(self):
+		response = self.client.get('/data/class/')
+		self.assertContains(response, "201530")
+		
+	def test_semester_class_view_has_submit_button(self):
+		response = self.client.get('/data/class/201530/')
+		self.assertContains(response, "Submit")
+	
+	def test_semester_class_view_takes_post_request(self):
+		request = HttpRequest()
+		request.method = "POST"
+		request.POST['semesterselect'] = "201530"
+		response = semester_ed_class_view(request)
+		self.assertEqual(response.status_code, 302)
+	
+	def test_semester_class_view_redirects_to_proper_page(self):
+		request = HttpRequest()
+		request.method = "POST"
+		request.POST['semesterselect'] = "201530"
+		response = semester_ed_class_view(request)
+		self.assertEqual(response['location'], "201530/")
 		
 	def test_class_page_shows_an_actual_class(self):
 		#follow=True follows the redirect to the login page
-		response = self.client.get("/data/class/")
+		response = self.client.get("/data/class/201530/")
 		self.assertIn("EG 5000", response.content.decode())
 	
-	def test_clas_page_has_submit_button(self):
-		response = self.client.get('/data/class/')
+	def test_class_page_has_submit_button(self):
+		response = self.client.get('/data/class/201530/')
 		self.assertIn("Submit", response.content.decode())
 	
-	def test_clas_page_can_take_post_request(self):
+	def test_class_page_can_take_post_request(self):
 		request = HttpRequest()
 		request.method = "POST"
 		request.POST['edclass'] = "EG 5000"
-		response = ed_class_view(request)
+		response = ed_class_view(request, "201530")
 		self.assertEqual(response.status_code, 302)
 		
 	def test_class_page_redirects_to_proper_url(self):
 		request = HttpRequest()
 		request.method = "POST"
 		request.POST['edclass'] = "EG 5000"
-		response = ed_class_view(request)
+		response = ed_class_view(request, "201530")
 		self.assertEqual(response['location'],"EG5000/" )
 		
 	def test_class_data_page_returns_correct_function(self):
-		found = resolve('/data/class/EG5000/')
+		found = resolve('/data/class/201530/EG5000/')
 		self.assertEqual(found.func, ed_class_data_view)
 	
 	def test_class_data_page_uses_correct_template(self):
 		edclass = EdClasses.objects.get(name="EG 5000")
 		edclass = re.sub('[\s+]', '', edclass.name)
-		response = self.client.get("/data/class/%s/" % (edclass))
+		response = self.client.get("/data/class/201530/%s/" % (edclass))
 		self.assertTemplateUsed(response, 'dataview/classdataview.html')
 		
 	def test_class_rubric_view_shows_rubric(self):
-		response = self.client.get('/data/class/EG5000/')
+		response = self.client.get('/data/class/201530/EG5000/')
 		self.assertIn("Excellenceisahabit", response.content.decode())
 		

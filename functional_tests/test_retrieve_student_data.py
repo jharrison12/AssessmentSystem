@@ -103,6 +103,13 @@ class DataView(FunctionalTest):
 		classchoice = self.browser.find_element_by_id('classlink')
 		classchoice.send_keys(Keys.ENTER)
 		
+		#Prof must choose by a semester.  OH MY
+		semesterdropdown = self.browser.find_element_by_id('semesterselectid')
+		semesternames = self.browser.find_elements_by_tag_name('option')
+		self.assertIn('201530', [i.text for i in semesternames])
+		submitbutton = self.browser.find_element_by_id('semestersubmit')
+		submitbutton.send_keys(Keys.ENTER)
+		
 		#Prof sees that there is a class there
 		classdropdown = self.browser.find_element_by_id('edlcassdropdown')
 		self.assertEqual(classdropdown.get_attribute('name'), 'edclass')
