@@ -292,4 +292,8 @@ class EdClass(TestCase):
 	def test_class_rubric_view_shows_rubric(self):
 		response = self.client.get('/data/class/201530/EG5000/')
 		self.assertIn("Excellenceisahabit", response.content.decode())
+	
+	def test_class_data_page_shows_aggregated_score(self):
+		response = self.client.get('/data/class/201530/EG5000/')
+		self.assertIn("1.5", response.content.decode())
 		

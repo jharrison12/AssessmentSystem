@@ -1,12 +1,13 @@
 <html>
 	<body>
 	<h1>Here is your class rubric</h1>
-		<table>
+		<table border="1px">
 			<th>Name</th>
 			<th>Score</th>
-			{% for row in rows %}
+			{% for rowname, score in finalscores.items %}
 				<tr>
-					<td>{{ row.name }}</td>
+					<td>{{ rowname }}</td>
+					<td>{{ score }}</td>
 				</tr>
 			{% endfor %}
 		</table>

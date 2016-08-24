@@ -41,8 +41,20 @@ def ed_class_view(request, semester):
 def ed_class_data_view(request, edclass, semester):
 	edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
 	edclasspulled = EdClasses.objects.get(name=edclassspaceadded)
-	logging.info("EDCLASS is %s" % edclasspulled)
 	classrubric = edclasspulled.keyrubric.get()
-	rows = Row.objects.filter(rubric=classrubric)
-	logging.info("ARE THERE ROWS?" + str(rows))
-	return render(request, 'dataview/classdataview.html', {'rows':rows})
+	templaterows = Row.objects.filter(rubric=classrubric)
+	#Questions about whether the below query actually works the way it should
+	rubrics = Rubric.objects.filter(enrollment__semester__text=semester, enrollment__edclass=edclasspulled)
+	rows = Row.objects.filter(rubric=rubrics)
+	scores = {}
+	for row in rows:
+		if row.name not in scores:
+			scores[row.name] = list((row.row_choice))
+		else:
+			scores[row.name].append((row.row_choice))
+	#average the scores for all of the items in scores
+	for key, rowscores in scores.items():
+		rowscores = [int(x) for x in rowscores]
+		rowscores = sum(rowscores)/len(rowscores)
+		scores[key] = rowscores
+	return render(request, 'dataview/classdataview.html', {'rows': templaterows, 'scores':rows, 'finalscores': scores})
