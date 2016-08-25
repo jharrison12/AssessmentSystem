@@ -68,7 +68,7 @@ class StudentView(TestCase):
 								  excellenttext="THE GREATEST!",
 								  proficienttext="THE SECOND BEST!",
 								  satisfactorytext="THE THIRD BEST!",
-								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=4)
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=1)
 		
 		bobenrollment.completedrubric = completedrubricforbob
 		bobenrollment.save()

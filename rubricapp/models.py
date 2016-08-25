@@ -40,10 +40,10 @@ class Semester(models.Model):
 class Row(models.Model):
 	CHOICES = (
 	(None, 'Your string for display'),
-	('1','Excellent'),
-	('2','Proficient'),
-	('3','Awful'),
-	('4','The worst ever'),
+	('4','Excellent'),
+	('3','Proficient'),
+	('2','Awful'),
+	('1','The worst ever'),
 	)
 	name = models.CharField(default="None", max_length=30)
 	rubric = models.ForeignKey(Rubric)

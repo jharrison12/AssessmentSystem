@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester
-import re, logging
+import re, logging, collections
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 # Create your views here.
 
@@ -46,7 +46,7 @@ def ed_class_data_view(request, edclass, semester):
 	#Questions about whether the below query actually works the way it should
 	rubrics = Rubric.objects.filter(enrollment__semester__text=semester, enrollment__edclass=edclasspulled)
 	rows = Row.objects.filter(rubric=rubrics)
-	scores = {}
+	scores = collections.OrderedDict()
 	for row in rows:
 		if row.name not in scores:
 			scores[row.name] = list((row.row_choice))
