@@ -169,6 +169,7 @@ class EdClass(TestCase):
 		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
 		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
 		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
+		jakeenrollment = Enrollment.objects.create(student=jake, edclass=edclass1, semester=semester2)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 
 		row1 = Row.objects.create(name="Fortitude",
@@ -201,11 +202,24 @@ class EdClass(TestCase):
 								  satisfactorytext="THE THIRD BEST!",
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=4)
 		
-		
-		
 		bobenrollment.completedrubric = completedrubricforbob
 		bobenrollment.save()	
 		
+		completedrubricforbobeg6000 = Rubric.objects.create(name="EG600021743148201530", template=False)
+		row1 = Row.objects.create(name="Fortitude",
+								  excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbobeg6000, row_choice=1)
+								  
+		row2 = Row.objects.create(name="Excellenceisahabit",
+								  excellenttext="THE GREATEST!",
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbobeg6000, row_choice=1)
+		bobenrollment1.completedrubric = completedrubricforbobeg6000
+		bobenrollment1.save()
+								  
 		completedrubricforjane = Rubric.objects.create(name="EG500021743149201530", template=False)
 		row1 = Row.objects.create(name="Fortitude",
 								  excellenttext="THE BEST!", 
@@ -221,6 +235,21 @@ class EdClass(TestCase):
 		
 		janeenrollment.completedrubric = completedrubricforjane
 		janeenrollment.save()	
+		
+		completedrubricforjake = Rubric.objects.create(name="EG50000000201610", template=False)
+		row1 = Row.objects.create(name="Fortitude",
+								  excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforjake, row_choice=4)
+		row2 = Row.objects.create(name="Excellenceisahabit",
+								  excellenttext="THE GREATEST!",
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforjake, row_choice=4)
+		
+		jakeenrollment.completedrubric = completedrubricforjake
+		jakeenrollment.save()
 	
 	def test_class_view_uses_class_view_function(self):
 		found = resolve('/data/class/')
@@ -296,4 +325,19 @@ class EdClass(TestCase):
 	def test_class_data_page_shows_aggregated_score(self):
 		response = self.client.get('/data/class/201530/EG5000/')
 		self.assertIn("1.5", response.content.decode())
+	
+	def test_EG5000_201530_rubric_data_does_not_appear_in_wrong_semester(self):
+		response = self.client.get('/data/class/201610/EG5000/')
+		self.assertNotIn("1.5", response.content.decode())
+		self.assertNotIn("2.5", response.content.decode())
+	
+	def test_EG5000_201610_rubric_shows_only_jake_score(self):
+		response = self.client.get('/data/class/201610/EG5000/')
+		#should only show score of 4.0
+		self.assertIn("4.0", response.content.decode())
+	
+	def test_EG6000_201530_rubric_shows_only_one_score(self):
+		response = self.client.get('/data/class/201530/EG6000/')
+		self.assertIn("1.0", response.content.decode())
+
 		
