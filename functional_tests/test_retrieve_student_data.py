@@ -121,8 +121,11 @@ class DataView(FunctionalTest):
 		#The following page should show the aggregate rubric data for the WHOLE class YAY!
 		bodytext = self.browser.find_element_by_tag_name('body')
 		self.assertIn("Excellence", bodytext.text)
+		self.assertIn("1", bodytext.text)
 		
-		#Prof changes mind once again.  They would rather look at the instance of all the rubrics
+		#Professor Decides to go back to the home page
+		self.assertIn("Return to data home", bodytext.text)
+		self.browser.find_element_by_link_text('Return to data home').click()
 		
 		#Prof 
 		

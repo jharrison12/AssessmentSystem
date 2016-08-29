@@ -1,6 +1,7 @@
-<html>
-	<body>
-	<h1>Here is your class rubric</h1>
+{% extends 'dataview/base.html' %}
+
+	{% block header_text %}Here is your class rubric{% endblock %}
+		{% block form %}
 		<table border="1px">
 			<th>Name</th>
 			<th>Score</th>
@@ -10,6 +11,4 @@
 					<td>{{ score }}</td>
 				</tr>
 			{% endfor %}
-		</table>
-	</body>
-</html>
+		{% endblock %}
