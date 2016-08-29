@@ -1,6 +1,7 @@
-<html>
-	<body>
-		<h1 id="studentchoice">Choose a student!</h1>
+{% extends 'dataview/base.html' %}
+		{% block headerid %}studentchoice{% endblock %}
+		{% block header_text %}Choose a student!{% endblock %}
+		{% block form %}
 		<form method="POST" action="">
 			<select name="studentnames" value="studentdropdown" id="studentnames">
 					{% for student in students %}
@@ -10,5 +11,4 @@
 		<input name="submitbutton" type="submit" name="submit" value="Submit" id="studentsubmit">
 		{% csrf_token %}
 		</form>
-	</body>
-</html>
+		{% endblock %}

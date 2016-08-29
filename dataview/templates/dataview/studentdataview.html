@@ -1,8 +1,9 @@
-<html>
-	<body>
-	
-		<h1>{{ student.firstname }} {{ student.lastname}}</h1>
-		
+{% extends 'dataview/base.html' %}
+
+
+		{% block headerid %}studentname{% endblock %}
+		{% block header_text %}{{ student.firstname }} {{ student.lastname}}{% endblock %}
+		{% block form %}
 		<form method="POST" action="">
 			<select name="rubricname" value="rubric">
 			{% for enrollment in enrollments %}
@@ -12,6 +13,4 @@
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="rubricsubmit">
 		{% csrf_token %}
 		</form>
-	
-	</body>
-</html>
+		{% endblock %}

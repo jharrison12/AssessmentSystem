@@ -1,6 +1,8 @@
-<html>
-	<body>
-	<h1>Choose a semester!</h1>
+{% extends 'dataview/base.html' %}
+
+	{% block headerid %}semesterchooseid{% endblock %}
+	{% block header_text %}Choose a semester!{% endblock %}
+			{% block form %}
 			<form method="POST" action="">
 				<select name="semesterselect" id="semesterselectid">
 			{% for semester in semesters %}
@@ -10,5 +12,4 @@
 				<input name="submitbutton" type="submit" name="submit" value="Submit" id="semestersubmit">
 				{% csrf_token %}
 			</form>
-	</body>
-</html>
+			{% endblock %}

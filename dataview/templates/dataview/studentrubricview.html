@@ -1,7 +1,10 @@
-<html>
-	<body>
+{% extends 'dataview/base.html' %}
+
 		<h1 id="rubricchoice">Rubric</h1>
-		<h2>{{ rubricname }}
+		{% block headerid %}rubricchoice{% endblock %}
+		{% block header_text %}Rubric{% endblock %}
+		{% block form %}
+		<h2>{{ rubricname }}</h2>
 		<table border="1px">
 			<tr>
 				<th>Row Title</th>
@@ -14,5 +17,4 @@
 			</tr>
 		{% endfor %}
 		</table>
-	</body>
-</html>
+		{% endblock %}

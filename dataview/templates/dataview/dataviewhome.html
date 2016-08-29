@@ -1,9 +1,11 @@
-<html>
-	<body>
-		<h1 id="headertext">Choose a data retrieval method</h1>
+{% extends 'dataview/base.html' %}
+		
+
+		{% block headerid %}headertext{% endblock %}
+		{% block header_text %}Choose a data retrieval method{% endblock %}
+		{% block form %}
 		<p>You got this far.  Take the day off</p>
 		<a href={% url 'dataview:student_view' %} id="studentlink">Look at one student's rubrics</a>
 		<a href={% url 'dataview:edclass_view' %} id="classlink">Look at aggregated class data</a>
 		<a href="" id="rubriclink">Look at aggregated rubric data</a>
-	</body>
-</html>
+		{% endblock %}

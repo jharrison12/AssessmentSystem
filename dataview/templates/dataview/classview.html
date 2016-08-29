@@ -1,6 +1,8 @@
-<html>
-	<body>
-	<h1>Choose a class!</h1>
+{% extends 'dataview/base.html' %}
+	
+	{% block headerid %}chooseclassid{% endblock %}
+	{% block header_text %}Choose a class!{% endblock %}
+	{% block form %}
 	<form method="POST" action=>
 		<select name="edclass" id="edlcassdropdown">	
 		{% for class in edclasses %}
@@ -10,5 +12,4 @@
 		<input name="submitbutton" type="submit" name="submit" value="Submit" id="classsubmit">
 		{% csrf_token %}
 	</form>
-	</body>
-</html>
+	{% endblock %}

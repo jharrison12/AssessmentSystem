@@ -87,7 +87,7 @@ class DataView(FunctionalTest):
 		submitbuttonstudent.send_keys(Keys.ENTER) 
 		
 		#Professor chooses a rubric
-		studentnameheader = self.browser.find_element_by_tag_name('h1')
+		studentnameheader = self.browser.find_element_by_tag_name('h3')
 		self.assertIn("Bob DaBuilder", studentnameheader.text)
 		rubricnames = self.browser.find_elements_by_tag_name('option')
 		self.assertIn("EG500021743148201530", [i.text for i in rubricnames])
