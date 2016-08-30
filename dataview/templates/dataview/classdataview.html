@@ -2,13 +2,22 @@
 
 	{% block header_text %}Here is your class rubric{% endblock %}
 		{% block form %}
-		<table border="1px">
-			<th>Name</th>
-			<th>Score</th>
-			{% for rowname, score in finalscores.items %}
-				<tr>
-					<td>{{ rowname }}</td>
-					<td>{{ score }}</td>
-				</tr>
+
+			<table border="1px">
+				<th>Name</th>
+				<th>Score</th>
+				{% for rowname, score in finalscores.items %}
+					<tr>
+						<td>{{ rowname }}</td>
+						<td>{{ score }}</td>
+					</tr>
 			{% endfor %}
+			</table>
+			
+			<p>Number of values per row:</p>
+			<ul>
+			{% for rowname, values in test.items %}
+				<li>{{ rowname}}: {{ values|length }}</li>
+			{% endfor %}
+			</ul>
 		{% endblock %}

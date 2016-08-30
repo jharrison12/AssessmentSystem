@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester
-import re, logging, collections
+import re, logging, collections, copy
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 # Create your views here.
 
@@ -53,9 +53,13 @@ def ed_class_data_view(request, edclass, semester):
 			scores[row.name] = list((row.row_choice))
 		else:
 			scores[row.name].append((row.row_choice))
+	scores1 = copy.deepcopy(scores)
 	#average the scores for all of the items in scores
 	for key, rowscores in scores.items():
-		rowscores = [int(x) for x in rowscores]
-		rowscores = sum(rowscores)/len(rowscores)
-		scores[key] = rowscores
-	return render(request, 'dataview/classdataview.html', {'rows': templaterows, 'scores':rows, 'finalscores': scores})
+		try:
+			rowscores = [int(x) for x in rowscores]
+			rowscores = sum(rowscores)/len(rowscores)
+			scores[key] = rowscores
+		except ValueError:
+			pass
+	return render(request, 'dataview/classdataview.html', {'rows': templaterows, 'scores':rows, 'finalscores': scores, 'test':scores1})
