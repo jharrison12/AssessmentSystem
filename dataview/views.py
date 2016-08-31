@@ -2,18 +2,21 @@ from django.shortcuts import render, redirect
 from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester
 import re, logging, collections, copy
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
-
+@login_required
 def home_page(request):
 	return render(request, 'dataview/dataviewhome.html', )
-	
+
+@login_required	
 def student_view(request):
 	students = Student.objects.all()
 	if request.method == "POST":
 		return redirect(request.POST['studentnames']+ '/')
 	return render(request, 'dataview/studentview.html', {"students": students})
 
+@login_required
 def student_data_view(request, lnumber):
 	student = Student.objects.get(lnumber=lnumber)
 	enrollments = Enrollment.objects.filter(student__lnumber=lnumber)

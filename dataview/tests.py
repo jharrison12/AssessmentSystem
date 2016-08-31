@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, semester_ed_class_view
@@ -10,6 +10,16 @@ import re
 # Create your tests here.
 
 class DataViewHome(TestCase):
+
+	def setUp(self):
+		Semester.objects.create(text="201530")
+		Semester.objects.create(text="201610")
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
 
 	def test_data_view_home_returns_function(self):
 		found = resolve('/data/')
@@ -23,14 +33,20 @@ class DataViewHome(TestCase):
 		response = self.client.get('/data/')
 		self.assertTemplateUsed(response, 'dataview/dataviewhome.html')
 		
+	def test_data_view_home_only_viewable_by_user(self):
+		self.client.logout()
+		response = self.client.get('/data/')
+		self.assertRedirects(response, 'login/?next=/data/',status_code=302)
+		
+		
 class StudentView(TestCase):
 
 	def setUp(self):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
-		bob = User.objects.create(username="bob")
-		edclass1 = EdClasses.objects.create(name="EG 5000",teacher=bob)
-		edclass2 = EdClasses.objects.create(name="EG 6000",teacher=bob)
+		jacob = User.objects.create(username="jacob")
+		edclass1 = EdClasses.objects.create(name="EG 5000",teacher=jacob)
+		edclass2 = EdClasses.objects.create(name="EG 6000",teacher=jacob)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -74,6 +90,12 @@ class StudentView(TestCase):
 		
 		bobenrollment.completedrubric = completedrubricforbob
 		bobenrollment.save()
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
 		
 		
 	def test_student_view_uses_student_view_function(self):
@@ -83,6 +105,11 @@ class StudentView(TestCase):
 	def test_student_view_works(self):
 		response = self.client.get('/data/student/')
 		self.assertContains(response, "Choose a student!")
+	
+	def test_student_view_requires_login(self):
+		self.client.logout()
+		response = self.client.get('/data/student/')
+		self.assertRedirects(response, 'login/?next=/data/student/', status_code=302)
 		
 	def test_student_view_uses_correct_template(self):
 		response = self.client.get('/data/student/')
@@ -100,6 +127,7 @@ class StudentView(TestCase):
 	def test_student_page_can_take_post_request(self):
 		request = HttpRequest()
 		request.method = "POST"
+		request.user = self.test_user
 		request.POST['studentnames'] = "Bob Dabuilder"
 		response = student_view(request)
 		self.assertEqual(response.status_code, 302)
@@ -107,9 +135,15 @@ class StudentView(TestCase):
 	def test_student_page_redirects_to_individual_student_page(self):
 		request = HttpRequest()
 		request.method = "POST"
+		request.user = self.test_user
 		request.POST['studentnames'] = "21743148"
 		response = student_view(request)
 		self.assertEqual(response['location'], '21743148/')
+		
+	def test_bob_student_data_view_page_requires_login(self):
+		self.client.logout()
+		response = self.client.get('/data/student/21743148/')
+		self.assertRedirects(response, '/login/?next=/data/student/21743148/', status_code=302)
 	
 	def test_dataview_page_exists_for_bob(self):
 		response = self.client.get('/data/student/21743148/')
@@ -127,6 +161,7 @@ class StudentView(TestCase):
 		request = HttpRequest()
 		request.method = "POST"
 		request.POST['rubricname'] ="bobcompletedrubric"
+		request.user = self.test_user
 		response = student_data_view(request,lnumber="21743148")
 		self.assertEqual(response.status_code, 302)
 	
@@ -134,6 +169,7 @@ class StudentView(TestCase):
 		request = HttpRequest()
 		request.method = "POST"
 		request.POST['rubricname'] = "EG5000 21743148 201530"
+		request.user = self.test_user
 		response = student_data_view(request, lnumber="21743148")
 		self.assertEqual(response['location'], 'EG500021743148201530/')
 	
@@ -158,9 +194,9 @@ class EdClass(TestCase):
 	def setUp(self):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
-		bob = User.objects.create(username="Bob")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob)
-		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob)
+		kelly = User.objects.create(username="kelly")
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=kelly)
+		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=kelly)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -253,6 +289,12 @@ class EdClass(TestCase):
 		
 		jakeenrollment.completedrubric = completedrubricforjake
 		jakeenrollment.save()
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
 	
 	def test_class_view_uses_class_view_function(self):
 		found = resolve('/data/class/')
@@ -278,6 +320,7 @@ class EdClass(TestCase):
 		request = HttpRequest()
 		request.method = "POST"
 		request.POST['semesterselect'] = "201530"
+		request.user = self.test_user
 		response = semester_ed_class_view(request)
 		self.assertEqual(response.status_code, 302)
 	
@@ -285,6 +328,7 @@ class EdClass(TestCase):
 		request = HttpRequest()
 		request.method = "POST"
 		request.POST['semesterselect'] = "201530"
+		request.user = self.test_user
 		response = semester_ed_class_view(request)
 		self.assertEqual(response['location'], "201530/")
 		
