@@ -4,14 +4,15 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row
 from time import sleep
+from django.contrib.auth.models import User
 
 class NewVisitorTest(FunctionalTest):
 
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
-		edclass1 = EdClasses.objects.create(name="EG 5000")
-		edclass2 = EdClasses.objects.create(name="EG 6000")
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user)
+		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=self.test_user)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		

@@ -3,6 +3,7 @@ from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, semester_ed_class_view
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row
+from django.contrib.auth.models import User
 from django.http import HttpRequest
 import re
 
@@ -27,8 +28,9 @@ class StudentView(TestCase):
 	def setUp(self):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
-		edclass1 = EdClasses.objects.create(name="EG 5000")
-		edclass2 = EdClasses.objects.create(name="EG 6000")
+		bob = User.objects.create(username="bob")
+		edclass1 = EdClasses.objects.create(name="EG 5000",teacher=bob)
+		edclass2 = EdClasses.objects.create(name="EG 6000",teacher=bob)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -156,8 +158,9 @@ class EdClass(TestCase):
 	def setUp(self):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
-		edclass1 = EdClasses.objects.create(name="EG 5000")
-		edclass2 = EdClasses.objects.create(name="EG 6000")
+		bob = User.objects.create(username="Bob")
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob)
+		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		

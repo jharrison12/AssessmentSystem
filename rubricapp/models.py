@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib import admin
+from django.contrib.auth.models import User
 
 class Student(models.Model):
 	firstname = models.TextField(default="")	
@@ -27,6 +28,7 @@ class EdClasses(models.Model):
 	name = models.TextField(default='', unique=True)
 	students = models.ManyToManyField(Student, through="Enrollment")
 	keyrubric = models.ManyToManyField(Rubric)
+	teacher = models.ForeignKey(User)
 	def __str__(self):
 		return self.name		
 		

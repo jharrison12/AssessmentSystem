@@ -6,13 +6,15 @@ from django.test import TestCase
 from rubricapp.views import home_page, semester_page, student_page, rubric_page
 from django.core.urlresolvers import resolve
 from django.db import IntegrityError
+from django.contrib.auth.models import User
 
 class RubricModel(TestCase):
 			
 	def create_rubric_and_rows_connect_to_class(self):
+		bob = User.objects.create(username="Bob")
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000")
-		edclass2 = EdClasses.objects.create(name="EG 6000")
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob)
+		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -94,6 +96,7 @@ class RubricModel(TestCase):
 		bobrubric = Rubric.objects.get(enrollment__student=bob)
 		
 		self.assertNotEqual(bobrubric, janerubric)
+	#TODO fix this
 	@skip
 	def test_duplicate_rubric_objects_are_invalid(self):
 		self.create_rubric_and_rows_connect_to_class()
@@ -106,8 +109,10 @@ class ClassAndSemesterModelTest(TestCase):
 	
 	def add_two_classes_to_semester_add_two_students_to_class(self):
 		first_semester = Semester.objects.create(text='201530')
-		edClass = EdClasses.objects.create(name='EG 5000') 
-		edClass2 = EdClasses.objects.create(name='EG 6000')
+		bob = User.objects.create(username="Bob")
+		janeteacher = User.objects.create(username="Jane")
+		edClass = EdClasses.objects.create(name='EG 5000', teacher=bob) 
+		edClass2 = EdClasses.objects.create(name='EG 6000', teacher=bob)
 		
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
@@ -122,6 +127,19 @@ class ClassAndSemesterModelTest(TestCase):
 		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2,  semester=first_semester)
 		
 		
+	def test_class_connect_to_particular_user(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		bob = User.objects.get(username="Bob")
+		edclass = EdClasses.objects.get(name="EG 5000")
+		self.assertEqual(edclass.teacher, bob)
+	
+	def test_different_teacher_does_not_connect_to_bob_class(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		jane = User.objects.get(username="Jane")
+		edclass = EdClasses.objects.get(name="EG 5000")
+		self.assertNotEqual(edclass.teacher, jane)
+		
+	
 	def test_model_for_semesters(self):
 		first_semester = Semester()
 		first_semester.text = '201530'

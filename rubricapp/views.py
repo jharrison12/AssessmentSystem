@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect ,get_object_or_404
 from django.http import HttpResponse
 from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubric
 from rubricapp.forms import RowForm, RowFormSet
@@ -23,9 +23,10 @@ def home_page(request):
 		return redirect(request.POST['semester'] +'/')
 	return render(request, 'rubricapp/home.html', {'semestercode': semester }) 
 	#context can be translated as {'html template django variable': variable created in view}
+
 @login_required
 def semester_page(request, semester):
-	summerclasses = EdClasses.objects.filter(semester__text=semester)
+	summerclasses = EdClasses.objects.filter(semester__text=semester, teacher=request.user)
 	if summerclasses.exists():
 		pass
 	else:
@@ -41,7 +42,7 @@ def student_page(request, edclass, semester):
 	logging.info("In the student page edclass:%s, semester %s" %( edclass, semester))
 	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
 	#Filter the class basedupon semester and name of the class
-	edclassesPulled = EdClasses.objects.get(semester__text=semester, name=edClassSpaceAdded)
+	edclassesPulled = get_object_or_404(EdClasses,semester__text=semester, name=edClassSpaceAdded, teacher=request.user)
 	logging.info("The classes pulled are %s" % (edclassesPulled))
 	students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False, enrollment__semester__text=semester)
 	for i in students:
@@ -59,7 +60,7 @@ def student_page(request, edclass, semester):
 def rubric_page(request, edclass, studentname,semester):
 	edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
 	#This returns the class
-	edclassenrolled = EdClasses.objects.get(name=edclassspaceadded)
+	edclassenrolled = get_object_or_404(EdClasses,name=edclassspaceadded, teacher=request.user)
 	#This returns the student
 	student = Student.objects.get(lnumber=studentname)
 	#this returns the rubric associated with the class

@@ -35,7 +35,6 @@ class HomePageTest(TestCase):
 		expected_html = render_to_string('rubricapp/home.html', { 'semestercode': semesters })
 		self.assertMultiLineEqual(response.content.decode(), expected_html)
 
-	
 	def test_home_page_can_redirects_after_Post_request(self):
 		self.create_two_semesters_for_unit_tests()
 		request = HttpRequest()
@@ -77,20 +76,35 @@ class SemesterClassViewTest(TestCase):
 		self.test_user = User.objects.create_user(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password=self.password)
 		self.assertEqual(login, True)
+		
+	def test_bob_cannot_see_jane_class(self):
+		semester = Semester.objects.create(text="201530")
+		jane = User.objects.create(username="Jane")
+		edclass1 = EdClasses.objects.create(name="EG 5111", teacher=jane)
+		semester.classes.add(edclass1)
+		response = self.client.get('/assessment/201530/')
+		self.assertNotIn("EG 5111", response.content.decode())
+	
+	def test_bob_can_see_bob_class(self):
+		semester = Semester.objects.create(text="201530")
+		jane = User.objects.create(username="Jane")
+		edclass1 = EdClasses.objects.create(name="EG 5111", teacher=self.test_user)
+		semester.classes.add(edclass1)
+		response = self.client.get('/assessment/201530/')
+		self.assertIn("EG 5111", response.content.decode())
 	
 	def test_displays_all_classes(self):
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000")
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user)
 		semester.classes.add(edclass1)
 		
 		response = self.client.get('/assessment/'+semester.text+'/')
-
 		self.assertContains(response, 'EG 5000') 
 	
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.get(text="201530")
-		class1 = EdClasses.objects.create(name="EG 5000")
-		class2 = EdClasses.objects.create(name="EG 6000")
+		class1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user)
+		class2 = EdClasses.objects.create(name="EG 6000", teacher=self.test_user)
 		semester.classes.add(class1)
 		semester.classes.add(class2)
 		
@@ -134,7 +148,7 @@ class SemesterClassViewTest(TestCase):
 		bob = User.objects.get(username="bob")
 		request.user = bob
 		request.method = "POST"
-		edClass = EdClasses.objects.get(name="EG 5000")
+		edClass = EdClasses.objects.get(name="EG 5000", teacher=self.test_user)
 		request.POST['edClass'] = edClass.name
 
 		response = semester_page(request, "201530")
@@ -144,26 +158,35 @@ class SemesterClassViewTest(TestCase):
 class ClassViewTest(TestCase):
 
 	def add_two_classes_to_semester_add_two_students_to_class(self):
-		first_semester = Semester.objects.create(text='201530')
-		edClass = EdClasses.objects.create(name='EG 5000') 
-		edClass2 = EdClasses.objects.create(name='EG 6000')
-		
-		first_semester.classes.add(edClass)
-		first_semester.classes.add(edClass2)
-		
-		
-		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
-		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, semester=first_semester)
-		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass, semester=first_semester)
-		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2, semester=first_semester)
-		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2, semester=first_semester)
 		self.client = Client()
 		self.username = 'bob'
 		self.email = 'test@test.com'
 		self.password = 'test'
 		self.test_user = User.objects.create_user(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
+		jane = User.objects.create(username="Jane")
+		
+		
+		first_semester = Semester.objects.create(text='201530')
+		edClass = EdClasses.objects.create(name='EG 5000', teacher=self.test_user) 
+		edClass2 = EdClasses.objects.create(name='EG 6000', teacher=self.test_user)
+		edClass1 = EdClasses.objects.create(name="EG 5111", teacher=jane)
+		
+		first_semester.classes.add(edClass)
+		first_semester.classes.add(edClass2)
+		first_semester.classes.add(edClass1)
+		
+		
+		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
+		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
+		kelly = Student.objects.create(lastname="Smith", firstname="Kelly", lnumber="33333333")
+		
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edClass, semester=first_semester)
+		janeenrollment = Enrollment.objects.create(student=jane,edclass=edClass, semester=first_semester)
+		bobenrollment2 = Enrollment.objects.create(student=bob,edclass=edClass2, semester=first_semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2, semester=first_semester)
+		kellyenrollment = Enrollment.objects.create(student=kelly, edclass=edClass1, semester=first_semester)
+		
 		
 	def test_user_logs_in(self):
 		self.client = Client()
@@ -173,6 +196,18 @@ class ClassViewTest(TestCase):
 		self.test_user = User.objects.create_user(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
 		self.assertEqual(login, True)
+		
+	def test_bob_cannot_see_jane_students(self):
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		response = self.client.get('/assessment/201530/EG5111/')
+		self.assertNotIn("Smith", response.content.decode())
+		
+	def test_jane_class_results_in_404(self):
+		#bob is logged in right now.  shouldnt see jane class
+		self.add_two_classes_to_semester_add_two_students_to_class()
+		response = self.client.get('/assessment/201530/EG5111/')
+		self.assertEqual(response.status_code, 404)
+		
 	
 	def test_semester_page_requires_login(self):
 		#follow=True follows the redirect to the login page
@@ -258,15 +293,27 @@ class ClassViewTest(TestCase):
 class StudentandRubricViewTest(TestCase):
 
 	def add_two_classes_to_semester_add_two_students_to_class_add_one_row(self):
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
+		jane = User.objects.create(username="Jane")
+		
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000")
-		edclass2 = EdClasses.objects.create(name="EG 6000")
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user)
+		edclass2 = EdClasses.objects.create(name="EG 6000",  teacher=self.test_user)
+		edclass = EdClasses.objects.create(name="EG 5111", teacher=jane)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
+		semester.classes.add(edclass)
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
+		kelly = Student.objects.create(lastname="Smith", firstname="Kelly", lnumber="33333333")
 		
+		kellyenrollment = Enrollment.objects.create(student=kelly, edclass=edclass, semester=semester)
 		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1, semester=semester)
 		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
 		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
@@ -290,12 +337,13 @@ class StudentandRubricViewTest(TestCase):
 		#because the manyto-many relationship is not a column in the database
 		edclass1.keyrubric.add(writingrubric)
 		edclass2.keyrubric.add(writingrubric)
-		self.client = Client()
-		self.username = 'bob'
-		self.email = 'test@test.com'
-		self.password = 'test'
-		self.test_user = User.objects.create_user(self.username, self.email, self.password)
-		login = self.client.login(username=self.username, password = self.password)
+		edclass.keyrubric.add(writingrubric)
+
+		
+	def test_rubric_page_not_viewable_by_dasterdaly_bob(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+		response = self.client.get('/assessment/201530/EG5111/33333333/')
+		self.assertEquals(response.status_code, 404)
 		
 	def test_class_page_requires_login(self):
 		response = self.client.get("/assessment/201530/EG5000", follow=True)
