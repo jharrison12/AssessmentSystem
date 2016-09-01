@@ -23,24 +23,28 @@ def student_data_view(request, lnumber):
 	if request.method == "POST":
 		return redirect(re.sub('[\s+]', '', request.POST['rubricname'])+'/')
 	return render(request, 'dataview/studentdataview.html', {"student": student, "enrollments":enrollments})
-	
+
+@login_required	
 def student_rubric_data_view(request,lnumber,rubricname):
 	logging.info("The rubric name is %s " % (rubricname))
 	rows = Row.objects.filter(rubric__name=rubricname)
 	return render(request, 'dataview/studentrubricview.html', {'rows':rows, 'rubricname':rubricname})
 
+@login_required
 def semester_ed_class_view(request):
 	semesters = Semester.objects.all()
 	if request.method == "POST":
 		return redirect(request.POST['semesterselect'] +'/')
 	return render(request, 'dataview/semesterclassview.html',{'semesters':semesters})
 
+@login_required
 def ed_class_view(request, semester):
 	edclasses = EdClasses.objects.filter(semester__text=semester)
 	if request.method == "POST":
 		return redirect(re.sub('[\s+]', '', request.POST['edclass'])+'/')
 	return render(request, 'dataview/classview.html', {'edclasses':edclasses})
 
+@login_required
 def ed_class_data_view(request, edclass, semester):
 	edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
 	edclasspulled = EdClasses.objects.get(name=edclassspaceadded)

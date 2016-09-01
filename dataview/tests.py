@@ -189,6 +189,11 @@ class StudentView(TestCase):
 		response = self.client.get('/data/student/21743148/EG500021743148201530/')
 		self.assertIn("The worst ever", response.content.decode())
 		
+	def test_student_rubic_view_requires_loing(self):
+		self.client.logout()
+		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		self.assertRedirects(response, '/login/?next=/data/student/21743148/EG500021743148201530/', status_code=302)
+		
 class EdClass(TestCase):
 	
 	def setUp(self):
@@ -295,6 +300,11 @@ class EdClass(TestCase):
 		self.password = 'test'
 		self.test_user = User.objects.create_user(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
+		
+	def test_class_view_requires_login(self):
+		self.client.logout()
+		response = self.client.get('/data/class/')
+		self.assertRedirects(response, 'login/?next=/data/class/', status_code=302)
 	
 	def test_class_view_uses_class_view_function(self):
 		found = resolve('/data/class/')
@@ -315,6 +325,11 @@ class EdClass(TestCase):
 	def test_semester_class_view_has_submit_button(self):
 		response = self.client.get('/data/class/201530/')
 		self.assertContains(response, "Submit")
+		
+	def test_semester_class_view_requires_login(self):
+		self.client.logout()
+		response = self.client.get('/data/class/201530/')
+		self.assertRedirects(response, 'login/?next=/data/class/201530/', status_code=302)
 	
 	def test_semester_class_view_takes_post_request(self):
 		request = HttpRequest()
@@ -345,12 +360,14 @@ class EdClass(TestCase):
 		request = HttpRequest()
 		request.method = "POST"
 		request.POST['edclass'] = "EG 5000"
+		request.user = self.test_user
 		response = ed_class_view(request, "201530")
 		self.assertEqual(response.status_code, 302)
 		
 	def test_class_page_redirects_to_proper_url(self):
 		request = HttpRequest()
 		request.method = "POST"
+		request.user = self.test_user
 		request.POST['edclass'] = "EG 5000"
 		response = ed_class_view(request, "201530")
 		self.assertEqual(response['location'],"EG5000/" )
@@ -364,6 +381,11 @@ class EdClass(TestCase):
 		edclass = re.sub('[\s+]', '', edclass.name)
 		response = self.client.get("/data/class/201530/%s/" % (edclass))
 		self.assertTemplateUsed(response, 'dataview/classdataview.html')
+		
+	def test_class_data_page_requires_login(self):
+		self.client.logout()
+		response = self.client.get('/data/class/201530/EG5000/')
+		self.assertRedirects(response, '/login/?next=/data/class/201530/EG5000/', status_code=302)
 		
 	def test_class_rubric_view_shows_rubric(self):
 		response = self.client.get('/data/class/201530/EG5000/')
