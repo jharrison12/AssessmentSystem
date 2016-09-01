@@ -6,6 +6,7 @@ from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, R
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 import re
+from django.contrib.auth.models import User
 
 # Create your tests here.
 
@@ -18,7 +19,7 @@ class DataViewHome(TestCase):
 		self.username = 'bob'
 		self.email = 'test@test.com'
 		self.password = 'test'
-		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
 
 	def test_data_view_home_returns_function(self):
@@ -37,6 +38,14 @@ class DataViewHome(TestCase):
 		self.client.logout()
 		response = self.client.get('/data/')
 		self.assertRedirects(response, 'login/?next=/data/',status_code=302)
+		
+	def test_data_view_home_only_viewable_to_superuser(self):
+		self.client.logout()
+		kathy = User.objects.create_user(username="kathy", password="b")
+		istrue = self.client.login(username="kathy", password="b")
+		self.assertEquals(istrue, True)
+		response = self.client.get('/data/')
+		self.assertRedirects(response, 'login/?next=/data/', status_code=302)
 		
 		
 class StudentView(TestCase):
@@ -94,7 +103,7 @@ class StudentView(TestCase):
 		self.username = 'bob'
 		self.email = 'test@test.com'
 		self.password = 'test'
-		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
 		
 		
@@ -110,7 +119,15 @@ class StudentView(TestCase):
 		self.client.logout()
 		response = self.client.get('/data/student/')
 		self.assertRedirects(response, 'login/?next=/data/student/', status_code=302)
-		
+	
+	def test_student_view_requires_superuser(self):
+		self.client.logout()
+		kathy = User.objects.create_user(username="kathy", password="b")
+		istrue = self.client.login(username="kathy", password="b")
+		self.assertEquals(istrue, True)
+		response = self.client.get('/data/student/')
+		self.assertRedirects(response, 'login/?next=/data/student/', status_code=302)
+	
 	def test_student_view_uses_correct_template(self):
 		response = self.client.get('/data/student/')
 		self.assertTemplateUsed(response, 'dataview/studentview.html')
@@ -144,6 +161,14 @@ class StudentView(TestCase):
 		self.client.logout()
 		response = self.client.get('/data/student/21743148/')
 		self.assertRedirects(response, '/login/?next=/data/student/21743148/', status_code=302)
+	
+	def test_student_data_view_requires_superuser(self):
+		self.client.logout()
+		kathy = User.objects.create_user(username="kathy",password="b")
+		istrue = self.client.login(username="kathy", password="b")
+		self.assertEquals(istrue, True)
+		response = self.client.get('/data/student/21743148/')
+		self.assertRedirects(response, 'login/?next=/data/student/21743148/', status_code=302)
 	
 	def test_dataview_page_exists_for_bob(self):
 		response = self.client.get('/data/student/21743148/')
@@ -189,9 +214,17 @@ class StudentView(TestCase):
 		response = self.client.get('/data/student/21743148/EG500021743148201530/')
 		self.assertIn("The worst ever", response.content.decode())
 		
-	def test_student_rubic_view_requires_loing(self):
+	def test_student_rubic_view_requires_login(self):
 		self.client.logout()
 		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		self.assertRedirects(response, '/login/?next=/data/student/21743148/EG500021743148201530/', status_code=302)
+	
+	def test_student_rubric_view_requires_superuser(self):
+		self.client.logout()
+		kathy = User.objects.create_user(username="kathy", password="b")
+		istrue = self.client.login(username="kathy", password="b")
+		self.assertEquals(istrue, True)
+		response = self.client.get("/data/student/21743148/EG500021743148201530/")
 		self.assertRedirects(response, '/login/?next=/data/student/21743148/EG500021743148201530/', status_code=302)
 		
 class EdClass(TestCase):
@@ -298,13 +331,21 @@ class EdClass(TestCase):
 		self.username = 'bob'
 		self.email = 'test@test.com'
 		self.password = 'test'
-		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
 		
 	def test_class_view_requires_login(self):
 		self.client.logout()
 		response = self.client.get('/data/class/')
 		self.assertRedirects(response, 'login/?next=/data/class/', status_code=302)
+		
+	def test_class_view_requires_superuser_login(self):
+		self.client.logout()
+		kathy = User.objects.create_user(username="kathy", password="b")
+		istrue = self.client.login(username="kathy", password="b")
+		self.assertEquals(istrue, True)
+		response = self.client.get('/data/class/')
+		self.assertRedirects(response, '/login/?next=/data/class/', status_code=302)
 	
 	def test_class_view_uses_class_view_function(self):
 		found = resolve('/data/class/')
@@ -330,6 +371,14 @@ class EdClass(TestCase):
 		self.client.logout()
 		response = self.client.get('/data/class/201530/')
 		self.assertRedirects(response, 'login/?next=/data/class/201530/', status_code=302)
+		
+	def test_semester_class_view_requires_superuser_login(self):
+		self.client.logout()
+		kathy = User.objects.create_user(username="kathy", password="b")
+		istrue = self.client.login(username="kathy", password="b")
+		self.assertEquals(istrue, True)
+		response = self.client.get('/data/class/201530/')
+		self.assertRedirects(response, '/login/?next=/data/class/201530/', status_code=302)
 	
 	def test_semester_class_view_takes_post_request(self):
 		request = HttpRequest()
@@ -387,6 +436,14 @@ class EdClass(TestCase):
 		response = self.client.get('/data/class/201530/EG5000/')
 		self.assertRedirects(response, '/login/?next=/data/class/201530/EG5000/', status_code=302)
 		
+	def test_semester_class_data_view_requires_superuser_login(self):
+		self.client.logout()
+		kathy = User.objects.create_user(username="kathy", password="b")
+		istrue = self.client.login(username="kathy", password="b")
+		self.assertEquals(istrue, True)
+		response = self.client.get('/data/class/201530/EG5000/')
+		self.assertRedirects(response, '/login/?next=/data/class/201530/EG5000/', status_code=302)
+	
 	def test_class_rubric_view_shows_rubric(self):
 		response = self.client.get('/data/class/201530/EG5000/')
 		self.assertIn("Excellenceisahabit", response.content.decode())

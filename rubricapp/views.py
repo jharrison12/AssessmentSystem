@@ -4,7 +4,7 @@ from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubr
 from rubricapp.forms import RowForm, RowFormSet
 import re, logging
 from copy import deepcopy
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)

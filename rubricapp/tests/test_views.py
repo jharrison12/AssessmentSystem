@@ -73,7 +73,7 @@ class SemesterClassViewTest(TestCase):
 		self.username = 'bob'
 		self.email = 'test@test.com'
 		self.password = 'bob'        
-		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password=self.password)
 		self.assertEqual(login, True)
 		
@@ -162,7 +162,7 @@ class ClassViewTest(TestCase):
 		self.username = 'bob'
 		self.email = 'test@test.com'
 		self.password = 'test'
-		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
 		jane = User.objects.create(username="Jane")
 		
@@ -297,7 +297,7 @@ class StudentandRubricViewTest(TestCase):
 		self.username = 'bob'
 		self.email = 'test@test.com'
 		self.password = 'test'
-		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
 		jane = User.objects.create(username="Jane")
 		
