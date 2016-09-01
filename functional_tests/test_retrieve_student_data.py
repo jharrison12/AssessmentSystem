@@ -62,6 +62,15 @@ class DataView(FunctionalTest):
 		#Professor pulls up the data view
 		self.create_two_classes_for_unit_tests()
 		self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+		# Prof must first login to the assessment system
+		idusername = self.browser.find_element_by_id('id_username')
+		idusername.send_keys('bob') 
+		passwordbox = self.browser.find_element_by_id('id_password')
+		passwordbox.send_keys('bob')
+		submitbutton = self.browser.find_element_by_xpath('/html/body/h3[2]/form/input[2]')
+		submitbutton.send_keys(Keys.ENTER)
+		##TODO logging takes user back to assessmentpage
+		self.browser.get("%s%s" % (self.live_server_url, '/data/'))
 		#Prof finds several options for how to view rubrics
 		headertext = self.browser.find_element_by_id('headertext')
 		self.assertEquals(headertext.text, "Choose a data retrieval method")
@@ -69,10 +78,6 @@ class DataView(FunctionalTest):
 		self.assertEquals(studentchoice.text, "Look at one student's rubrics")
 		classchoice = self.browser.find_element_by_id('classlink')
 		self.assertEquals(classchoice.text, "Look at aggregated class data")
-		rubricchoice = self.browser.find_element_by_id("rubriclink")
-		self.assertEquals(rubricchoice.text, "Look at aggregated rubric data")
-		
-		##TODO: Add login functionality
 		
 		#Professor Chooses the student view
 		studentchoice.send_keys(Keys.ENTER)

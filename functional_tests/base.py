@@ -12,7 +12,7 @@ class FunctionalTest(LiveServerTestCase):
 		self.username = 'bob'
 		self.email = 'test@test.com'
 		self.password = 'bob'        
-		self.test_user = User.objects.create_user(self.username, self.email, self.password)
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
 		self.browser.implicitly_wait(4)
 	
 	def tearDown(self):
