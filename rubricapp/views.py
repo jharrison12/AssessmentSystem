@@ -100,7 +100,8 @@ def rubric_page(request, edclass, studentname,semester):
 															'rows':rows, 
 															'edclass':edclass,
 															'semester':semester,
-															'errorrow': errorrow})
+															'errorrow': errorrow,
+															'rubricForClass': rubricforclass.name.title()})
 	else:
 		#This view returns a brandnew copy of the rubric based upon
 		#the rubric associated with the edclass

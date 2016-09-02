@@ -476,7 +476,6 @@ class StudentandRubricViewTest(TestCase):
 			   
 			   
 		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
-		print(response.content.decode())
 		self.assertContains(response, "You must choose a value for all rows!" )
 		
 

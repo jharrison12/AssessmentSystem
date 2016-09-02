@@ -118,9 +118,18 @@ class NewVisitorTest(FunctionalTest):
 		self.assertIn("Excellent", [option.text for option in rubricoptions])
 		excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
 		excellent.click()
-		sleep(2)
 
 		#The dr. clicks on "submit" the student data is submited to a database
+		submitbutton = self.browser.find_element_by_id('rubricsubmit')
+		submitbutton.send_keys(Keys.ENTER)
+		
+		#Dr. discoveres that empty values are not accepted in the rubric
+		bodytext = self.browser.find_element_by_tag_name('body')
+		self.assertIn("You must choose a value for all rows!", bodytext.text)
+		
+		#Dr. decides to fill out the entire rubric this time
+		proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
+		proficient.click()
 		submitbutton = self.browser.find_element_by_id('rubricsubmit')
 		submitbutton.send_keys(Keys.ENTER)
 		
@@ -140,11 +149,14 @@ class NewVisitorTest(FunctionalTest):
 		self.assertNotEqual(excellent.get_attribute("selected"), "true")
 		excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
 		excellent.click()
+		proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
+		proficient.click()
 		submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
 		submitbuttonstudent.send_keys(Keys.ENTER) 
 		
 		#The new webpage should say "No more students"
 		bodytext = self.browser.find_element_by_tag_name('body')
+		sleep(10)
 		self.assertIn("There are no more students",bodytext.text)
 		
 		#The mischevious professor tries to go back to a completed student url
