@@ -30,10 +30,17 @@
 						<td>{{ form.unsatisfactorytext.value }}</td>
 
 					</tr>
-					
-					{% endfor %}
-
-				
+							<!---
+							Would love to get this to work, but it wasn't working.
+							{% if form.has_error %}
+								{% for error in form.errors %}
+									{{ error }}
+								{% endfor %}
+							{% endif %}-->
+						{% endfor %}
+					{% if errorrow %}
+						{{ errorrow }}
+					{% endif %}
 			</table>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="rubricsubmit">
 				

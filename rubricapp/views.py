@@ -71,7 +71,7 @@ def rubric_page(request, edclass, studentname,semester):
 	if request.method == 'POST':
 		#this should return a single Enrollment object
 		logging.info("Posting")
-		RowFormSetWeb = RowFormSet(request.POST)#, queryset=Row.objects.filter(rubric=rubricForClass))
+		RowFormSetWeb = RowFormSet(request.POST)
 		RowFormSetWeb.clean()
 		if RowFormSetWeb.is_valid():
 			savedFormset = RowFormSetWeb.save(commit=False)
@@ -91,7 +91,16 @@ def rubric_page(request, edclass, studentname,semester):
 			logging.info("Great enrollment id is %d" % greatEnrollment.pk)
 			return redirect('/assessment/'+ semester +'/'+ edclass + '/')
 		else:
-			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,'studentname': student.lastname + ", " + student.firstname, 'RowFormSetWeb':RowFormSetWeb, 'rows':rows, 'edclass':edclass})
+			#Hard coding error message not ideal, but I was having real issues
+			#with having the RowFormSet to post an error message.
+			errorrow = "You must choose a value for all rows!"
+			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
+															'studentname': student.lastname + ", " + student.firstname, 
+															'RowFormSetWeb':RowFormSetWeb, 
+															'rows':rows, 
+															'edclass':edclass,
+															'semester':semester,
+															'errorrow': errorrow})
 	else:
 		#This view returns a brandnew copy of the rubric based upon
 		#the rubric associated with the edclass

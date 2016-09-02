@@ -461,6 +461,23 @@ class StudentandRubricViewTest(TestCase):
 		bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
 		row = Row.objects.get(excellenttext="THE BEST!", rubric__name=bobenrollment.completedrubric.name)
 		self.assertEqual(row.row_choice, "1")
+	
+	def test_post_request_does_not_take_0_value(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
+		data ={"form-TOTAL_FORMS": "2",
+			   "form-INITIAL_FORMS": "2",
+			   "form-MIN_NUM_FORMS": "0",
+			   "form-MAX_NUM_FORMS": "1000",
+			   "form-0-row_choice":"0", 
+			   "form-1-row_choice":"2", 
+			   "form-0-id": "3",
+			   "form-1-id": "4"}
+			   
+			   
+		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
+		print(response.content.decode())
+		self.assertContains(response, "You must choose a value for all rows!" )
 		
 
 		

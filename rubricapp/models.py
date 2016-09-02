@@ -49,7 +49,7 @@ class Row(models.Model):
 	)
 	name = models.CharField(default="None", max_length=30)
 	rubric = models.ForeignKey(Rubric)
-	row_choice = models.CharField(max_length=20,choices=CHOICES, default="None", blank=True)
+	row_choice = models.CharField(max_length=20,choices=CHOICES, default="None")
 	excellenttext = models.TextField(default="", blank=True)
 	proficienttext = models.TextField(default="", blank=True)
 	satisfactorytext = models.TextField(default="", blank=True)

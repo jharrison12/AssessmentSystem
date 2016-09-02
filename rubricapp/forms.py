@@ -21,6 +21,8 @@ class RubricForm(ModelForm):
 		}
 
 RowFormSet = modelformset_factory(Row, fields=('row_choice','excellenttext','proficienttext','satisfactorytext', 'unsatisfactorytext'), extra=0) #extra=0 keeps the formset from creating new form
+
+
 ## Form for validating password
 class ValidatingPasswordForm(object):
 	MIN_LENGTH = 10
