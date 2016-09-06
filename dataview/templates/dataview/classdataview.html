@@ -3,21 +3,26 @@
 	{% block header_text %}Here is your class rubric{% endblock %}
 		{% block form %}
 
-			<table border="1px">
-				<th>Name</th>
-				<th>Score</th>
+			
+				{% if finalscores.items|length = 0 %}
+				<p>There is no data for this class</p>
+				{% else %}
+				<table border="1px" class="table">
+					<th>Name</th>
+					<th>Score</th>
 				{% for rowname, score in finalscores.items %}
 					<tr>
 						<td>{{ rowname }}</td>
 						<td>{{ score }}</td>
 					</tr>
-			{% endfor %}
-			</table>
+				{% endfor %}
+				</table>
 			
 			<p>Number of values per row:</p>
-			<ul>
+			<ul style="list-style: none;">
 			{% for rowname, values in test.items %}
 				<li>{{ rowname}}: {{ values|length }}</li>
 			{% endfor %}
 			</ul>
+				{% endif %}
 		{% endblock %}
