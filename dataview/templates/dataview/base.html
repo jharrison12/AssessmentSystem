@@ -1,12 +1,25 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, inital-scale=1">
 		<title>Data View</title>
+		<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 	</head>
 	<body>
-		<h1>Data View</h1>
-		<h3 id="{% block headerid %}{% endblock %}">{% block header_text %}{% endblock %}</h3>
-		{% block form %}
-		{% endblock %}
+	<div class="container">
+		<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="text-center">
+						<h1>Data View</h1>
+						<h3 id="{% block headerid %}{% endblock %}">{% block header_text %}{% endblock %}</h3>		
+						{% block form %}
+						{% endblock %}
+				</div>
+			</div>
+		</div>
+	</div>
 		<ul>
 			<li><a href="{% url 'dataview:home' %}">Return to data home</a></li>
 			<li><a href="{% url 'logout' %}?next=/login">Logout of Assessment App</a></li>

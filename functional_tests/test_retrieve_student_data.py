@@ -67,7 +67,7 @@ class DataView(FunctionalTest):
 		idusername.send_keys('bob') 
 		passwordbox = self.browser.find_element_by_id('id_password')
 		passwordbox.send_keys('bob')
-		submitbutton = self.browser.find_element_by_xpath('/html/body/h3[2]/form/input[2]')
+		submitbutton = self.browser.find_element_by_xpath('/html/body/div[1]/div/div/div/h3[2]/form/input[2]')
 		submitbutton.send_keys(Keys.ENTER)
 		##TODO logging takes user back to assessmentpage
 		self.browser.get("%s%s" % (self.live_server_url, '/data/'))

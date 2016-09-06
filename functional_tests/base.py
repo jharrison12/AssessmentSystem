@@ -4,7 +4,7 @@ import sys
 from django.test import LiveServerTestCase, Client
 from django.contrib.auth.models import User
 
-class FunctionalTest(LiveServerTestCase):
+class FunctionalTest(StaticLiveServerTestCase):
 	
 	def setUp(self):
 		self.browser = webdriver.Chrome()
