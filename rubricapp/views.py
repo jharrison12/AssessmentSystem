@@ -72,8 +72,8 @@ def rubric_page(request, edclass, studentname,semester):
 		#this should return a single Enrollment object
 		logging.info("Posting")
 		RowFormSetWeb = RowFormSet(request.POST)
-		RowFormSetWeb.clean()
-		if RowFormSetWeb.is_valid():
+		try:
+			RowFormSetWeb.clean()
 			savedFormset = RowFormSetWeb.save(commit=False)
 			#Not sure if the below is necessary.  But it works!
 			for i in savedFormset:
@@ -90,7 +90,7 @@ def rubric_page(request, edclass, studentname,semester):
 			logging.info("Great enrollment rubric completed  is %s" % greatEnrollment.rubriccompleted)
 			logging.info("Great enrollment id is %d" % greatEnrollment.pk)
 			return redirect('/assessment/'+ semester +'/'+ edclass + '/')
-		else:
+		except ValidationError:
 			#Hard coding error message not ideal, but I was having real issues
 			#with having the RowFormSet to post an error message.
 			errorrow = "You must choose a value for all rows!"

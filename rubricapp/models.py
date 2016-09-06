@@ -41,7 +41,7 @@ class Semester(models.Model):
 	
 class Row(models.Model):
 	CHOICES = (
-	(None, 'Your string for display'),
+	('0', 'Your string for display'),
 	('4','Excellent'),
 	('3','Proficient'),
 	('2','Awful'),
@@ -49,7 +49,7 @@ class Row(models.Model):
 	)
 	name = models.CharField(default="None", max_length=30)
 	rubric = models.ForeignKey(Rubric)
-	row_choice = models.CharField(max_length=20,choices=CHOICES, default="None")
+	row_choice = models.CharField(max_length=20,choices=CHOICES, default="0")
 	excellenttext = models.TextField(default="", blank=True)
 	proficienttext = models.TextField(default="", blank=True)
 	satisfactorytext = models.TextField(default="", blank=True)
@@ -57,11 +57,11 @@ class Row(models.Model):
 	
 	def __str__(self):
 		return self.row_choice
-	
+
 		
 class Enrollment(models.Model):
-	student = models.ForeignKey(Student)
-	edclass = models.ForeignKey(EdClasses)
+	student = models.ForeignKey(Student, null=False)
+	edclass = models.ForeignKey(EdClasses, null=False)
 	semester = models.ForeignKey(Semester)
 	#Will need to change completedrubric editable to False
 	completedrubric = models.OneToOneField(Rubric, null=True, editable=False)

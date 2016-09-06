@@ -12,6 +12,7 @@ from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment
 class EnrollmentAdmin(admin.ModelAdmin):
 	model = Enrollment
 	fields = ('student', 'rubriccompleted', 'semester', 'edclass')
+	actions = None
 	# The method below turns a readonly field if the user is editing the semester instance
 	def get_readonly_fields(self, request, obj=None):
 		if obj:
