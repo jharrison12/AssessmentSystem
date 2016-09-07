@@ -497,6 +497,15 @@ class StudentandRubricViewTest(TestCase):
 		bobenrollment = Enrollment.objects.filter(student=student, edclass=edclass)
 		print(bobenrollment.count())
 		self.assertEqual(bobenrollment.count(), 1)
+		
+	def test_get_request_for_student_rubric_page_returns_rubric_if_completedrubric_false(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+		bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__name="EG 5000")
+		Rubric.objects.create(name="EG500021743148201530")
+		bobenrollment.rubriccompleted = False
+		response = self.client.get("/assessment/201530/EG5000/21743148/")
+		print(response.content.decode())
+		self.assertContains(response, "id_form-TOTAL_FORMS")
 	
 		
 class UserLoginTest(TestCase):

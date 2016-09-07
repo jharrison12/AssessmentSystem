@@ -131,10 +131,23 @@ def rubric_page(request, edclass, studentname,semester):
 													'rubricForClass': rubricForClassText.title(), 
 													'semester': semester})
 		except ValidationError:
-			error = "You have already completed a rubric for this student."
-			greatEnrollment.rubriccompleted=True
-			greatEnrollment.save()
-			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
+			#Validationerror because a name for the rubric as already been completed
+			if greatEnrollment.rubriccompleted == False:
+				rubricname = "%s%s%s" %(edclass, studentname, semester)
+				noncompletedrubric = Rubric.objects.get(name=rubricname)
+				rows = Row.objects.filter(rubric=noncompletedrubric)
+				RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=noncompletedrubric))
+				return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
+													'studentname': student.lastname + ", " + student.firstname, 
+													'RowFormSetWeb':RowFormSetWeb,
+													'rows':rows, 
+													'edclass':edclass, 
+													'rubricForClass': oldrubricname.title(), 
+													'semester': semester,})
+			else:
+				error = "You have already completed a rubric for this student."
+				greatEnrollment.save()
+				return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
 													'studentname': student.lastname + ", " + student.firstname, 
 													'rows':rows, 
 													'edclass':edclass, 
