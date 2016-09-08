@@ -5,7 +5,6 @@ from django.http import HttpRequest
 from django.test import TestCase, Client
 from rubricapp.views import home_page, semester_page, student_page, rubric_page
 from django.core.urlresolvers import resolve
-from bs4 import BeautifulSoup
 from django.contrib.auth.models import UserManager, User
 
 class HomePageTest(TestCase):
@@ -504,7 +503,6 @@ class StudentandRubricViewTest(TestCase):
 		Rubric.objects.create(name="EG500021743148201530")
 		bobenrollment.rubriccompleted = False
 		response = self.client.get("/assessment/201530/EG5000/21743148/")
-		print(response.content.decode())
 		self.assertContains(response, "id_form-TOTAL_FORMS")
 	
 		
@@ -517,4 +515,8 @@ class UserLoginTest(TestCase):
 	def test_login_page_takes_name(self):
 		response = self.client.get('/login/')
 		self.assertTemplateUsed(response, 'registration/login.html')
+	
+	def test_change_password_page_works(self):
+		response = self.client.get('/password_change/')
+		self.assertContains(response, 'password')
 		

@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from rubricapp import views
 from django.contrib.auth import views as auth_views
-from rubricapp.forms import ValidatingPasswordForm
+#from rubricapp.forms import ValidatingPasswordForm
 from dataview import urls
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin

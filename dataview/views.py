@@ -22,7 +22,7 @@ def student_view(request):
 @user_passes_test(lambda u: u.is_superuser)
 def student_data_view(request, lnumber):
 	student = Student.objects.get(lnumber=lnumber)
-	enrollments = Enrollment.objects.filter(student__lnumber=lnumber)
+	enrollments = Enrollment.objects.filter(student__lnumber=lnumber, rubriccompleted=True)
 	if request.method == "POST":
 		return redirect(re.sub('[\s+]', '', request.POST['rubricname'])+'/')
 	return render(request, 'dataview/studentdataview.html', {"student": student, "enrollments":enrollments})

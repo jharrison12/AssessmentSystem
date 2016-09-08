@@ -98,6 +98,7 @@ class StudentView(TestCase):
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=1)
 		
 		bobenrollment.completedrubric = completedrubricforbob
+		bobenrollment.rubriccompleted = True
 		bobenrollment.save()
 		self.client = Client()
 		self.username = 'bob'

@@ -4,6 +4,8 @@ from rubricapp.models import Rubric, Row
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.contrib import auth
+from django.contrib.auth.forms import PasswordChangeForm
+import zxcvbn 
 
 class RowForm(ModelForm):
 	
@@ -45,31 +47,43 @@ class BaseRowFormSet(BaseModelFormSet):
 		
 RowFormSet = modelformset_factory(Row, fields=('row_choice','excellenttext','proficienttext','satisfactorytext', 'unsatisfactorytext'), formset=BaseRowFormSet, extra=0) #extra=0 keeps the formset from creating new form
 
-
+class PwordChangeForm(PasswordChangeForm):
+	pass
 
 ## Form for validating password
+
+
+
+"""
 class ValidatingPasswordForm(object):
 	MIN_LENGTH = 10
+	is_valid = True
 	
-	def clean_new_password1(self):
-		password1 = self.cleaned_data.get('new_password1')
-
+	def __init__(self, user,data):
+		self.user = user
+		self.data = data
+	
+	def is_valid(self):
+		password1 = self.data
+		first_isalpha = password1[0].isalpha()
 		# At least MIN_LENGTH long
 		if len(password1) < self.MIN_LENGTH:
 			raise forms.ValidationError("The new password must be at least %d characters long." % self.MIN_LENGTH)
 
 		# At least one letter and one non-letter
-		first_isalpha = password1[0].isalpha()
-		if all(c.isalpha() == first_isalpha for c in password1):
+		
+		elif all(c.isalpha() == first_isalpha for c in password1):
 			raise forms.ValidationError("The new password must contain at least one letter and at least one digit or" \
 										" punctuation character.")
 
 		# ... any other validation you want ...
-
-		return password1
+		else:
+			return password1
 		
 class ValidatingPasswordChangeForm(ValidatingPasswordForm, auth.forms.PasswordChangeForm):
 	pass
 
 class ValidatingSetPasswordForm(ValidatingPasswordForm, auth.forms.SetPasswordForm):
 	pass
+	
+"""

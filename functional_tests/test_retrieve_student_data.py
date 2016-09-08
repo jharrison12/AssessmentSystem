@@ -55,6 +55,7 @@ class DataView(FunctionalTest):
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=1)
 								  
 		bobenrollment.completedrubric = completedrubricforbob
+		bobenrollment.rubriccompleted = True
 		
 		bobenrollment.save()
 	
