@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.contrib import auth
 from django.contrib.auth.forms import PasswordChangeForm
-import zxcvbn 
+#import zxcvbn 
 
 class RowForm(ModelForm):
 	
