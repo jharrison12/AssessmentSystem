@@ -4,7 +4,7 @@
 		{% block form %}
 
 			
-				{% if finalscores.items|length = 0 %}
+				{% if finalscores.items|length == 0 %}
 				<p>There is no data for this class</p>
 				{% else %}
 				<table border="1px" class="table table-striped">

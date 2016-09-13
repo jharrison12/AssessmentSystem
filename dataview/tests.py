@@ -37,7 +37,7 @@ class DataViewHome(TestCase):
 	def test_data_view_home_only_viewable_by_user(self):
 		self.client.logout()
 		response = self.client.get('/data/')
-		self.assertRedirects(response, 'login/?next=/data/',status_code=302)
+		self.assertRedirects(response, '/login/?next=/data/',status_code=302)
 		
 	def test_data_view_home_only_viewable_to_superuser(self):
 		self.client.logout()
@@ -45,7 +45,7 @@ class DataViewHome(TestCase):
 		istrue = self.client.login(username="kathy", password="b")
 		self.assertEquals(istrue, True)
 		response = self.client.get('/data/')
-		self.assertRedirects(response, 'login/?next=/data/', status_code=302)
+		self.assertRedirects(response, '/login/?next=/data/', status_code=302)
 		
 		
 class StudentView(TestCase):
@@ -119,7 +119,7 @@ class StudentView(TestCase):
 	def test_student_view_requires_login(self):
 		self.client.logout()
 		response = self.client.get('/data/student/')
-		self.assertRedirects(response, 'login/?next=/data/student/', status_code=302)
+		self.assertRedirects(response, '/login/?next=/data/student/', status_code=302)
 	
 	def test_student_view_requires_superuser(self):
 		self.client.logout()
@@ -127,7 +127,7 @@ class StudentView(TestCase):
 		istrue = self.client.login(username="kathy", password="b")
 		self.assertEquals(istrue, True)
 		response = self.client.get('/data/student/')
-		self.assertRedirects(response, 'login/?next=/data/student/', status_code=302)
+		self.assertRedirects(response, '/login/?next=/data/student/', status_code=302)
 	
 	def test_student_view_uses_correct_template(self):
 		response = self.client.get('/data/student/')
@@ -169,7 +169,7 @@ class StudentView(TestCase):
 		istrue = self.client.login(username="kathy", password="b")
 		self.assertEquals(istrue, True)
 		response = self.client.get('/data/student/21743148/')
-		self.assertRedirects(response, 'login/?next=/data/student/21743148/', status_code=302)
+		self.assertRedirects(response, '/login/?next=/data/student/21743148/', status_code=302)
 	
 	def test_dataview_page_exists_for_bob(self):
 		response = self.client.get('/data/student/21743148/')
@@ -281,6 +281,7 @@ class EdClass(TestCase):
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=4)
 		
 		bobenrollment.completedrubric = completedrubricforbob
+		bobenrollment.rubriccompleted = True
 		bobenrollment.save()	
 		
 		completedrubricforbobeg6000 = Rubric.objects.create(name="EG600021743148201530", template=False)
@@ -312,6 +313,7 @@ class EdClass(TestCase):
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforjane, row_choice=1)
 		
 		janeenrollment.completedrubric = completedrubricforjane
+		janeenrollment.rubriccompleted = True
 		janeenrollment.save()	
 		
 		completedrubricforjake = Rubric.objects.create(name="EG50000000201610", template=False)
@@ -327,6 +329,7 @@ class EdClass(TestCase):
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforjake, row_choice=4)
 		
 		jakeenrollment.completedrubric = completedrubricforjake
+		jakeenrollment.rubriccompleted = True
 		jakeenrollment.save()
 		self.client = Client()
 		self.username = 'bob'
@@ -338,7 +341,7 @@ class EdClass(TestCase):
 	def test_class_view_requires_login(self):
 		self.client.logout()
 		response = self.client.get('/data/class/')
-		self.assertRedirects(response, 'login/?next=/data/class/', status_code=302)
+		self.assertRedirects(response, '/login/?next=/data/class/', status_code=302)
 		
 	def test_class_view_requires_superuser_login(self):
 		self.client.logout()
@@ -371,7 +374,7 @@ class EdClass(TestCase):
 	def test_semester_class_view_requires_login(self):
 		self.client.logout()
 		response = self.client.get('/data/class/201530/')
-		self.assertRedirects(response, 'login/?next=/data/class/201530/', status_code=302)
+		self.assertRedirects(response, '/login/?next=/data/class/201530/', status_code=302)
 		
 	def test_semester_class_view_requires_superuser_login(self):
 		self.client.logout()
@@ -451,6 +454,7 @@ class EdClass(TestCase):
 	
 	def test_class_data_page_shows_aggregated_score(self):
 		response = self.client.get('/data/class/201530/EG5000/')
+		print(response.content.decode())
 		self.assertIn("1.5", response.content.decode())
 	
 	def test_EG5000_201530_rubric_data_does_not_appear_in_wrong_semester(self):
