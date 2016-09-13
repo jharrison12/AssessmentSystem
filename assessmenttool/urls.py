@@ -16,6 +16,6 @@ urlpatterns = [
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
-	url(r'^password_change/$', auth_views.password_change, {'password_change_form': PwordChangeForm}), 
+	#url(r'^password_change/$', auth_views.password_change, {'password_change_form': PwordChangeForm}), 
     url('^', include('django.contrib.auth.urls',)),
 ]
