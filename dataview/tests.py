@@ -454,7 +454,6 @@ class EdClass(TestCase):
 	
 	def test_class_data_page_shows_aggregated_score(self):
 		response = self.client.get('/data/class/201530/EG5000/')
-		print(response.content.decode())
 		self.assertIn("1.5", response.content.decode())
 	
 	def test_EG5000_201530_rubric_data_does_not_appear_in_wrong_semester(self):

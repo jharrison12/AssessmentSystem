@@ -58,22 +58,32 @@ def ed_class_data_view(request, edclass, semester):
 	classrubric = edclasspulled.keyrubric.get()
 	templaterows = Row.objects.filter(rubric=classrubric)
 	#Questions about whether the below query actually works the way it should
-	rubrics = Rubric.objects.filter(enrollment__semester__text=semester, enrollment__edclass=edclasspulled)
-	rows = Row.objects.filter(rubric=rubrics)
+	#logging.info("Semester %s EdClass %s" %(semester, edclasspulled))
+	#TODO Figure out why filtering rows by the query object below works in django 1.8 but not 1.10
+	#rubrics = Rubric.objects.filter(enrollment__semester__text=semester, enrollment__edclass=edclasspulled)
+	#logging.info("Rubric num is %d" % rubrics.count())
+	rows = Row.objects.filter(rubric__enrollment__semester__text=semester, rubric__enrollment__edclass=edclasspulled)
+	logging.info("Row num is %d" % rows.count())
+	for row in rows:
+		logging.info("Row choices %s" % (row.row_choice))
 	#Must be ordereddict or the rows will rearrange themselves in alphabetical order on page
 	scores = collections.OrderedDict()
 	for row in rows:
 		if row.name not in scores:
+			logging.info("First if for row in rows %s" % row.row_choice)
 			scores[row.name] = list((row.row_choice))
 		else:
+			logging.info("Adding %s" % row.row_choice)
 			scores[row.name].append((row.row_choice))
 	scores1 = copy.deepcopy(scores)
 	#average the scores for all of the items in scores
 	for key, rowscores in scores.items():
 		try:
+			logging.info("Rowscores processed " + str(rowscores) )
 			rowscores = [int(x) for x in rowscores]
 			rowscores = sum(rowscores)/len(rowscores)
-			scores[key] = rowscores
+			scores[key] = rowscores	
+			logging.info("Rowscores now " + str(rowscores) )
 		except ValueError:
 			pass
 	return render(request, 'dataview/classdataview.html', {'rows': templaterows, 'scores':rows, 'finalscores': scores, 'test':scores1})
