@@ -517,6 +517,12 @@ class UserLoginTest(TestCase):
 		self.assertTemplateUsed(response, 'registration/login.html')
 	
 	def test_change_password_page_works(self):
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'test'
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password = self.password)
 		response = self.client.get('/password_change/')
 		self.assertContains(response, 'password')
 		
