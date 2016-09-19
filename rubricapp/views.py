@@ -95,6 +95,8 @@ def rubric_page(request, edclass, studentname,semester):
 			#with having the RowFormSet to post an error message.
 			errorrow = "You must choose a value for all rows!"
 			RowsForCompletedRubric = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
+			#Zipping the two lists allows you to iterate both the RowFormSet and the rows once
+			#and not show n^2 rows or form set
 			zippedformandrows = zip(RowFormSetWeb, rows)
 			return render(request, 'rubricapp/rubricnotcompleted.html', {'studentlnumber': student.lnumber,
 															'studentname': student.lastname + ", " + student.firstname, 
@@ -157,4 +159,7 @@ def rubric_page(request, edclass, studentname,semester):
 													'rubricForClass': oldrubricname.title(), 
 													'semester': semester,
 													'error': error})
+@login_required												
+def user_page(request):
+	return render(request, 'rubricapp/userpage.html', {'user': request.user,})
 		

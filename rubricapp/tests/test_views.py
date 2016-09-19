@@ -3,7 +3,7 @@ from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, R
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase, Client
-from rubricapp.views import home_page, semester_page, student_page, rubric_page
+from rubricapp.views import home_page, semester_page, student_page, rubric_page, user_page
 from django.core.urlresolvers import resolve
 from django.contrib.auth.models import UserManager, User
 
@@ -541,4 +541,39 @@ class UserLoginTest(TestCase):
 		login = self.client.login(username=self.username, password = self.password)
 		response = self.client.get('/password_change/')
 		self.assertContains(response, 'password')
+		
+class UserPageTest(TestCase):
+
+	def setUp(self):
+		self.client = Client()
+		self.username = 'bob'
+		self.email = 'test@test.com'
+		self.password = 'bob'        
+		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
+		login = self.client.login(username=self.username, password=self.password)
+		
+	def test_user_view_exists(self):
+		request = HttpRequest()
+		Bob = User.objects.get(username='bob')
+		request.user = Bob
+		response =  user_page(request)
+		self.assertContains(response, 'Change Password')
+		
+	def test_user_page_exists(self):
+		response = self.client.get('/user/')
+		self.assertEquals(response.status_code, 200)
+		
+	def test_user_page_requires_login(self):
+		self.client.logout()
+		response = self.client.get('/user/')
+		self.assertRedirects(response, '/login/?next=/user/', status_code=302)
+		
+	def test_user_page_shows_correct_links(self):
+		response = self.client.get('/user/')
+		self.assertContains(response, "Reset Password")
+		self.assertContains(response, "Logout")
+		
+		
+		
+		
 		

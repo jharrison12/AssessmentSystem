@@ -1,0 +1,11 @@
+{% extends 'rubricapp/base.html' %}
+
+
+		{% block headerid%}user{% endblock %}{% block header_text %}Welcome {{ user }}{% endblock %}
+		
+		{% block form %}
+		<ul style="list-style: none;">
+			<li><a href={% url 'password_change' %}>Change Password</a></li>
+			<li><a href={% url 'password_reset' %}>Reset Password</a></li>
+		</ul>
+		{% endblock %}
