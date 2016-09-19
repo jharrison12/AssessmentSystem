@@ -122,6 +122,8 @@ class NewVisitorTest(FunctionalTest):
 		#The dr. clicks on "submit" the student data is submited to a database
 		submitbutton = self.browser.find_element_by_id('rubricsubmit')
 		submitbutton.send_keys(Keys.ENTER)
+		bodytext = self.browser.find_element_by_tag_name('body')
+		self.assertIn("THE BEST!", bodytext.text)
 		
 		#Dr. discoveres that empty values are not accepted in the rubric
 		bodytext = self.browser.find_element_by_tag_name('body')

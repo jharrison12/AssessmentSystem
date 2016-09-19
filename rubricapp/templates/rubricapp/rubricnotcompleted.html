@@ -1,0 +1,56 @@
+{% extends 'rubricapp/base.html' %}
+
+		{% block headerid%}studentheader{% endblock %}
+		{% block header_text %}Student name: {{ studentname }}{% endblock %}
+		{% block form %}
+		<h3 id="rubricheader">{{ rubricForClass }}</h3>
+		<form method="post" action= {% url 'rubricapp:rubricpage' edclass=edclass studentname=studentlnumber semester=semester%}>
+			
+			<table border="1" class="table table-striped" >
+		<!-- TODO fix this so that it pulls from forms.py -->
+				{% if error %}
+						{{ error }}
+				{% else %}
+				<tr>
+					<th></th>
+					<th>Excellent</th>
+					<th>Proficient</th>
+					<th>Sub-par</th>
+					<th>Abysmal</th>
+				</tr>
+								{% for form, row in rows %}
+								{{ RowFormSetWeb.management_form }}
+								{{ form.id }}				
+					<tr>
+						<td>{{ form.row_choice }}</td>
+
+						<td>{{ row.excellenttext }}</td>
+						<td>{{ row.proficienttext  }}</td>
+						<td>{{ row.satisfactorytext  }}</td>
+						<td>{{ row.unsatisfactorytext  }}</td>
+					</tr>
+								{% endfor %}
+							<!---
+							Would love to get this to work, but it wasn't working.
+							{% if form.has_error %}
+								{% for error in form.errors %}
+									{{ error }}
+								{% endfor %}
+							{% endif %}-->
+
+					{% if errorrow %}
+						{{ errorrow }}
+					{% endif %}
+			</table>
+			<input name="submitbutton" type="submit" name="submit" value="Submit" id="rubricsubmit">
+				
+		{% csrf_token %}
+		</form>
+				{% endif %}
+		{% endblock %}
+		
+	
+		
+		
+
+						

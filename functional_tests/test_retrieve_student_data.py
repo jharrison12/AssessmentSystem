@@ -81,7 +81,7 @@ class DataView(FunctionalTest):
 		self.assertEquals(classchoice.text, "Look at aggregated class data")
 		
 		#Professor Chooses the student view
-		studentchoice.send_keys(Keys.ENTER)
+		studentchoice.click()
 		studentchoiceheader = self.browser.find_element_by_id("studentchoice")
 		self.assertEqual(studentchoiceheader.text, "Choose a student!")
 		
@@ -108,7 +108,7 @@ class DataView(FunctionalTest):
 		#Prof changes their minds.  They want to look at all the rubrics from a particular course
 		self.browser.get("%s%s" % (self.live_server_url, '/data/'))
 		classchoice = self.browser.find_element_by_id('classlink')
-		classchoice.send_keys(Keys.ENTER)
+		classchoice.click()
 		
 		#Prof must choose by a semester.  OH MY
 		semesterdropdown = self.browser.find_element_by_id('semesterselectid')

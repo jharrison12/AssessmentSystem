@@ -94,10 +94,12 @@ def rubric_page(request, edclass, studentname,semester):
 			#Hard coding error message not ideal, but I was having real issues
 			#with having the RowFormSet to post an error message.
 			errorrow = "You must choose a value for all rows!"
-			return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
+			RowsForCompletedRubric = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
+			zippedformandrows = zip(RowFormSetWeb, rows)
+			return render(request, 'rubricapp/rubricnotcompleted.html', {'studentlnumber': student.lnumber,
 															'studentname': student.lastname + ", " + student.firstname, 
-															'RowFormSetWeb':RowFormSetWeb, 
-															'rows':rows, 
+															'RowFormSetWeb':RowsForCompletedRubric, 
+															'rows':zippedformandrows, 
 															'edclass':edclass,
 															'semester':semester,
 															'errorrow': errorrow,
@@ -132,6 +134,7 @@ def rubric_page(request, edclass, studentname,semester):
 													'semester': semester})
 		except ValidationError:
 			#Validationerror because a name for the rubric as already been completed
+			#Checks if rubriccompleted is False.  Shows rubric if it is
 			if greatEnrollment.rubriccompleted == False:
 				rubricname = "%s%s%s" %(edclass, studentname, semester)
 				noncompletedrubric = Rubric.objects.get(name=rubricname)
