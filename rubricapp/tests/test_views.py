@@ -79,7 +79,7 @@ class SemesterClassViewTest(TestCase):
 	def test_bob_cannot_see_jane_class(self):
 		semester = Semester.objects.create(text="201530")
 		jane = User.objects.create(username="Jane")
-		edclass1 = EdClasses.objects.create(name="EG 5111", teacher=jane)
+		edclass1 = EdClasses.objects.create(name="EG 5111", teacher=jane, crn=2222)
 		semester.classes.add(edclass1)
 		response = self.client.get('/assessment/201530/')
 		self.assertNotIn("EG 5111", response.content.decode())
@@ -87,14 +87,14 @@ class SemesterClassViewTest(TestCase):
 	def test_bob_can_see_bob_class(self):
 		semester = Semester.objects.create(text="201530")
 		jane = User.objects.create(username="Jane")
-		edclass1 = EdClasses.objects.create(name="EG 5111", teacher=self.test_user)
+		edclass1 = EdClasses.objects.create(name="EG 5111", teacher=self.test_user, crn=2222)
 		semester.classes.add(edclass1)
 		response = self.client.get('/assessment/201530/')
 		self.assertIn("EG 5111", response.content.decode())
 	
 	def test_displays_all_classes(self):
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user)
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user, crn=2222)
 		semester.classes.add(edclass1)
 		
 		response = self.client.get('/assessment/'+semester.text+'/')
@@ -102,8 +102,8 @@ class SemesterClassViewTest(TestCase):
 	
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.get(text="201530")
-		class1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user)
-		class2 = EdClasses.objects.create(name="EG 6000", teacher=self.test_user)
+		class1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user, crn=2222)
+		class2 = EdClasses.objects.create(name="EG 6000", teacher=self.test_user, crn=3333)
 		semester.classes.add(class1)
 		semester.classes.add(class2)
 		
@@ -167,9 +167,9 @@ class ClassViewTest(TestCase):
 		
 		
 		first_semester = Semester.objects.create(text='201530')
-		edClass = EdClasses.objects.create(name='EG 5000', teacher=self.test_user) 
-		edClass2 = EdClasses.objects.create(name='EG 6000', teacher=self.test_user)
-		edClass1 = EdClasses.objects.create(name="EG 5111", teacher=jane)
+		edClass = EdClasses.objects.create(name='EG 5000', teacher=self.test_user, crn=2222) 
+		edClass2 = EdClasses.objects.create(name='EG 6000', teacher=self.test_user, crn=3333)
+		edClass1 = EdClasses.objects.create(name="EG 5111", teacher=jane, crn=4444)
 		
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
@@ -300,9 +300,9 @@ class StudentandRubricViewTest(TestCase):
 		jane = User.objects.create(username="Jane")
 		
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user)
-		edclass2 = EdClasses.objects.create(name="EG 6000",  teacher=self.test_user)
-		edclass = EdClasses.objects.create(name="EG 5111", teacher=jane)
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user, crn=2222)
+		edclass2 = EdClasses.objects.create(name="EG 6000",  teacher=self.test_user, crn=3333)
+		edclass = EdClasses.objects.create(name="EG 5111", teacher=jane, crn=4444)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		semester.classes.add(edclass)

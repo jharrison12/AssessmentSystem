@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.db import models
 
 from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment
 #For user creation
@@ -11,8 +12,13 @@ from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment
 
 class EnrollmentAdmin(admin.ModelAdmin):
 	model = Enrollment
-	fields = ('student', 'rubriccompleted', 'semester', 'edclass')
+	#fields = ('student', 'rubriccompleted', 'semester', 'edclass')
+	list_display = ('student', 'rubriccompleted', 'semester', 'encode_class_name_for_admin')
 	actions = None
+	
+	#def encode_class_name_for_admin(self,obj):
+		#return obj.edclass + obj.edclass.semester
+
 	# The method below turns a readonly field if the user is editing the semester instance
 	def get_readonly_fields(self, request, obj=None):
 		if obj:

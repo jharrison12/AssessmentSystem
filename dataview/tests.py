@@ -54,8 +54,8 @@ class StudentView(TestCase):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
 		jacob = User.objects.create(username="jacob")
-		edclass1 = EdClasses.objects.create(name="EG 5000",teacher=jacob)
-		edclass2 = EdClasses.objects.create(name="EG 6000",teacher=jacob)
+		edclass1 = EdClasses.objects.create(name="EG 5000",teacher=jacob, crn=2222)
+		edclass2 = EdClasses.objects.create(name="EG 6000",teacher=jacob, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -234,8 +234,8 @@ class EdClass(TestCase):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
 		kelly = User.objects.create(username="kelly")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=kelly)
-		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=kelly)
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=kelly, crn=2222)
+		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=kelly, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		

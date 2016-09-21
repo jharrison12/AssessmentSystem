@@ -25,20 +25,25 @@ class CompletedRubric(Rubric):
 		return self.name
 
 class EdClasses(models.Model):
-	name = models.TextField(default='', unique=True)
+	crn = models.IntegerField(unique=True, null=False)
+	name = models.TextField(default='')
 	students = models.ManyToManyField(Student, through="Enrollment")
 	keyrubric = models.ManyToManyField(Rubric)
 	teacher = models.ForeignKey(User)
+	
 	def __str__(self):
-		return self.name		
+		return self.name	
+		
+
 		
 		
 class Semester(models.Model):
 	text = models.TextField(default='201530')
 	classes = models.ManyToManyField(EdClasses)	
+	
 	def __str__(self):
 		return self.text
-	
+
 class Row(models.Model):
 	CHOICES = (
 	('0', 'Your string for display'),
@@ -66,6 +71,9 @@ class Enrollment(models.Model):
 	#Will need to change completedrubric editable to False
 	completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
 	rubriccompleted = models.BooleanField(default=False)
+	
+	def encode_class_name_for_admin(self,obj):
+		return self.edclass.name + " " + self.semester.text
 	
 	def __str__(self):
 		return 'Enrollment %s: %s' % (self.student, self.edclass)

@@ -13,8 +13,8 @@ class RubricModel(TestCase):
 	def create_rubric_and_rows_connect_to_class(self):
 		bob = User.objects.create(username="Bob")
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob)
-		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob)
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob, crn=2222)
+		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -104,14 +104,14 @@ class RubricModel(TestCase):
 		with self.assertRaises(ValidationError):
 			rubric = Rubric(name="writingrubric")
 			rubric.full_clean()
-@skip		
+
 class ClassAndSemesterModelTest(TestCase):
 	
 	def create_rubric_and_rows_connect_to_class(self):
 		bob = User.objects.create(username="Bob")
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob)
-		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob)
+		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob, crn=2222)
+		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -133,6 +133,13 @@ class ClassAndSemesterModelTest(TestCase):
 		#because the manyto-many relationship is not a column in the database
 		edclass1.keyrubric.add(writingrubric)
 		
+	def test_class_model_identifier_is_crn(self):
+		self.create_rubric_and_rows_connect_to_class()
+		bob = User.objects.get(username="Bob")
+		edclass2 = EdClasses.objects.create(name="EG 5000", crn=30140, teacher=bob)
+		edclass1 = EdClasses.objects.get(name="EG 5000", crn=2222)
+		self.assertNotEqual(edclass1, edclass2)
+		
 
 class EnrollmentModelTest(TestCase):
 	
@@ -141,8 +148,8 @@ class EnrollmentModelTest(TestCase):
 		first_semester = Semester.objects.create(text='201530')
 		bob = User.objects.create(username="Bob")
 		janeteacher = User.objects.create(username="Jane")
-		edClass = EdClasses.objects.create(name='EG 5000', teacher=bob) 
-		edClass2 = EdClasses.objects.create(name='EG 6000', teacher=bob)
+		edClass = EdClasses.objects.create(name='EG 5000', teacher=bob, crn=2222) 
+		edClass2 = EdClasses.objects.create(name='EG 6000', teacher=bob, crn=3333)
 		
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
