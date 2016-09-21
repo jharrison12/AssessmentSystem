@@ -12,18 +12,19 @@ from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment
 
 class EnrollmentAdmin(admin.ModelAdmin):
 	model = Enrollment
-	#fields = ('student', 'rubriccompleted', 'semester', 'edclass')
-	list_display = ('student', 'rubriccompleted', 'semester', 'encode_class_name_for_admin')
+	fields = ('student', 'rubriccompleted', 'semester', 'edclass')
+	#list_display = ('student', 'rubriccompleted', 'semester', 'edclass')
 	actions = None
-	
-	#def encode_class_name_for_admin(self,obj):
-		#return obj.edclass + obj.edclass.semester
 
 	# The method below turns a readonly field if the user is editing the semester instance
 	def get_readonly_fields(self, request, obj=None):
 		if obj:
 			return self.readonly_fields + ('semester','student','edclass',)
 		return self.readonly_fields
+	
+	def has_delete_permission(self, request, obj=None):
+		return False
+
 
 # The inline enrollment form for EdClass does not work because you can
 # change the semester after creating the enrollment (do not want)
@@ -45,7 +46,11 @@ class EdClassAdmin(admin.ModelAdmin):
 		if db_field.name == "keyrubric":
 			kwargs["queryset"] = Rubric.objects.filter(template=True)
 			return super(EdClassAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
-
+	
+	def get_readonly_fields(self, request, obj=None):
+		if obj:
+			return self.readonly_fields + ('crn','name', 'keyrubric')
+		return self.readonly_fields
 
 
 # The two classes below make the rows in the rubric app inline rows
@@ -73,6 +78,10 @@ class RubricAdmin(admin.ModelAdmin):
 	
 	def get_queryset(self, request):
 		return Rubric.objects.filter(template=True)
+		
+	def has_delete_permission(self, request, obj=None):
+		return False
+
 
 
 
