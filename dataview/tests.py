@@ -54,8 +54,8 @@ class StudentView(TestCase):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
 		jacob = User.objects.create(username="jacob")
-		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000",teacher=jacob, crn=2222)
-		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000",teacher=jacob, crn=3333)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000",teacher=jacob, crn=2222, sectionnumber="01")
+		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000",teacher=jacob, crn=3333, sectionnumber="01")
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -84,7 +84,7 @@ class StudentView(TestCase):
 		edclass1.keyrubric.add(writingrubric)
 		edclass2.keyrubric.add(writingrubric)
 		
-		completedrubricforbob = Rubric.objects.create(name="EG500021743148201530", template=False)
+		completedrubricforbob = Rubric.objects.create(name="EG50000121743148201530", template=False)
 		row1 = Row.objects.create(name="Fortitude",
 								  excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
@@ -177,7 +177,7 @@ class StudentView(TestCase):
 		
 	def test_data_view_shows_rubrics(self):
 		response = self.client.get('/data/student/21743148/')
-		self.assertIn("EG500021743148201530", response.content.decode())
+		self.assertIn("EG50000121743148201530", response.content.decode())
 		
 	def test_student_data_page_has_submit_button(self):
 		response = self.client.get("/data/student/21743148/")
@@ -194,39 +194,39 @@ class StudentView(TestCase):
 	def test_student_data_view_redirects_to_correct_url(self):
 		request = HttpRequest()
 		request.method = "POST"
-		request.POST['rubricname'] = "EG5000 21743148 201530"
+		request.POST['rubricname'] = "EG500001 21743148 201530"
 		request.user = self.test_user
 		response = student_data_view(request, lnumber="21743148")
-		self.assertEqual(response['location'], 'EG500021743148201530/')
+		self.assertEqual(response['location'], 'EG50000121743148201530/')
 	
 	def test_student_rubric_view_shows_a_rubric(self):
-		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		response = self.client.get('/data/student/21743148/EG50000121743148201530/')
 		self.assertIn("Rubric", response.content.decode())
 	
 	def test_student_rubric_view_uses_correct_template(self):
-		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		response = self.client.get('/data/student/21743148/EG50000121743148201530/')
 		self.assertTemplateUsed(response, 'dataview/studentrubricview.html')
 		
 	def test_student_rubric_view_shows__rows(self):
-		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		response = self.client.get('/data/student/21743148/EG50000121743148201530/')
 		self.assertIn("Excellenceisahabit", response.content.decode())
 	
 	def test_student_rubric_view_shows_scores(self):
-		response = self.client.get('/data/student/21743148/EG500021743148201530/')
+		response = self.client.get('/data/student/21743148/EG50000121743148201530/')
 		self.assertIn("The worst ever", response.content.decode())
 		
 	def test_student_rubic_view_requires_login(self):
 		self.client.logout()
-		response = self.client.get('/data/student/21743148/EG500021743148201530/')
-		self.assertRedirects(response, '/login/?next=/data/student/21743148/EG500021743148201530/', status_code=302)
+		response = self.client.get('/data/student/21743148/EG50000121743148201530/')
+		self.assertRedirects(response, '/login/?next=/data/student/21743148/EG50000121743148201530/', status_code=302)
 	
 	def test_student_rubric_view_requires_superuser(self):
 		self.client.logout()
 		kathy = User.objects.create_user(username="kathy", password="b")
 		istrue = self.client.login(username="kathy", password="b")
 		self.assertEquals(istrue, True)
-		response = self.client.get("/data/student/21743148/EG500021743148201530/")
-		self.assertRedirects(response, '/login/?next=/data/student/21743148/EG500021743148201530/', status_code=302)
+		response = self.client.get("/data/student/21743148/EG50000121743148201530/")
+		self.assertRedirects(response, '/login/?next=/data/student/21743148/EG50000121743148201530/', status_code=302)
 		
 class EdClass(TestCase):
 	
@@ -234,8 +234,8 @@ class EdClass(TestCase):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
 		kelly = User.objects.create(username="kelly")
-		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=kelly, crn=2222)
-		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=kelly, crn=3333)
+		edclass1 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly, crn=2222)
+		edclass2 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -267,7 +267,7 @@ class EdClass(TestCase):
 		edclass1.keyrubric.add(writingrubric)
 		edclass2.keyrubric.add(writingrubric)
 		
-		completedrubricforbob = Rubric.objects.create(name="EG500021743148201530", template=False)
+		completedrubricforbob = Rubric.objects.create(name="EG50000121743148201530", template=False)
 		row1 = Row.objects.create(name="Fortitude",
 								  excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
@@ -299,7 +299,7 @@ class EdClass(TestCase):
 		bobenrollment1.completedrubric = completedrubricforbobeg6000
 		bobenrollment1.save()
 								  
-		completedrubricforjane = Rubric.objects.create(name="EG500021743149201530", template=False)
+		completedrubricforjane = Rubric.objects.create(name="EG50000121743149201530", template=False)
 		row1 = Row.objects.create(name="Fortitude",
 								  excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
@@ -316,7 +316,7 @@ class EdClass(TestCase):
 		janeenrollment.rubriccompleted = True
 		janeenrollment.save()	
 		
-		completedrubricforjake = Rubric.objects.create(name="EG50000000201610", template=False)
+		completedrubricforjake = Rubric.objects.create(name="EG5000010000201610", template=False)
 		row1 = Row.objects.create(name="Fortitude",
 								  excellenttext="THE BEST!", 
 								  proficienttext="THE SECOND BEST!",
@@ -421,53 +421,56 @@ class EdClass(TestCase):
 		request = HttpRequest()
 		request.method = "POST"
 		request.user = self.test_user
-		request.POST['edclass'] = "EG 5000"
+		request.POST['edclass'] = "EG 5000 01"
 		response = ed_class_view(request, "201530")
-		self.assertEqual(response['location'],"EG5000/" )
+		self.assertEqual(response['location'],"EG500001/" )
 		
 	def test_class_data_page_returns_correct_function(self):
-		found = resolve('/data/class/201530/EG5000/')
+		found = resolve('/data/class/201530/EG500001/')
 		self.assertEqual(found.func, ed_class_data_view)
 	
 	def test_class_data_page_uses_correct_template(self):
-		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05")
 		edclass = re.sub('[\s+]', '', str(edclass))
+		print(edclass)
 		response = self.client.get("/data/class/201530/%s/" % (edclass))
 		self.assertTemplateUsed(response, 'dataview/classdataview.html')
 		
 	def test_class_data_page_requires_login(self):
 		self.client.logout()
-		response = self.client.get('/data/class/201530/EG5000/')
-		self.assertRedirects(response, '/login/?next=/data/class/201530/EG5000/', status_code=302)
+		response = self.client.get('/data/class/201530/EG500001/')
+		self.assertRedirects(response, '/login/?next=/data/class/201530/EG500001/', status_code=302)
 		
 	def test_semester_class_data_view_requires_superuser_login(self):
 		self.client.logout()
 		kathy = User.objects.create_user(username="kathy", password="b")
 		istrue = self.client.login(username="kathy", password="b")
 		self.assertEquals(istrue, True)
-		response = self.client.get('/data/class/201530/EG5000/')
-		self.assertRedirects(response, '/login/?next=/data/class/201530/EG5000/', status_code=302)
+		response = self.client.get('/data/class/201530/EG500001/')
+		self.assertRedirects(response, '/login/?next=/data/class/201530/EG500001/', status_code=302)
 	
 	def test_class_rubric_view_shows_rubric(self):
-		response = self.client.get('/data/class/201530/EG5000/')
+		response = self.client.get('/data/class/201530/EG500005/')
 		self.assertIn("Excellenceisahabit", response.content.decode())
 	
 	def test_class_data_page_shows_aggregated_score(self):
-		response = self.client.get('/data/class/201530/EG5000/')
+		response = self.client.get('/data/class/201530/EG500005/')
 		self.assertIn("1.5", response.content.decode())
 	
-	def test_EG5000_201530_rubric_data_does_not_appear_in_wrong_semester(self):
-		response = self.client.get('/data/class/201610/EG5000/')
+	def test_EG500005_201530_rubric_data_does_not_appear_in_wrong_semester(self):
+		response = self.client.get('/data/class/201610/EG500005/')
 		self.assertNotIn("1.5", response.content.decode())
 		self.assertNotIn("2.5", response.content.decode())
 	
-	def test_EG5000_201610_rubric_shows_only_jake_score(self):
-		response = self.client.get('/data/class/201610/EG5000/')
+	def test_EG500005_201610_rubric_shows_only_jake_score(self):
+		response = self.client.get('/data/class/201610/EG500005/')
 		#should only show score of 4.0
 		self.assertIn("4.0", response.content.decode())
 	
 	def test_EG6000_201530_rubric_shows_only_one_score(self):
-		response = self.client.get('/data/class/201530/EG6000/')
+		response = self.client.get('/data/class/201530/EG600004/')
 		self.assertIn("1.0", response.content.decode())
+		
+
 
 		

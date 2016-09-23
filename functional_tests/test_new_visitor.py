@@ -11,8 +11,8 @@ class NewVisitorTest(FunctionalTest):
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
-		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
-		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", sectionnumber="01", teacher=self.test_user, crn=2222)
+		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", sectionnumber="01", teacher=self.test_user, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -81,7 +81,7 @@ class NewVisitorTest(FunctionalTest):
 		dropdown_list = self.browser.find_element_by_id('classdropdown')
 		self.assertEqual(dropdown_list.get_attribute('name'), "edClass")
 		classchoice = self.browser.find_elements_by_tag_name('option')
-		self.assertIn("EG 5000", [i.text for i in classchoice])
+		self.assertIn("EG 5000 01", [i.text for i in classchoice])
 
 		#Dr. clicks on a "Choose" button and is taken to a new page
 		submitbutton = self.browser.find_element_by_id('classubmit')
@@ -163,7 +163,7 @@ class NewVisitorTest(FunctionalTest):
 		
 		#The mischevious professor tries to go back to a completed student url
 		
-		self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG5000/21743148'))
+		self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/21743148'))
 		bodytext = self.browser.find_element_by_tag_name('body')
 		self.assertIn("You have already completed a rubric for this student.", bodytext.text)
 		

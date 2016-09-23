@@ -13,8 +13,8 @@ class RubricModel(TestCase):
 	def create_rubric_and_rows_connect_to_class(self):
 		bob = User.objects.create(username="Bob")
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", sectionnumber="01", teacher=bob, crn=2222)
-		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", sectionnumber="01", teacher=bob, crn=3333)
+		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000",  teacher=bob, crn=2222)
+		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -44,7 +44,7 @@ class RubricModel(TestCase):
 	def test_to_make_sure_class_object_matches_with_rubric(self):
 		self.create_rubric_and_rows_connect_to_class()
 		bob = Student.objects.get(lnumber="21743148")
-		edClass = EdClasses.objects.get(subject='EG', coursenumber='5000')#, semester="201530")
+		edClass = EdClasses.objects.get(sectionnumber="01",subject='EG', coursenumber='5000')#, semester="201530")
 		enrollmentObj = Enrollment.objects.get(student=bob, edclass=edClass)
 		#should get the only rubric attached to the object
 		writingrubric = edClass.keyrubric.get()
@@ -110,8 +110,8 @@ class ClassAndSemesterModelTest(TestCase):
 	def create_rubric_and_rows_connect_to_class(self):
 		bob = User.objects.create(username="Bob")
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=bob, crn=2222)
-		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=bob, crn=3333)
+		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=bob, crn=2222)
+		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -148,8 +148,8 @@ class EnrollmentModelTest(TestCase):
 		first_semester = Semester.objects.create(text='201530')
 		bob = User.objects.create(username="Bob")
 		janeteacher = User.objects.create(username="Jane")
-		edClass = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=bob, crn=2222) 
-		edClass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=bob, crn=3333)
+		edClass = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=bob, crn=2222) 
+		edClass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
 		
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)

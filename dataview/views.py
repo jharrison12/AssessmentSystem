@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester
 import re, logging, collections, copy
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 from django.contrib.auth.decorators import login_required,user_passes_test
 # Create your views here.
 
@@ -54,8 +54,10 @@ def ed_class_view(request, semester):
 @user_passes_test(lambda u: u.is_superuser)
 def ed_class_data_view(request, edclass, semester):
 	edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
-	edclasscoursenumber = re.search('([0-9]+)', edclass).group(0)
-	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber)
+	edclasscoursenumber = re.search('([0-9]{4})', edclass).group(0)
+	edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
+	logging.info("%s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber))
+	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber)
 	classrubric = edclasspulled.keyrubric.get()
 	templaterows = Row.objects.filter(rubric=classrubric)
 	#Questions about whether the below query actually works the way it should

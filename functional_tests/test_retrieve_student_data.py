@@ -11,8 +11,8 @@ class DataView(FunctionalTest):
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
-		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
-		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
+		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
+		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -103,6 +103,7 @@ class DataView(FunctionalTest):
 		
 		#Professor sees the rubric
 		bodytext = self.browser.find_element_by_tag_name('body')
+		
 		self.assertIn("Excellence", bodytext.text)
 
 		#Prof changes their minds.  They want to look at all the rubrics from a particular course
@@ -121,7 +122,7 @@ class DataView(FunctionalTest):
 		classdropdown = self.browser.find_element_by_id('edlcassdropdown')
 		self.assertEqual(classdropdown.get_attribute('name'), 'edclass')
 		classnames = self.browser.find_elements_by_tag_name('option')
-		self.assertIn("EG 5000 ", [i.text for i in classnames])
+		self.assertIn("EG 5000 01", [i.text for i in classnames])
 		submitbutton = self.browser.find_element_by_id('classsubmit')
 		submitbutton.send_keys(Keys.ENTER)
 		

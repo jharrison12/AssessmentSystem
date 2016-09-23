@@ -12,7 +12,7 @@ urlpatterns = [
     # Examples:
 	 url(r'^$', views.home_page, name='home'),
 	 url(r'^(?P<semester>\d+)/$', views.semester_page, name='semester'),
-	 url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{4})/$', views.student_page, name='student'),
-	 url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{4})/(?P<studentname>[0-9]+)/$', views.rubric_page, name="rubricpage"),
+	 url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{6})/$', views.student_page, name='student'),
+	 url(r'^(?P<semester>\d+)/(?P<edclass>EG[0-9]{6})/(?P<studentname>[0-9]+)/$', views.rubric_page, name="rubricpage"),
 
 ]

@@ -35,8 +35,8 @@ class EdClasses(models.Model):
 
 	crn = models.IntegerField(unique=True, null=False)
 	subject = models.CharField(max_length=4, choices=CHOICES, default="EG")
-	coursenumber = models.TextField(default='')
-	sectionnumber = models.CharField(max_length=2)
+	coursenumber = models.TextField(default='', blank=False)
+	sectionnumber = models.CharField(max_length=2, blank=False)
 	students = models.ManyToManyField(Student, through="Enrollment")
 	keyrubric = models.ManyToManyField(Rubric)
 	teacher = models.ForeignKey(User)
