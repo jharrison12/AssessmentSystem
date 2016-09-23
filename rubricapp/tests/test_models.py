@@ -13,8 +13,8 @@ class RubricModel(TestCase):
 	def create_rubric_and_rows_connect_to_class(self):
 		bob = User.objects.create(username="Bob")
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob, crn=2222)
-		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob, crn=3333)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", sectionnumber="01", teacher=bob, crn=2222)
+		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", sectionnumber="01", teacher=bob, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -44,7 +44,7 @@ class RubricModel(TestCase):
 	def test_to_make_sure_class_object_matches_with_rubric(self):
 		self.create_rubric_and_rows_connect_to_class()
 		bob = Student.objects.get(lnumber="21743148")
-		edClass = EdClasses.objects.get(name='EG 5000')#, semester="201530")
+		edClass = EdClasses.objects.get(subject='EG', coursenumber='5000')#, semester="201530")
 		enrollmentObj = Enrollment.objects.get(student=bob, edclass=edClass)
 		#should get the only rubric attached to the object
 		writingrubric = edClass.keyrubric.get()
@@ -82,7 +82,7 @@ class RubricModel(TestCase):
 		self.create_rubric_and_rows_connect_to_class()
 		jane = Student.objects.get(lnumber="21743149")
 		bob = Student.objects.get(lnumber="21743148")
-		edClass = EdClasses.objects.get(name='EG 5000', semester__text="201530")
+		edClass = EdClasses.objects.get(subject="EG", coursenumber="5000", semester__text="201530")
 		writingrubric = Rubric.objects.create(name="writingrubric2")
 		writingrubric1 = Rubric.objects.create(name="writingrubric1")
 		bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
@@ -110,8 +110,8 @@ class ClassAndSemesterModelTest(TestCase):
 	def create_rubric_and_rows_connect_to_class(self):
 		bob = User.objects.create(username="Bob")
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=bob, crn=2222)
-		edclass2 = EdClasses.objects.create(name="EG 6000", teacher=bob, crn=3333)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=bob, crn=2222)
+		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=bob, crn=3333)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		
@@ -136,8 +136,8 @@ class ClassAndSemesterModelTest(TestCase):
 	def test_class_model_identifier_is_crn(self):
 		self.create_rubric_and_rows_connect_to_class()
 		bob = User.objects.get(username="Bob")
-		edclass2 = EdClasses.objects.create(name="EG 5000", crn=30140, teacher=bob)
-		edclass1 = EdClasses.objects.get(name="EG 5000", crn=2222)
+		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="5000", crn=30140, teacher=bob)
+		edclass1 = EdClasses.objects.get(subject="EG", coursenumber="5000", crn=2222)
 		self.assertNotEqual(edclass1, edclass2)
 		
 
@@ -148,8 +148,8 @@ class EnrollmentModelTest(TestCase):
 		first_semester = Semester.objects.create(text='201530')
 		bob = User.objects.create(username="Bob")
 		janeteacher = User.objects.create(username="Jane")
-		edClass = EdClasses.objects.create(name='EG 5000', teacher=bob, crn=2222) 
-		edClass2 = EdClasses.objects.create(name='EG 6000', teacher=bob, crn=3333)
+		edClass = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=bob, crn=2222) 
+		edClass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=bob, crn=3333)
 		
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
@@ -167,13 +167,13 @@ class EnrollmentModelTest(TestCase):
 	def test_class_connect_to_particular_user(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		bob = User.objects.get(username="Bob")
-		edclass = EdClasses.objects.get(name="EG 5000")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		self.assertEqual(edclass.teacher, bob)
 	
 	def test_different_teacher_does_not_connect_to_bob_class(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		jane = User.objects.get(username="Jane")
-		edclass = EdClasses.objects.get(name="EG 5000")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		self.assertNotEqual(edclass.teacher, jane)
 		
 	
@@ -203,8 +203,8 @@ class EnrollmentModelTest(TestCase):
 		first_saved_class = saved_classes[0]
 		second_saved_class = saved_classes[1]
 
-		self.assertEqual(first_saved_class.name, 'EG 5000')
-		self.assertEqual(second_saved_class.name, 'EG 6000')
+		self.assertEqual(first_saved_class.subject + " " + first_saved_class.coursenumber, 'EG 5000')
+		self.assertEqual(second_saved_class.subject + " " + second_saved_class.coursenumber, 'EG 6000')
 	
 	def test_classes_link_to_semester(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
@@ -214,14 +214,14 @@ class EnrollmentModelTest(TestCase):
 		first_saved_class = saved_classes[0]
 		second_saved_class = saved_classes[1]
 
-		self.assertQuerysetEqual(first_semester.classes.filter(name="EG 5000"),[repr(first_saved_class)] )
-		self.assertQuerysetEqual(first_semester.classes.filter(name="EG 6000"), [repr(second_saved_class)] )
+		self.assertQuerysetEqual(first_semester.classes.filter(subject="EG", coursenumber="5000"),[repr(first_saved_class)] )
+		self.assertQuerysetEqual(first_semester.classes.filter(subject="EG", coursenumber="6000"), [repr(second_saved_class)] )
 	
 	def test_students_link_to_class(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		
-		oneclass = EdClasses.objects.get(name="EG 5000")
-		twoclass = EdClasses.objects.get(name="EG 6000")
+		oneclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+		twoclass = EdClasses.objects.get(subject="EG", coursenumber="6000")
 		
 		jane = Student.objects.get(lnumber="21743149")
 		bob = Student.objects.get(lnumber="21743148")
@@ -237,7 +237,7 @@ class EnrollmentModelTest(TestCase):
 	
 	def test_students_link_to_enrollments(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		edclass1 = EdClasses.objects.get(name="EG 5000")
+		edclass1 = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		bob = Student.objects.get(lnumber="21743148")
 		bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
 		self.assertEqual(bobenrollment.rubriccompleted, False)
@@ -245,7 +245,7 @@ class EnrollmentModelTest(TestCase):
 	def test_students_are_pulled_by_class_and_semester(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		second_semester = Semester.objects.create(text="201610")
-		edClass = EdClasses.objects.get(name='EG 5000')
+		edClass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		second_semester.classes.add(edClass)
 		studentsinclass = Student.objects.filter(edclasses=edClass, enrollment__semester=second_semester)
 		self.assertEqual(studentsinclass.count(), 0)
@@ -253,7 +253,7 @@ class EnrollmentModelTest(TestCase):
 	def test_students_can_be_added_to_class_by_semester(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		second_semester = Semester.objects.create(text="201610")
-		edclass = EdClasses.objects.get(name='EG 5000')
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		second_semester.classes.add(edclass)
 		elaine = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
 		elainenrollment = Enrollment.objects.create(student=elaine, edclass=edclass, semester=second_semester)
@@ -263,7 +263,7 @@ class EnrollmentModelTest(TestCase):
 	def test_students_are_not_enrolled_in_same_course_in_different_semesters(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		second_semester = Semester.objects.create(text="201610")
-		edclass = EdClasses.objects.get(name='EG 5000')
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		second_semester.classes.add(edclass)
 		elaine = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
 		elainenrollment = Enrollment.objects.create(student=elaine, edclass=edclass, semester=second_semester)

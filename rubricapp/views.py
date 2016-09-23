@@ -7,7 +7,7 @@ from copy import deepcopy
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 @login_required
 def home_page(request):
@@ -40,9 +40,13 @@ def student_page(request, edclass, semester):
 	#REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the 
 	#course code
 	logging.info("In the student page edclass:%s, semester %s" %( edclass, semester))
-	edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
+	edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
+	logging.info("In the student page edclass:%s, semester %s" %( edclass, semester))
+	edclasscoursenumber = re.search('([0-9]+)', edclass).group(0)
+	logging.info("In the student page subject:%s, course %s" %( edclasssubjectarea, edclasscoursenumber))
+	#edClassSpaceAdded = re.sub('([A-Z]+)', r'\1 ', edclass )
 	#Filter the class basedupon semester and name of the class
-	edclassesPulled = get_object_or_404(EdClasses,semester__text=semester, name=edClassSpaceAdded, teacher=request.user)
+	edclassesPulled = get_object_or_404(EdClasses,semester__text=semester, subject=edclasssubjectarea, coursenumber=edclasscoursenumber, teacher=request.user)
 	logging.info("The classes pulled are %s" % (edclassesPulled))
 	students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False, enrollment__semester__text=semester)
 	for i in students:
@@ -58,9 +62,11 @@ def student_page(request, edclass, semester):
 
 @login_required
 def rubric_page(request, edclass, studentname,semester):
-	edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
+	#edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
+	edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
+	edclasscoursenumber = re.search('([0-9]+)', edclass).group(0)
 	#This returns the class
-	edclassenrolled = get_object_or_404(EdClasses,name=edclassspaceadded, teacher=request.user)
+	edclassenrolled = get_object_or_404(EdClasses,subject=edclasssubjectarea, coursenumber=edclasscoursenumber, teacher=request.user)
 	#This returns the student
 	student = Student.objects.get(lnumber=studentname)
 	#this returns the rubric associated with the class

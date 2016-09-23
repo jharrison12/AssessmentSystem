@@ -53,8 +53,9 @@ def ed_class_view(request, semester):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def ed_class_data_view(request, edclass, semester):
-	edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
-	edclasspulled = EdClasses.objects.get(name=edclassspaceadded)
+	edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
+	edclasscoursenumber = re.search('([0-9]+)', edclass).group(0)
+	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber)
 	classrubric = edclasspulled.keyrubric.get()
 	templaterows = Row.objects.filter(rubric=classrubric)
 	#Questions about whether the below query actually works the way it should

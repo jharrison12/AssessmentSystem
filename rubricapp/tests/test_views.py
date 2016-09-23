@@ -79,7 +79,7 @@ class SemesterClassViewTest(TestCase):
 	def test_bob_cannot_see_jane_class(self):
 		semester = Semester.objects.create(text="201530")
 		jane = User.objects.create(username="Jane")
-		edclass1 = EdClasses.objects.create(name="EG 5111", teacher=jane, crn=2222)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5111", teacher=jane, crn=2222)
 		semester.classes.add(edclass1)
 		response = self.client.get('/assessment/201530/')
 		self.assertNotIn("EG 5111", response.content.decode())
@@ -87,14 +87,14 @@ class SemesterClassViewTest(TestCase):
 	def test_bob_can_see_bob_class(self):
 		semester = Semester.objects.create(text="201530")
 		jane = User.objects.create(username="Jane")
-		edclass1 = EdClasses.objects.create(name="EG 5111", teacher=self.test_user, crn=2222)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5111", teacher=self.test_user, crn=2222)
 		semester.classes.add(edclass1)
 		response = self.client.get('/assessment/201530/')
 		self.assertIn("EG 5111", response.content.decode())
 	
 	def test_displays_all_classes(self):
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user, crn=2222)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
 		semester.classes.add(edclass1)
 		
 		response = self.client.get('/assessment/'+semester.text+'/')
@@ -102,8 +102,8 @@ class SemesterClassViewTest(TestCase):
 	
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.get(text="201530")
-		class1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user, crn=2222)
-		class2 = EdClasses.objects.create(name="EG 6000", teacher=self.test_user, crn=3333)
+		class1 = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
+		class2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
 		semester.classes.add(class1)
 		semester.classes.add(class2)
 		
@@ -147,8 +147,8 @@ class SemesterClassViewTest(TestCase):
 		bob = User.objects.get(username="bob")
 		request.user = bob
 		request.method = "POST"
-		edClass = EdClasses.objects.get(name="EG 5000", teacher=self.test_user)
-		request.POST['edClass'] = edClass.name
+		edClass = EdClasses.objects.get(subject="EG", coursenumber="5000", teacher=self.test_user)
+		request.POST['edClass'] = edClass.subject + edClass.coursenumber
 
 		response = semester_page(request, "201530")
 
@@ -167,9 +167,9 @@ class ClassViewTest(TestCase):
 		
 		
 		first_semester = Semester.objects.create(text='201530')
-		edClass = EdClasses.objects.create(name='EG 5000', teacher=self.test_user, crn=2222) 
-		edClass2 = EdClasses.objects.create(name='EG 6000', teacher=self.test_user, crn=3333)
-		edClass1 = EdClasses.objects.create(name="EG 5111", teacher=jane, crn=4444)
+		edClass = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222) 
+		edClass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
+		edClass1 = EdClasses.objects.create(subject="EG", coursenumber="5111", teacher=jane, crn=4444)
 		
 		first_semester.classes.add(edClass)
 		first_semester.classes.add(edClass2)
@@ -224,8 +224,8 @@ class ClassViewTest(TestCase):
 		Bob = User.objects.get(username='bob')
 		request.user = Bob
 		request.method = "POST"
-		edClass = EdClasses.objects.get(name="EG 5000")
-		request.POST['edClass'] = edClass.name
+		edClass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+		request.POST['edClass'] = edClass.subject + edClass.coursenumber
 
 		response = semester_page(request, "201530")
 		
@@ -268,10 +268,10 @@ class ClassViewTest(TestCase):
 		
 	def test_class_page_shows_url_if_no_students(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__name="EG 5000")
+		bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__subject="EG", edclass__coursenumber="5000")
 		bobenrollment.rubriccompleted = True
 		bobenrollment.save()
-		janeenrollment = Enrollment.objects.get(student__lastname="Doe", edclass__name="EG 5000")
+		janeenrollment = Enrollment.objects.get(student__lastname="Doe", edclass__subject="EG", edclass__coursenumber="5000")
 		janeenrollment.rubriccompleted = True
 		janeenrollment.save()
 		
@@ -282,7 +282,7 @@ class ClassViewTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		booritter = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
 		newsemester = Semester.objects.create(text="201610")
-		edclass = EdClasses.objects.get(name="EG 5000")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		newsemester.classes.add(edclass)
 		booenrollment = Enrollment.objects.create(student=booritter, edclass=edclass, semester=newsemester)
 		response = self.client.get('/assessment/201530/EG5000/')
@@ -300,9 +300,9 @@ class StudentandRubricViewTest(TestCase):
 		jane = User.objects.create(username="Jane")
 		
 		semester = Semester.objects.create(text="201530")
-		edclass1 = EdClasses.objects.create(name="EG 5000", teacher=self.test_user, crn=2222)
-		edclass2 = EdClasses.objects.create(name="EG 6000",  teacher=self.test_user, crn=3333)
-		edclass = EdClasses.objects.create(name="EG 5111", teacher=jane, crn=4444)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
+		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000",  teacher=self.test_user, crn=3333)
+		edclass = EdClasses.objects.create(subject="EG", coursenumber="5111", teacher=jane, crn=4444)
 		semester.classes.add(edclass1)
 		semester.classes.add(edclass2)
 		semester.classes.add(edclass)
@@ -412,7 +412,7 @@ class StudentandRubricViewTest(TestCase):
 			   
 		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
 		student = Student.objects.get(lnumber="21743148")
-		edclass = EdClasses.objects.get(name="EG 5000")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		
 		bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
 		
@@ -454,7 +454,7 @@ class StudentandRubricViewTest(TestCase):
 			   
 		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
 		student = Student.objects.get(lnumber="21743148")
-		edclass = EdClasses.objects.get(name="EG 5000")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		
 		bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
 		row = Row.objects.get(excellenttext="THE BEST!", rubric__name=bobenrollment.completedrubric.name)
@@ -507,7 +507,7 @@ class StudentandRubricViewTest(TestCase):
 			   
 		response = self.client.post("/assessment/201530/EG5000/21743148/", data)
 		student = Student.objects.get(lnumber="21743148")
-		edclass = EdClasses.objects.get(name="EG 5000")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		
 		bobenrollment = Enrollment.objects.filter(student=student, edclass=edclass)
 		print(bobenrollment.count())
@@ -515,7 +515,7 @@ class StudentandRubricViewTest(TestCase):
 		
 	def test_get_request_for_student_rubric_page_returns_rubric_if_completedrubric_false(self):
 		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-		bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__name="EG 5000")
+		bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__subject="EG", edclass__coursenumber="5000")
 		Rubric.objects.create(name="EG500021743148201530")
 		bobenrollment.rubriccompleted = False
 		response = self.client.get("/assessment/201530/EG5000/21743148/")

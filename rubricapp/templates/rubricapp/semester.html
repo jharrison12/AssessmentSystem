@@ -5,7 +5,7 @@
 		<form method="POST" action={{ class.name }}>
 			<select name="edClass" id="classdropdown">
 				{% for class in summerclasses %}
-				<option name="{{ class.name }}">{{ class.name }}</option>
+				<option name="{{ class.subject }}{{ class.coursenumber}}">{{ class.subject }} {{ class.coursenumber}}</option>
 				{% endfor %}
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="classubmit">

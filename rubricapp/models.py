@@ -25,14 +25,24 @@ class CompletedRubric(Rubric):
 		return self.name
 
 class EdClasses(models.Model):
+	CHOICES = (
+	('EG', "Graduate Education",),
+	('EGSE', "Special Education",),
+	('EGEL', "English Language Learning"),
+	('MAED', 'Math Education'),
+	('ED', "Undergraduate Education"),
+	)
+
 	crn = models.IntegerField(unique=True, null=False)
-	name = models.TextField(default='')
+	subject = models.CharField(max_length=4, choices=CHOICES, default="EG")
+	coursenumber = models.TextField(default='')
+	sectionnumber = models.CharField(max_length=2)
 	students = models.ManyToManyField(Student, through="Enrollment")
 	keyrubric = models.ManyToManyField(Rubric)
 	teacher = models.ForeignKey(User)
 	
 	def __str__(self):
-		return self.name	
+		return self.subject + " " + self.coursenumber + " " + self.sectionnumber
 		
 
 		
