@@ -43,7 +43,7 @@ class EdClasses(models.Model):
 
 	crn = models.IntegerField(unique=True, null=False)
 	subject = models.CharField(max_length=4, choices=CHOICES, default="EG")
-	coursenumber = models.TextField(default='', blank=False)
+	coursenumber = models.CharField(default='', blank=False, max_length=4)
 	sectionnumber = models.CharField(max_length=2, blank=False)
 	students = models.ManyToManyField(Student, through="Enrollment")
 	#keyrubric = models.ManyToManyField(Rubric)
