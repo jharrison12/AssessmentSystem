@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, semester_ed_class_view
-from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row
+from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, EdClassSemester
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 import re
@@ -56,8 +56,11 @@ class StudentView(TestCase):
 		jacob = User.objects.create(username="jacob")
 		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000",teacher=jacob, crn=2222, sectionnumber="01")
 		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000",teacher=jacob, crn=3333, sectionnumber="01")
-		semester.classes.add(edclass1)
-		semester.classes.add(edclass2)
+		edclasssemester1 = EdClassSemester.objects.create(edclass=edclass1, semester=semester)
+		edclasssemester2 = EdClassSemester.objects.create(edclass=edclass2, semester=semester)
+		
+		#semester.classes.add(edclass1)
+		#semester.classes.add(edclass2)
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
@@ -81,8 +84,10 @@ class StudentView(TestCase):
 		
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		edclass1.keyrubric.add(writingrubric)
-		edclass2.keyrubric.add(writingrubric)
+		#edclass1.keyrubric.add(writingrubric)
+		#edclass2.keyrubric.add(writingrubric)
+		edclasssemester1.keyrubric.add(writingrubric)
+		edclasssemester2.keyrubric.add(writingrubric)
 		
 		completedrubricforbob = Rubric.objects.create(name="EG50000121743148201530", template=False)
 		row1 = Row.objects.create(name="Fortitude",
@@ -236,8 +241,13 @@ class EdClass(TestCase):
 		kelly = User.objects.create(username="kelly")
 		edclass1 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly, crn=2222)
 		edclass2 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly, crn=3333)
-		semester.classes.add(edclass1)
-		semester.classes.add(edclass2)
+		edclasssemester1 = EdClassSemester.objects.create(edclass=edclass1, semester=semester)
+		edclasssemester2 = EdClassSemester.objects.create(edclass=edclass2, semester=semester)
+		edclasssemester3 = EdClassSemester.objects.create(edclass=edclass1, semester=semester2)
+		edclasssemester4 = EdClassSemester.objects.create(edclass=edclass2, semester=semester2)
+		
+		#semester.classes.add(edclass1)
+		#semester.classes.add(edclass2)
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
@@ -264,8 +274,12 @@ class EdClass(TestCase):
 		
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		edclass1.keyrubric.add(writingrubric)
-		edclass2.keyrubric.add(writingrubric)
+		#edclass1.keyrubric.add(writingrubric)
+		#edclass2.keyrubric.add(writingrubric)
+		edclasssemester1.keyrubric.add(writingrubric)
+		edclasssemester2.keyrubric.add(writingrubric)
+		edclasssemester3.keyrubric.add(writingrubric)
+		edclasssemester4.keyrubric.add(writingrubric)
 		
 		completedrubricforbob = Rubric.objects.create(name="EG50000121743148201530", template=False)
 		row1 = Row.objects.create(name="Fortitude",
@@ -457,7 +471,7 @@ class EdClass(TestCase):
 		response = self.client.get('/data/class/201530/EG500005/')
 		self.assertIn("1.5", response.content.decode())
 	
-	def test_EG500005_201530_rubric_data_does_not_appear_in_wrong_semester(self):
+	def test_EG500005_201610_rubric_data_does_not_appear_in_wrong_semester(self):
 		response = self.client.get('/data/class/201610/EG500005/')
 		self.assertNotIn("1.5", response.content.decode())
 		self.assertNotIn("2.5", response.content.decode())

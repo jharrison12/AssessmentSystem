@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row,EdClassSemester
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
@@ -15,8 +15,10 @@ class RubricModel(TestCase):
 		semester = Semester.objects.create(text="201530")
 		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000",  teacher=bob, crn=2222)
 		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
-		semester.classes.add(edclass1)
-		semester.classes.add(edclass2)
+		#semester.classes.add(edclass1)
+		#semester.classes.add(edclass2)
+		edclasssemester1 = EdClassSemester.objects.create(semester=semester,edclass=edclass1)
+		edclasssemester2 = EdClassSemester.objects.create(semester=semester,edclass=edclass2)
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
@@ -34,7 +36,8 @@ class RubricModel(TestCase):
 							
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		edclass1.keyrubric.add(writingrubric)
+		edclasssemester1.keyrubric.add(writingrubric)
+		edclasssemester2.keyrubric.add(writingrubric)
 		
 	def test_rubric_connected_with_enrollment_class(self):
 		self.create_rubric_and_rows_connect_to_class()
@@ -45,9 +48,9 @@ class RubricModel(TestCase):
 		self.create_rubric_and_rows_connect_to_class()
 		bob = Student.objects.get(lnumber="21743148")
 		edClass = EdClasses.objects.get(sectionnumber="01",subject='EG', coursenumber='5000')#, semester="201530")
-		enrollmentObj = Enrollment.objects.get(student=bob, edclass=edClass)
+		edclasssemesterobj = EdClassSemester.objects.get(edclass=edClass)
 		#should get the only rubric attached to the object
-		writingrubric = edClass.keyrubric.get()
+		writingrubric = edclasssemesterobj.keyrubric.get()
 		self.assertEqual(writingrubric.name, "writingrubric")
 	
 	def test_rubric_object_only_has_one_row(self):
@@ -112,8 +115,12 @@ class ClassAndSemesterModelTest(TestCase):
 		semester = Semester.objects.create(text="201530")
 		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=bob, crn=2222)
 		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
-		semester.classes.add(edclass1)
-		semester.classes.add(edclass2)
+		#semester.classes.add(edclass1)
+		#semester.classes.add(edclass2)
+		edclasssemester1 = EdClassSemester.objects.create(edclass=edclass1, semester=semester)
+		edclasssemester2 = EdClassSemester.objects.create(edclass=edclass2, semester=semester)
+		
+
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
@@ -131,7 +138,7 @@ class ClassAndSemesterModelTest(TestCase):
 							
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		edclass1.keyrubric.add(writingrubric)
+		edclasssemester1.keyrubric.add(writingrubric)
 		
 	def test_class_model_identifier_is_crn(self):
 		self.create_rubric_and_rows_connect_to_class()
@@ -150,9 +157,10 @@ class EnrollmentModelTest(TestCase):
 		janeteacher = User.objects.create(username="Jane")
 		edClass = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=bob, crn=2222) 
 		edClass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
-		
-		first_semester.classes.add(edClass)
-		first_semester.classes.add(edClass2)
+		edclasssemester1 = EdClassSemester.objects.create(semester=first_semester, edclass=edClass)
+		edclasssemester2 = EdClassSemester.objects.create(semester=first_semester, edclass=edClass2)
+		#first_semester.classes.add(edClass)
+		#first_semester.classes.add(edClass2)
 		
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
@@ -208,14 +216,17 @@ class EnrollmentModelTest(TestCase):
 	
 	def test_classes_link_to_semester(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
-		first_semester = Semester.objects.get(text='201530')
+		#first_semester = Semester.objects.get(text='201530')
+
 		
 		saved_classes = EdClasses.objects.all()
 		first_saved_class = saved_classes[0]
 		second_saved_class = saved_classes[1]
-
-		self.assertQuerysetEqual(first_semester.classes.filter(subject="EG", coursenumber="5000"),[repr(first_saved_class)] )
-		self.assertQuerysetEqual(first_semester.classes.filter(subject="EG", coursenumber="6000"), [repr(second_saved_class)] )
+		edclasssemester1 = EdClassSemester.objects.get(edclass__subject="EG", edclass__coursenumber="5000")
+		edclasssemester2  =EdClassSemester.objects.get(edclass__subject="EG", edclass__coursenumber="6000")
+		
+		self.assertEqual(edclasssemester1.edclass ,first_saved_class )
+		self.assertEqual(edclasssemester2.edclass, second_saved_class )
 	
 	def test_students_link_to_class(self):
 		self.add_two_classes_to_semester_add_two_students_to_class()
@@ -246,7 +257,7 @@ class EnrollmentModelTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		second_semester = Semester.objects.create(text="201610")
 		edClass = EdClasses.objects.get(subject="EG", coursenumber="5000")
-		second_semester.classes.add(edClass)
+		#edclasssemester.objects.create()
 		studentsinclass = Student.objects.filter(edclasses=edClass, enrollment__semester=second_semester)
 		self.assertEqual(studentsinclass.count(), 0)
 		
@@ -254,7 +265,7 @@ class EnrollmentModelTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		second_semester = Semester.objects.create(text="201610")
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
-		second_semester.classes.add(edclass)
+		#second_semester.classes.add(edclass)
 		elaine = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
 		elainenrollment = Enrollment.objects.create(student=elaine, edclass=edclass, semester=second_semester)
 		studentsinclass = Student.objects.filter(edclasses=edclass, enrollment__semester=second_semester)
@@ -264,7 +275,7 @@ class EnrollmentModelTest(TestCase):
 		self.add_two_classes_to_semester_add_two_students_to_class()
 		second_semester = Semester.objects.create(text="201610")
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
-		second_semester.classes.add(edclass)
+		#second_semester.classes.add(edclass)
 		elaine = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
 		elainenrollment = Enrollment.objects.create(student=elaine, edclass=edclass, semester=second_semester)
 		first_semester = Semester.objects.get(text='201530')

@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, EdClassSemester
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase, Client
@@ -80,32 +80,42 @@ class SemesterClassViewTest(TestCase):
 		semester = Semester.objects.create(text="201530")
 		jane = User.objects.create(username="Jane")
 		edclass1 = EdClasses.objects.create(sectionnumber="01", subject="EG", coursenumber="5111", teacher=jane, crn=2222)
-		semester.classes.add(edclass1)
+		#semester.classes.add(edclass1)
+		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=edclass1)
 		response = self.client.get('/assessment/201530/')
 		self.assertNotIn("EG 5111", response.content.decode())
 	
 	def test_bob_can_see_bob_class(self):
 		semester = Semester.objects.create(text="201530")
 		jane = User.objects.create(username="Jane")
+		rubric = Rubric.objects.create(name="BOB")
 		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5111", teacher=self.test_user, crn=2222)
-		semester.classes.add(edclass1)
+		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=edclass1)#, keyrubric=rubric)
+		edclasssemester.keyrubric.add(rubric)
+		#semester.classes.add(edclass1)
 		response = self.client.get('/assessment/201530/')
 		self.assertIn("EG 5111", response.content.decode())
 	
 	def test_displays_all_classes(self):
 		semester = Semester.objects.create(text="201530")
+		rubric = Rubric.objects.create(name="BOB")
 		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
-		semester.classes.add(edclass1)
+		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=edclass1)#, keyrubric=rubric)
+		edclasssemester.keyrubric.add(rubric)
+		#semester.classes.add(edclass1)
 		
 		response = self.client.get('/assessment/'+semester.text+'/')
 		self.assertContains(response, 'EG 5000 01') 
 	
 	def create_two_classes_for_unit_tests(self):
 		semester = Semester.objects.get(text="201530")
+		rubric = Rubric.objects.create(name="BOB")
 		class1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
 		class2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
-		semester.classes.add(class1)
-		semester.classes.add(class2)
+		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=class1)#, keyrubric=rubric)
+		edclasssemester1 = EdClassSemester.objects.create(semester=semester, edclass=class2)#, keyrubric=rubric)
+		edclasssemester.keyrubric.add(rubric)
+		edclasssemester1.keyrubric.add(rubric)
 		
 	def create_two_semesters_for_unit_tests(self):
 		Semester.objects.create(text="201530")
@@ -171,10 +181,17 @@ class ClassViewTest(TestCase):
 		edClass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
 		edClass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5111", teacher=jane, crn=4444)
 		
-		first_semester.classes.add(edClass)
-		first_semester.classes.add(edClass2)
-		first_semester.classes.add(edClass1)
+		#first_semester.classes.add(edClass)
+		#first_semester.classes.add(edClass2)
+		#first_semester.classes.add(edClass1)
+		rubric = Rubric.objects.create(name="bob")
+		edclasssemester = EdClassSemester.objects.create(semester=first_semester, edclass=edClass)#, keyrubric=rubric)
+		edclasssemester1 = EdClassSemester.objects.create(semester=first_semester, edclass=edClass2)#, keyrubric=rubric)
+		edclasssemester2 = EdClassSemester.objects.create(semester=first_semester, edclass=edClass1)#, keyrubric=rubric)
 		
+		edclasssemester.keyrubric.add(rubric)
+		edclasssemester1.keyrubric.add(rubric)
+		edclasssemester2.keyrubric.add(rubric)
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
@@ -283,7 +300,8 @@ class ClassViewTest(TestCase):
 		booritter = Student.objects.create(lastname="Ritter", firstname="Elaine", lnumber="21743142")
 		newsemester = Semester.objects.create(text="201610")
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
-		newsemester.classes.add(edclass)
+		#newsemester.classes.add(edclass)
+		edclassenrollment = EdClassSemester.objects.create(semester=newsemester, edclass=edclass)
 		booenrollment = Enrollment.objects.create(student=booritter, edclass=edclass, semester=newsemester)
 		response = self.client.get('/assessment/201530/EG500001/')
 		self.assertNotContains(response, "Elaine")
@@ -303,9 +321,11 @@ class StudentandRubricViewTest(TestCase):
 		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
 		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000",  teacher=self.test_user, crn=3333)
 		edclass = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5111", teacher=jane, crn=4444)
-		semester.classes.add(edclass1)
-		semester.classes.add(edclass2)
-		semester.classes.add(edclass)
+		#semester.classes.add(edclass1)
+		#semester.classes.add(edclass2)
+		#semester.classes.add(edclass)
+		
+	
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
@@ -330,12 +350,17 @@ class StudentandRubricViewTest(TestCase):
 		
 	
 		
-		
+		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=edclass)#, keyrubric=writingrubric)
+		edclasssemester1 = EdClassSemester.objects.create(semester=semester, edclass=edclass1)#, keyrubric=writingrubric)
+		edclasssemester2 = EdClassSemester.objects.create(semester=semester, edclass=edclass2)#, keyrubric=writingrubric)
+		edclasssemester.keyrubric.add(writingrubric)
+		edclasssemester1.keyrubric.add(writingrubric)
+		edclasssemester2.keyrubric.add(writingrubric)
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		edclass1.keyrubric.add(writingrubric)
-		edclass2.keyrubric.add(writingrubric)
-		edclass.keyrubric.add(writingrubric)
+		#edclass1.keyrubric.add(writingrubric)
+		#edclass2.keyrubric.add(writingrubric)
+		#edclass.keyrubric.add(writingrubric)
 
 		
 	def test_rubric_page_not_viewable_by_dasterdaly_bob(self):

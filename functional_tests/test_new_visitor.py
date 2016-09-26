@@ -2,7 +2,7 @@ from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, EdClassSemester
 from time import sleep
 from django.contrib.auth.models import User
 
@@ -13,8 +13,10 @@ class NewVisitorTest(FunctionalTest):
 		semester2 = Semester.objects.create(text="201610")
 		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", sectionnumber="01", teacher=self.test_user, crn=2222)
 		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", sectionnumber="01", teacher=self.test_user, crn=3333)
-		semester.classes.add(edclass1)
-		semester.classes.add(edclass2)
+		#semester.classes.add(edclass1)
+		#semester.classes.add(edclass2)
+		edclasssemester1 = EdClassSemester.objects.create(edclass=edclass1, semester=semester)
+		edclasssemester2 = EdClassSemester.objects.create(edclass=edclass2, semester=semester)
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
@@ -40,8 +42,8 @@ class NewVisitorTest(FunctionalTest):
 		
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
-		edclass1.keyrubric.add(writingrubric)
-		edclass2.keyrubric.add(writingrubric)
+		edclasssemester1.keyrubric.add(writingrubric)
+		edclasssemester2.keyrubric.add(writingrubric)
 
 		
 	def test_user_visits_inital_page(self):

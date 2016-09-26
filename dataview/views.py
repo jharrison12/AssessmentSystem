@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester
+from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, EdClassSemester
 import re, logging, collections, copy
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 from django.contrib.auth.decorators import login_required,user_passes_test
@@ -58,7 +58,8 @@ def ed_class_data_view(request, edclass, semester):
 	edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
 	logging.info("%s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber))
 	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber)
-	classrubric = edclasspulled.keyrubric.get()
+	edclasssemester = EdClassSemester.objects.get(edclass=edclasspulled, semester__text=semester)
+	classrubric = edclasssemester.keyrubric.get()
 	templaterows = Row.objects.filter(rubric=classrubric)
 	#Questions about whether the below query actually works the way it should
 	#logging.info("Semester %s EdClass %s" %(semester, edclasspulled))

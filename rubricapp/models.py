@@ -23,6 +23,14 @@ class CompletedRubric(Rubric):
 	
 	def __str__self(self):
 		return self.name
+		
+class Semester(models.Model):
+	text = models.TextField(default='201530')
+	#classes = models.ManyToManyField(EdClasses)	
+	
+	def __str__(self):
+		return self.text
+
 
 class EdClasses(models.Model):
 	CHOICES = (
@@ -38,21 +46,20 @@ class EdClasses(models.Model):
 	coursenumber = models.TextField(default='', blank=False)
 	sectionnumber = models.CharField(max_length=2, blank=False)
 	students = models.ManyToManyField(Student, through="Enrollment")
-	keyrubric = models.ManyToManyField(Rubric)
+	#keyrubric = models.ManyToManyField(Rubric)
+	semester = models.ManyToManyField(Semester, through="EdClassSemester")
 	teacher = models.ForeignKey(User)
 	
 	def __str__(self):
 		return self.subject + " " + self.coursenumber + " " + self.sectionnumber
 		
 
+class EdClassSemester(models.Model):
+	edclass = models.ForeignKey(EdClasses, null=False)
+	semester = models.ForeignKey(Semester, null=False)
+	keyrubric = models.ManyToManyField(Rubric)
+			
 		
-		
-class Semester(models.Model):
-	text = models.TextField(default='201530')
-	classes = models.ManyToManyField(EdClasses)	
-	
-	def __str__(self):
-		return self.text
 
 class Row(models.Model):
 	CHOICES = (
