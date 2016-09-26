@@ -58,6 +58,12 @@ class EdClassSemester(models.Model):
 	edclass = models.ForeignKey(EdClasses, null=False)
 	semester = models.ForeignKey(Semester, null=False)
 	keyrubric = models.ManyToManyField(Rubric)
+	
+	def __str__(self):
+		return "%s %s %s %s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.semester.text)
+	
+	class Meta:
+		unique_together = ("edclass", "semester")
 			
 		
 

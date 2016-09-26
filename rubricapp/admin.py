@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import models
 
-from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment
+from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, EdClassSemester
 #For user creation
 
 
@@ -35,24 +35,63 @@ class EnrollmentAdmin(admin.ModelAdmin):
 #	readonly_fields = ('semester',)
 #	fields = ('student', 'rubriccompleted', 'semester')
 #	extra = 1
-	
 
+"""	
+## Once again you cannot make an inline read only AND give the functionality
+## to add more objects. Unfortunately
+class EdClassSemesterInline(admin.TabularInline):
+	model = EdClassSemester
+	extra = 1
+	actions = None
+	def get_readonly_fields(self, request, obj=None):
+		if obj:
+			return self.readonly_fields + ('semester','keyrubric')
+		return self.readonly_fields
+	
+	def has_delete_permission(self, request, obj=None):
+		return False
+		
+	#def has_add_permission(self, request):
+		#return False
+		
+"""
 
 class EdClassAdmin(admin.ModelAdmin):
-	#inlines = (EnrollmentAdmin1,)
+	#inlines = (EdClassSemesterInline,)
 	
 	#This only shows the template
-	def formfield_for_manytomany(self, db_field, request, **kwargs):
-		if db_field.name == "keyrubric":
-			kwargs["queryset"] = Rubric.objects.filter(template=True)
-			return super(EdClassAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+	#def formfield_for_manytomany(self, db_field, request, **kwargs):
+	#	if db_field.name == "keyrubric":
+	#		kwargs["queryset"] = Rubric.objects.filter(template=True)
+	#		return super(EdClassAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
 	
 	def get_readonly_fields(self, request, obj=None):
 		if obj:
-			return self.readonly_fields + ('crn','coursenumber','subject', 'keyrubric', 'sectionnumber')
+			return self.readonly_fields + ('crn','coursenumber','subject', 'sectionnumber')
 		return self.readonly_fields
+		
+	def has_delete_permission(self, request, obj=None):
+		return False
 
 
+
+class EdClassSemesterAdmin(admin.ModelAdmin):
+	actions = None
+	
+	def formfield_for_manytomany(self, db_field, request, **kwargs):
+		if db_field.name == "keyrubric":
+			kwargs["queryset"] = Rubric.objects.filter(template=True)
+			return super(EdClassSemesterAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+	
+	def get_readonly_fields(self, request, obj=None):
+		if obj:
+			return self.readonly_fields + ('edclass','semester','keyrubric')
+		return self.readonly_fields
+		
+	def has_delete_permission(self, request, obj=None):
+		return False
+		
+	
 # The two classes below make the rows in the rubric app inline rows
 # But the admin cannot edit a row after the fact they can only add a row			
 class RowAdminInline(admin.TabularInline):
@@ -82,14 +121,18 @@ class RubricAdmin(admin.ModelAdmin):
 	def has_delete_permission(self, request, obj=None):
 		return False
 
-
+class SemesterAdmin(admin.ModelAdmin):
+	actions = None
+	
+	def has_delete_permission(self, request, obj=None):
+		return False
 
 
 
 # Register your models here.
 
-
-admin.site.register(Semester)
+admin.site.register(EdClassSemester, EdClassSemesterAdmin)
+admin.site.register(Semester, SemesterAdmin)
 admin.site.register(EdClasses, EdClassAdmin)
 admin.site.register(Student)
 admin.site.register(Rubric, RubricAdmin)

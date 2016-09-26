@@ -351,7 +351,7 @@ class EdClass(TestCase):
 		self.password = 'test'
 		self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
 		login = self.client.login(username=self.username, password = self.password)
-		
+
 	def test_class_view_requires_login(self):
 		self.client.logout()
 		response = self.client.get('/data/class/')
@@ -480,11 +480,28 @@ class EdClass(TestCase):
 		response = self.client.get('/data/class/201610/EG500005/')
 		#should only show score of 4.0
 		self.assertIn("4.0", response.content.decode())
-	
+
 	def test_EG6000_201530_rubric_shows_only_one_score(self):
 		response = self.client.get('/data/class/201530/EG600004/')
 		self.assertIn("1.0", response.content.decode())
-		
 
+	def test_same_class_different_semester_different_rubric_data(self):
+		twentyseventeen = Semester.objects.create(text="201710")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05")
+		edclasssemester = EdClassSemester.objects.create(semester=twentyseventeen, edclass=edclass)
+		completedrubricforgeorge = Rubric.objects.create(name="EG500001555201710", template=False)
+		edclasssemester.keyrubric.add(completedrubricforgeorge)
+		badrow = Row.objects.create(excellenttext="STOP", 
+									proficienttext="STOP",
+									satisfactorytext="STOP",
+									unsatisfactorytext="STOP",rubric=completedrubricforgeorge, row_choice=3)
+								
+		george = Student.objects.create(lastname="Harrison", firstname="George", lnumber="5555")
+		georgeenrollment = Enrollment.objects.create(student=george, edclass=edclass,semester=twentyseventeen)
+		georgeenrollment.completedrubric = completedrubricforgeorge
+		georgeenrollment.rubriccompleted = True
+		georgeenrollment.save()
+		response = self.client.get('/data/class/201710/EG500005/')
+		self.assertContains(response, "3.0")
 
 		

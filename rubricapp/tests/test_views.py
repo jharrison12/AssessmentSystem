@@ -325,8 +325,6 @@ class StudentandRubricViewTest(TestCase):
 		#semester.classes.add(edclass2)
 		#semester.classes.add(edclass)
 		
-	
-		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
 		kelly = Student.objects.create(lastname="Smith", firstname="Kelly", lnumber="33333333")
@@ -356,6 +354,8 @@ class StudentandRubricViewTest(TestCase):
 		edclasssemester.keyrubric.add(writingrubric)
 		edclasssemester1.keyrubric.add(writingrubric)
 		edclasssemester2.keyrubric.add(writingrubric)
+		
+
 		#Many to many relationship must be added after creation of objects
 		#because the manyto-many relationship is not a column in the database
 		#edclass1.keyrubric.add(writingrubric)
@@ -545,6 +545,43 @@ class StudentandRubricViewTest(TestCase):
 		bobenrollment.rubriccompleted = False
 		response = self.client.get("/assessment/201530/EG500001/21743148/")
 		self.assertContains(response, "id_form-TOTAL_FORMS")
+		
+	def test_rubric_for_different_semester_doesnt_shows_up_in_correct_semester(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+		newsemester = Semester.objects.create(text="201610")
+		badrubric = Rubric.objects.create()
+		badrow = Row.objects.create(excellenttext="STOP", 
+									proficienttext="STOP",
+									satisfactorytext="STOP",
+									unsatisfactorytext="STOP",rubric=badrubric)
+									
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+		edclassnewsemester = EdClassSemester.objects.create(semester=newsemester, edclass=edclass)
+		edclassnewsemester.keyrubric.add(badrubric)
+		george = Student.objects.create(lastname="Harrison", firstname="Georgeo", lnumber="5555")
+		newgeorgeenrollment = Enrollment.objects.create(student=george, edclass=edclass,semester=newsemester)
+		response = self.client.get('/assessment/201610/EG500001/5555/')
+		self.assertContains(response, "STOP")
+		
+	def test_rubric_for_different_semester_doesnt_show_up_wrong_semester(self):
+		self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+		newsemester = Semester.objects.create(text="201610")
+		badrubric = Rubric.objects.create()
+		badrow = Row.objects.create(excellenttext="STOP", 
+									proficienttext="STOP",
+									satisfactorytext="STOP",
+									unsatisfactorytext="STOP",rubric=badrubric)
+									
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+		edclassnewsemester = EdClassSemester.objects.create(semester=newsemester, edclass=edclass)
+		edclassnewsemester.keyrubric.add(badrubric)
+		george = Student.objects.create(lastname="Harrison", firstname="Georgeo", lnumber="5555")
+		newgeorgeenrollment = Enrollment.objects.create(student=george, edclass=edclass,semester=newsemester)
+		response = self.client.get('/assessment/201530/EG500001/21743148/')
+		self.assertNotContains(response, "STOP")
+		
+									
+		
 	
 		
 class UserLoginTest(TestCase):
