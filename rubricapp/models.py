@@ -3,13 +3,13 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 
 class Student(models.Model):
-	firstname = models.TextField(default="")	
-	lastname = models.TextField(default="")
-	lnumber = models.TextField(default="", unique=True)
+	firstname = models.CharField(default="", max_length=30)	
+	lastname = models.CharField(default="", max_length=30)
+	lnumber = models.CharField(default="", unique=True, max_length=8)
 	
 	def __str__(self):
-		return self.lnumber
-	#TODO add models
+		return self.firstname + " " + self.lastname
+	
 
 
 class Rubric(models.Model):

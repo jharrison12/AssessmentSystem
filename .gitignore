@@ -4,3 +4,5 @@ __pycache__
 *.pyc
 todo.txt
 db.sqlite3
+dbcopy.sqlite3
+rubricapp.json
