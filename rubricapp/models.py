@@ -70,10 +70,10 @@ class EdClassSemester(models.Model):
 class Row(models.Model):
 	CHOICES = (
 	('0', 'Your string for display'),
-	('4','Excellent'),
+	('4','Exemplary'),
 	('3','Proficient'),
-	('2','Awful'),
-	('1','The worst ever'),
+	('2','Partially Proficient'),
+	('1','Incomplete'),
 	)
 	name = models.CharField(default="None", max_length=30)
 	rubric = models.ForeignKey(Rubric)

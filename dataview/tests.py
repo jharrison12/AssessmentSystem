@@ -218,7 +218,7 @@ class StudentView(TestCase):
 	
 	def test_student_rubric_view_shows_scores(self):
 		response = self.client.get('/data/student/21743148/EG50000121743148201530/')
-		self.assertIn("The worst ever", response.content.decode())
+		self.assertIn("Incomplete", response.content.decode())
 		
 	def test_student_rubic_view_requires_login(self):
 		self.client.logout()
