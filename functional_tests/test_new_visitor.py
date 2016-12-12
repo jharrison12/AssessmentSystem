@@ -117,7 +117,7 @@ class NewVisitorTest(FunctionalTest):
 		
 		rubricoptions = self.browser.find_elements_by_tag_name('option')
 		
-		self.assertIn("Excellent", [option.text for option in rubricoptions])
+		self.assertIn("Exemplary", [option.text for option in rubricoptions])
 		excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[3]')
 		excellent.click()
 

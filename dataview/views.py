@@ -86,6 +86,7 @@ def ed_class_data_view(request, edclass, semester):
 			logging.info("Rowscores processed " + str(rowscores) )
 			rowscores = [int(x) for x in rowscores]
 			rowscores = sum(rowscores)/len(rowscores)
+			rowscores = '{:03.2f}'.format(rowscores)
 			scores[key] = rowscores	
 			logging.info("Rowscores now " + str(rowscores) )
 		except ValueError:

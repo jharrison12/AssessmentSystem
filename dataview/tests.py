@@ -504,4 +504,51 @@ class EdClass(TestCase):
 		response = self.client.get('/data/class/201710/EG500005/')
 		self.assertContains(response, "3.0")
 
+	def test_EG6000_201530_rubric_only_shows_two_decimal_places(self):
+		summer2016 = Semester.objects.get(text="201530")
+		edclass = EdClasses.objects.get(subject="EG", coursenumber="6000", sectionnumber="04")
+		edclasssemester = EdClassSemester.objects.get(semester=summer2016, edclass=edclass)
+		completedrubricforgeorge = Rubric.objects.create(name="EG6000045555201530", template=False)
+		#edclasssemester.keyrubric.add(completedrubricforgeorge)
 		
+		row1 = Row.objects.create(name="Fortitude",
+								  excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforgeorge, row_choice=4)
+								  
+		row2 = Row.objects.create(name="Excellenceisahabit",
+								  excellenttext="THE GREATEST!",
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforgeorge, row_choice=4)
+									
+		george = Student.objects.create(lastname="Harrison", firstname="George", lnumber="5555")
+		georgeenrollment = Enrollment.objects.create(student=george, edclass=edclass,semester=summer2016)
+		georgeenrollment.completedrubric = completedrubricforgeorge
+		georgeenrollment.rubriccompleted = True
+		georgeenrollment.save()
+		
+		completedrubricforharry = Rubric.objects.create(name="EG6000044444201530", template=False)
+		
+		row1 = Row.objects.create(name="Fortitude",
+								  excellenttext="THE BEST!", 
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforharry, row_choice=3)
+								  
+		row2 = Row.objects.create(name="Excellenceisahabit",
+								  excellenttext="THE GREATEST!",
+								  proficienttext="THE SECOND BEST!",
+								  satisfactorytext="THE THIRD BEST!",
+								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforharry, row_choice=3)
+									
+		harry = Student.objects.create(lastname="Harrison", firstname="Harry", lnumber="4444")
+		harryenrollment = Enrollment.objects.create(student=harry, edclass=edclass,semester=summer2016)
+		harryenrollment.completedrubric = completedrubricforharry
+		harryenrollment.rubriccompleted = True
+		harryenrollment.save()
+		
+		response = self.client.get('/data/class/201530/EG600004/')
+		self.assertNotIn("2.666", response.content.decode())
+		print(response.content.decode())
