@@ -13,7 +13,7 @@ def home_page(request):
 @login_required	
 @user_passes_test(lambda u: u.is_superuser)
 def student_view(request):
-	students = Student.objects.all()
+	students = Student.objects.filter(enrollment__rubriccompleted=True)
 	if request.method == "POST":
 		return redirect(request.POST['studentnames']+ '/')
 	return render(request, 'dataview/studentview.html', {"students": students})

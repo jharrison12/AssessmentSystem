@@ -232,6 +232,11 @@ class StudentView(TestCase):
 		self.assertEquals(istrue, True)
 		response = self.client.get("/data/student/21743148/EG50000121743148201530/")
 		self.assertRedirects(response, '/login/?next=/data/student/21743148/EG50000121743148201530/', status_code=302)
+	
+	def test_student_does_not_appear_if_zero_tests(self):
+		ron = Student.objects.create(lastname="Smith", firstname="Ron",lnumber="21111111")
+		response = self.client.get('/data/student/')
+		self.assertNotIn("Ron Smith", response.content.decode())
 		
 class EdClass(TestCase):
 	
@@ -551,4 +556,4 @@ class EdClass(TestCase):
 		
 		response = self.client.get('/data/class/201530/EG600004/')
 		self.assertNotIn("2.666", response.content.decode())
-		print(response.content.decode())
+		
