@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, semester_ed_class_view
-from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, EdClassSemester
+from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 import re
@@ -56,8 +56,8 @@ class StudentView(TestCase):
 		jacob = User.objects.create(username="jacob")
 		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000",teacher=jacob, crn=2222, sectionnumber="01")
 		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000",teacher=jacob, crn=3333, sectionnumber="01")
-		edclasssemester1 = EdClassSemester.objects.create(edclass=edclass1, semester=semester)
-		edclasssemester2 = EdClassSemester.objects.create(edclass=edclass2, semester=semester)
+		edclasssemester1 = Assignment.objects.create(edclass=edclass1, semester=semester)
+		edclasssemester2 = Assignment.objects.create(edclass=edclass2, semester=semester)
 		
 		#semester.classes.add(edclass1)
 		#semester.classes.add(edclass2)
@@ -246,10 +246,10 @@ class EdClass(TestCase):
 		kelly = User.objects.create(username="kelly")
 		edclass1 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly, crn=2222)
 		edclass2 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly, crn=3333)
-		edclasssemester1 = EdClassSemester.objects.create(edclass=edclass1, semester=semester)
-		edclasssemester2 = EdClassSemester.objects.create(edclass=edclass2, semester=semester)
-		edclasssemester3 = EdClassSemester.objects.create(edclass=edclass1, semester=semester2)
-		edclasssemester4 = EdClassSemester.objects.create(edclass=edclass2, semester=semester2)
+		edclasssemester1 = Assignment.objects.create(edclass=edclass1, semester=semester)
+		edclasssemester2 = Assignment.objects.create(edclass=edclass2, semester=semester)
+		edclasssemester3 = Assignment.objects.create(edclass=edclass1, semester=semester2)
+		edclasssemester4 = Assignment.objects.create(edclass=edclass2, semester=semester2)
 		
 		#semester.classes.add(edclass1)
 		#semester.classes.add(edclass2)
@@ -493,7 +493,7 @@ class EdClass(TestCase):
 	def test_same_class_different_semester_different_rubric_data(self):
 		twentyseventeen = Semester.objects.create(text="201710")
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05")
-		edclasssemester = EdClassSemester.objects.create(semester=twentyseventeen, edclass=edclass)
+		edclasssemester = Assignment.objects.create(semester=twentyseventeen, edclass=edclass)
 		completedrubricforgeorge = Rubric.objects.create(name="EG500001555201710", template=False)
 		edclasssemester.keyrubric.add(completedrubricforgeorge)
 		badrow = Row.objects.create(excellenttext="STOP", 
@@ -512,7 +512,7 @@ class EdClass(TestCase):
 	def test_EG6000_201530_rubric_only_shows_two_decimal_places(self):
 		summer2016 = Semester.objects.get(text="201530")
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="6000", sectionnumber="04")
-		edclasssemester = EdClassSemester.objects.get(semester=summer2016, edclass=edclass)
+		edclasssemester = Assignment.objects.get(semester=summer2016, edclass=edclass)
 		completedrubricforgeorge = Rubric.objects.create(name="EG6000045555201530", template=False)
 		#edclasssemester.keyrubric.add(completedrubricforgeorge)
 		

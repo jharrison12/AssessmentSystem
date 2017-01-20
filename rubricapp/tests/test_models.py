@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row,EdClassSemester
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
@@ -17,8 +17,8 @@ class RubricModel(TestCase):
 		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
 		#semester.classes.add(edclass1)
 		#semester.classes.add(edclass2)
-		edclasssemester1 = EdClassSemester.objects.create(semester=semester,edclass=edclass1)
-		edclasssemester2 = EdClassSemester.objects.create(semester=semester,edclass=edclass2)
+		edclasssemester1 = Assignment.objects.create(semester=semester,edclass=edclass1)
+		edclasssemester2 = Assignment.objects.create(semester=semester,edclass=edclass2)
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
@@ -48,7 +48,7 @@ class RubricModel(TestCase):
 		self.create_rubric_and_rows_connect_to_class()
 		bob = Student.objects.get(lnumber="21743148")
 		edClass = EdClasses.objects.get(sectionnumber="01",subject='EG', coursenumber='5000')#, semester="201530")
-		edclasssemesterobj = EdClassSemester.objects.get(edclass=edClass)
+		edclasssemesterobj = Assignment.objects.get(edclass=edClass)
 		#should get the only rubric attached to the object
 		writingrubric = edclasssemesterobj.keyrubric.get()
 		self.assertEqual(writingrubric.name, "writingrubric")
@@ -117,8 +117,8 @@ class ClassAndSemesterModelTest(TestCase):
 		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
 		#semester.classes.add(edclass1)
 		#semester.classes.add(edclass2)
-		edclasssemester1 = EdClassSemester.objects.create(edclass=edclass1, semester=semester)
-		edclasssemester2 = EdClassSemester.objects.create(edclass=edclass2, semester=semester)
+		edclasssemester1 = Assignment.objects.create(edclass=edclass1, semester=semester)
+		edclasssemester2 = Assignment.objects.create(edclass=edclass2, semester=semester)
 		
 
 		
@@ -157,8 +157,8 @@ class EnrollmentModelTest(TestCase):
 		janeteacher = User.objects.create(username="Jane")
 		edClass = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=bob, crn=2222) 
 		edClass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333)
-		edclasssemester1 = EdClassSemester.objects.create(semester=first_semester, edclass=edClass)
-		edclasssemester2 = EdClassSemester.objects.create(semester=first_semester, edclass=edClass2)
+		edclasssemester1 = Assignment.objects.create(semester=first_semester, edclass=edClass)
+		edclasssemester2 = Assignment.objects.create(semester=first_semester, edclass=edClass2)
 		#first_semester.classes.add(edClass)
 		#first_semester.classes.add(edClass2)
 		
@@ -222,8 +222,8 @@ class EnrollmentModelTest(TestCase):
 		saved_classes = EdClasses.objects.all()
 		first_saved_class = saved_classes[0]
 		second_saved_class = saved_classes[1]
-		edclasssemester1 = EdClassSemester.objects.get(edclass__subject="EG", edclass__coursenumber="5000")
-		edclasssemester2  =EdClassSemester.objects.get(edclass__subject="EG", edclass__coursenumber="6000")
+		edclasssemester1 = Assignment.objects.get(edclass__subject="EG", edclass__coursenumber="5000")
+		edclasssemester2  =Assignment.objects.get(edclass__subject="EG", edclass__coursenumber="6000")
 		
 		self.assertEqual(edclasssemester1.edclass ,first_saved_class )
 		self.assertEqual(edclasssemester2.edclass, second_saved_class )

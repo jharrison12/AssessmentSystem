@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect ,get_object_or_404
 from django.http import HttpResponse
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubric, EdClassSemester
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubric, Assignment
 from rubricapp.forms import RowForm, RowFormSet
 import re, logging
 from copy import deepcopy
@@ -75,7 +75,7 @@ def rubric_page(request, edclass, studentname,semester):
 	#This returns the student
 	student = Student.objects.get(lnumber=studentname)
 	#this returns the rubric associated with the class
-	edclasssemester = EdClassSemester.objects.get(edclass=edclassenrolled, semester__text=semester)
+	edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester)
 	rubricforclass = edclasssemester.keyrubric.get()
 	#this returns the rows associated with the magic rubric
 	rows = Row.objects.filter(rubric=rubricforclass)
@@ -122,7 +122,7 @@ def rubric_page(request, edclass, studentname,semester):
 		#This view returns a brandnew copy of the rubric based upon
 		#the rubric associated with the edclass
 		#rubricforclass = edclassenrolled.keyrubric.get()
-		edclasssemester = EdClassSemester.objects.get(edclass=edclassenrolled, semester__text=semester)
+		edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester)
 		rubricforclass = edclasssemester.keyrubric.get()
 		oldrubricname = rubricforclass.name
 		rows = Row.objects.filter(rubric=rubricforclass)

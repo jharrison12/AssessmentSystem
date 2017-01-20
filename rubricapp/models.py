@@ -47,14 +47,15 @@ class EdClasses(models.Model):
 	sectionnumber = models.CharField(max_length=2, blank=False)
 	students = models.ManyToManyField(Student, through="Enrollment")
 	#keyrubric = models.ManyToManyField(Rubric)
-	semester = models.ManyToManyField(Semester, through="EdClassSemester")
+	semester = models.ManyToManyField(Semester, through="Assignment")
 	teacher = models.ForeignKey(User)
 	
 	def __str__(self):
 		return self.subject + " " + self.coursenumber + " " + self.sectionnumber
 		
 
-class EdClassSemester(models.Model):
+class Assignment(models.Model):
+	assignmentname = models.CharField(default="None", max_length=30)
 	edclass = models.ForeignKey(EdClasses, null=False)
 	semester = models.ForeignKey(Semester, null=False)
 	keyrubric = models.ManyToManyField(Rubric)
@@ -63,7 +64,7 @@ class EdClassSemester(models.Model):
 		return "%s %s %s %s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.semester.text)
 	
 	class Meta:
-		unique_together = ("edclass", "semester")
+		unique_together = ("edclass", "semester", "assignmentname")
 			
 		
 

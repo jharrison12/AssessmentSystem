@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, EdClassSemester
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase, Client
@@ -81,7 +81,7 @@ class SemesterClassViewTest(TestCase):
 		jane = User.objects.create(username="Jane")
 		edclass1 = EdClasses.objects.create(sectionnumber="01", subject="EG", coursenumber="5111", teacher=jane, crn=2222)
 		#semester.classes.add(edclass1)
-		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=edclass1)
+		edclasssemester = Assignment.objects.create(semester=semester, edclass=edclass1)
 		response = self.client.get('/assessment/201530/')
 		self.assertNotIn("EG 5111", response.content.decode())
 	
@@ -90,7 +90,7 @@ class SemesterClassViewTest(TestCase):
 		jane = User.objects.create(username="Jane")
 		rubric = Rubric.objects.create(name="BOB")
 		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5111", teacher=self.test_user, crn=2222)
-		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=edclass1)#, keyrubric=rubric)
+		edclasssemester = Assignment.objects.create(semester=semester, edclass=edclass1)#, keyrubric=rubric)
 		edclasssemester.keyrubric.add(rubric)
 		#semester.classes.add(edclass1)
 		response = self.client.get('/assessment/201530/')
@@ -100,7 +100,7 @@ class SemesterClassViewTest(TestCase):
 		semester = Semester.objects.create(text="201530")
 		rubric = Rubric.objects.create(name="BOB")
 		edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
-		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=edclass1)#, keyrubric=rubric)
+		edclasssemester = Assignment.objects.create(semester=semester, edclass=edclass1)#, keyrubric=rubric)
 		edclasssemester.keyrubric.add(rubric)
 		#semester.classes.add(edclass1)
 		
@@ -112,8 +112,8 @@ class SemesterClassViewTest(TestCase):
 		rubric = Rubric.objects.create(name="BOB")
 		class1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222)
 		class2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
-		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=class1)#, keyrubric=rubric)
-		edclasssemester1 = EdClassSemester.objects.create(semester=semester, edclass=class2)#, keyrubric=rubric)
+		edclasssemester = Assignment.objects.create(semester=semester, edclass=class1)#, keyrubric=rubric)
+		edclasssemester1 = Assignment.objects.create(semester=semester, edclass=class2)#, keyrubric=rubric)
 		edclasssemester.keyrubric.add(rubric)
 		edclasssemester1.keyrubric.add(rubric)
 		
@@ -185,9 +185,9 @@ class ClassViewTest(TestCase):
 		#first_semester.classes.add(edClass2)
 		#first_semester.classes.add(edClass1)
 		rubric = Rubric.objects.create(name="bob")
-		edclasssemester = EdClassSemester.objects.create(semester=first_semester, edclass=edClass)#, keyrubric=rubric)
-		edclasssemester1 = EdClassSemester.objects.create(semester=first_semester, edclass=edClass2)#, keyrubric=rubric)
-		edclasssemester2 = EdClassSemester.objects.create(semester=first_semester, edclass=edClass1)#, keyrubric=rubric)
+		edclasssemester = Assignment.objects.create(semester=first_semester, edclass=edClass)#, keyrubric=rubric)
+		edclasssemester1 = Assignment.objects.create(semester=first_semester, edclass=edClass2)#, keyrubric=rubric)
+		edclasssemester2 = Assignment.objects.create(semester=first_semester, edclass=edClass1)#, keyrubric=rubric)
 		
 		edclasssemester.keyrubric.add(rubric)
 		edclasssemester1.keyrubric.add(rubric)
@@ -301,7 +301,7 @@ class ClassViewTest(TestCase):
 		newsemester = Semester.objects.create(text="201610")
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 		#newsemester.classes.add(edclass)
-		edclassenrollment = EdClassSemester.objects.create(semester=newsemester, edclass=edclass)
+		edclassenrollment = Assignment.objects.create(semester=newsemester, edclass=edclass)
 		booenrollment = Enrollment.objects.create(student=booritter, edclass=edclass, semester=newsemester)
 		response = self.client.get('/assessment/201530/EG500001/')
 		self.assertNotContains(response, "Elaine")
@@ -348,9 +348,9 @@ class StudentandRubricViewTest(TestCase):
 		
 	
 		
-		edclasssemester = EdClassSemester.objects.create(semester=semester, edclass=edclass)#, keyrubric=writingrubric)
-		edclasssemester1 = EdClassSemester.objects.create(semester=semester, edclass=edclass1)#, keyrubric=writingrubric)
-		edclasssemester2 = EdClassSemester.objects.create(semester=semester, edclass=edclass2)#, keyrubric=writingrubric)
+		edclasssemester = Assignment.objects.create(semester=semester, edclass=edclass)#, keyrubric=writingrubric)
+		edclasssemester1 = Assignment.objects.create(semester=semester, edclass=edclass1)#, keyrubric=writingrubric)
+		edclasssemester2 = Assignment.objects.create(semester=semester, edclass=edclass2)#, keyrubric=writingrubric)
 		edclasssemester.keyrubric.add(writingrubric)
 		edclasssemester1.keyrubric.add(writingrubric)
 		edclasssemester2.keyrubric.add(writingrubric)
@@ -556,7 +556,7 @@ class StudentandRubricViewTest(TestCase):
 									unsatisfactorytext="STOP",rubric=badrubric)
 									
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
-		edclassnewsemester = EdClassSemester.objects.create(semester=newsemester, edclass=edclass)
+		edclassnewsemester = Assignment.objects.create(semester=newsemester, edclass=edclass)
 		edclassnewsemester.keyrubric.add(badrubric)
 		george = Student.objects.create(lastname="Harrison", firstname="Georgeo", lnumber="5555")
 		newgeorgeenrollment = Enrollment.objects.create(student=george, edclass=edclass,semester=newsemester)
@@ -573,7 +573,7 @@ class StudentandRubricViewTest(TestCase):
 									unsatisfactorytext="STOP",rubric=badrubric)
 									
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
-		edclassnewsemester = EdClassSemester.objects.create(semester=newsemester, edclass=edclass)
+		edclassnewsemester = Assignment.objects.create(semester=newsemester, edclass=edclass)
 		edclassnewsemester.keyrubric.add(badrubric)
 		george = Student.objects.create(lastname="Harrison", firstname="Georgeo", lnumber="5555")
 		newgeorgeenrollment = Enrollment.objects.create(student=george, edclass=edclass,semester=newsemester)

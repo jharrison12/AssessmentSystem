@@ -2,7 +2,7 @@ from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, EdClassSemester
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment
 from time import sleep
 from django.contrib.auth.models import User
 
@@ -15,8 +15,8 @@ class DataView(FunctionalTest):
 		edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=self.test_user, crn=3333)
 		#semester.classes.add(edclass1)
 		#semester.classes.add(edclass2)
-		edclasssemester1 = EdClassSemester.objects.create(semester=semester, edclass=edclass1)
-		edclasssemester2 = EdClassSemester.objects.create(semester=semester, edclass=edclass2)
+		edclasssemester1 = Assignment.objects.create(semester=semester, edclass=edclass1)
+		edclasssemester2 = Assignment.objects.create(semester=semester, edclass=edclass2)
 		
 		
 		bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
