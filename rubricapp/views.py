@@ -75,6 +75,7 @@ def assignment_page(request, semester, edclass):
 def student_page(request, edclass, semester, assignmentname):
     # REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the
     # course code
+    ##TODO fix this so it will only return non-complete rubrics
     logging.warning("In the student page edclass:%s, semester %s" % (edclass, semester))
     edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
     logging.warning("In the student page edclass:%s, semester %s" % (edclass, semester))
@@ -115,6 +116,8 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     # This returns the student
     student = Student.objects.get(lnumber=studentname)
     # this returns the rubric associated with the class
+    logging.info("Rubric pulled is {} {} {}".format(edclassenrolled, semester, assignmentname))
+    logging.info("All the assignment names {}".format(Assignment.objects.all()))
     edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester, assignmentname=assignmentname)
     rubricforclass = edclasssemester.keyrubric.get()
     # this returns the rows associated with the magic rubric
@@ -125,7 +128,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         logging.info("Posting")
         RowFormSetWeb = RowFormSet(request.POST)
         try:
-            RowFormSetWeb.clean()
+            RowFormSetWeb.clean
             savedFormset = RowFormSetWeb.save(commit=False)
             # Not sure if the below is necessary.  But it works!
             for i in savedFormset:

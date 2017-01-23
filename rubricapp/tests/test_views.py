@@ -396,8 +396,8 @@ class StudentandRubricViewTest(TestCase):
 
 
         edclasssemester = Assignment.objects.create(semester=semester, edclass=edclass, assignmentname="Writing Assignment")#, keyrubric=writingrubric)
-        edclasssemester1 = Assignment.objects.create(semester=semester, edclass=edclass1)#, keyrubric=writingrubric)
-        edclasssemester2 = Assignment.objects.create(semester=semester, edclass=edclass2)#, keyrubric=writingrubric)
+        edclasssemester1 = Assignment.objects.create(semester=semester, edclass=edclass1, assignmentname="Writing Assignment")#, keyrubric=writingrubric)
+        edclasssemester2 = Assignment.objects.create(semester=semester, edclass=edclass2, assignmentname="Writing Assignment")#, keyrubric=writingrubric)
         edclasssemester.keyrubric.add(writingrubric)
         edclasssemester1.keyrubric.add(writingrubric)
         edclasssemester2.keyrubric.add(writingrubric)
@@ -590,7 +590,7 @@ class StudentandRubricViewTest(TestCase):
         bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__subject="EG", edclass__coursenumber="5000")
         Rubric.objects.create(name="EG50000121743148201530")
         bobenrollment.rubriccompleted = False
-        response = self.client.get("/assessment/201530/EG500001/writingassignment/21743148/")
+        response = self.client.get("/assessment/201530/EG500001/WritingAssignment/21743148/")
         self.assertContains(response, "id_form-TOTAL_FORMS")
 
     def test_rubric_for_different_semester_doesnt_shows_up_in_correct_semester(self):

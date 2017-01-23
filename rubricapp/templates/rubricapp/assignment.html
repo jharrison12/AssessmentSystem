@@ -5,9 +5,9 @@
 		{% block form %}
 		{% if assignments|length > 0 %}
 		<form method="POST" action={{ assignment }}>
-			<select name="assignmentname" id="assignmentdropdown">
+			<select name="assignment" id="assignmentdropdown">
 					{% for assignment in assignments %}
-					<option value="{{ assignment.assignmentname.strip.lower }}" id={{ assignment.assignmentname.strip.lower }}>{{ assignment.assignmentname }}</option>
+					<option value="{{ assignment }}" id={{ assignment.assignmentname }}>{{ assignment.assignmentname }}</option>
 					{% endfor %}	
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="assignmentsubmit">
