@@ -3,7 +3,7 @@ from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, R
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase, Client
-from rubricapp.views import home_page, semester_page, student_page, rubric_page, user_page
+from rubricapp.views import home_page, semester_page, student_page, rubric_page, user_page, assignment_page
 from django.core.urlresolvers import resolve
 from django.contrib.auth.models import UserManager, User
 
@@ -264,7 +264,7 @@ class ClassViewTest(TestCase):
         bob = Student.objects.get(lnumber="21743148")
         request.POST['studentnames'] = bob.lnumber
 
-        response = student_page(request, "EG500001", "201530")
+        response = student_page(request, "EG500001", "201530", "Writing Assignment")
 
         self.assertEqual(response.status_code, 302)
 
@@ -277,7 +277,7 @@ class ClassViewTest(TestCase):
         student = Student.objects.get(lnumber="21743148")
         request.POST['studentnames'] = student.lnumber
 
-        response = student_page(request, "EG500001", "201530")
+        response = student_page(request, "EG500001", "201530", "Writing Assignment")
 
         self.assertEqual(response.status_code, 302)
 

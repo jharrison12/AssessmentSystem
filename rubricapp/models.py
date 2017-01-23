@@ -61,8 +61,11 @@ class Assignment(models.Model):
 	keyrubric = models.ManyToManyField(Rubric)
 	
 	def __str__(self):
-		return "%s %s %s %s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.semester.text)
-	
+		return "%s %s %s %s %s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.semester.text,self.assignmentname)
+
+	#def encode_assignment_name_for_admin(self,obj):
+	#	return self.assignmentname.text
+
 	class Meta:
 		unique_together = ("edclass", "semester", "assignmentname")
 			

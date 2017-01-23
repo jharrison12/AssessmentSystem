@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+
 
 
 @login_required
@@ -59,19 +60,19 @@ def assignment_page(request, semester, edclass):
                                         teacher=request.user,
                                         sectionnumber=edclasssectionnumber)
     logging.info("The classes pulled are %s" % (edclassesPulled))
-    assignments = Assignment.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False,
-                                      enrollment__semester__text=semester)
+    assignments = Assignment.objects.filter(edclass=edclassesPulled,
+                                      semester__text=semester)
     for i in assignments:
-        logging.info("Students are %s" % (i.lnumber))
+        logging.info("Assignments are %s" % (i.assignmentname))
     if request.method == 'POST':
         # Why is adding the forward slash unneccessary?
         # Why does the redirect no need the edclass added to the beginning?
-        return redirect(re.sub('[\s+]', '', request.POST['assignmentnames']) + '/')
-    return render(request, 'rubricapp/student.html', {'assignments': assignments, 'semester': semester})
+        return redirect(re.sub('[\s+]', '', request.POST['assignmentname']) + '/')
+    return render(request, 'rubricapp/assignment.html', {'assignments': assignments, 'semester': semester})
 
 
 @login_required
-def student_page(request, edclass, semester):
+def student_page(request, edclass, semester, assignmentname):
     # REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the
     # course code
     logging.warning("In the student page edclass:%s, semester %s" % (edclass, semester))
@@ -114,7 +115,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     # This returns the student
     student = Student.objects.get(lnumber=studentname)
     # this returns the rubric associated with the class
-    edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester)
+    edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester, assignmentname=assignmentname)
     rubricforclass = edclasssemester.keyrubric.get()
     # this returns the rows associated with the magic rubric
     rows = Row.objects.filter(rubric=rubricforclass)
@@ -161,7 +162,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         # This view returns a brandnew copy of the rubric based upon
         # the rubric associated with the edclass
         # rubricforclass = edclassenrolled.keyrubric.get()
-        edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester)
+        edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester, assignmentname=assignmentname)
         rubricforclass = edclasssemester.keyrubric.get()
         oldrubricname = rubricforclass.name
         rows = Row.objects.filter(rubric=rubricforclass)
