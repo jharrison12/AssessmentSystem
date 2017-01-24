@@ -177,13 +177,28 @@ class NewVisitorTest(FunctionalTest):
         bodytext = self.browser.find_element_by_tag_name('body')
         self.assertIn("There are no more students", bodytext.text)
 
-        # Dr. returns to the class page
+        # Dr. returns to the class page and chooses different assignment
+        self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/'))
+        assignmentchoice = self.browser.find_elements_by_tag_name('option')
+        self.assertIn("Unit Assignment", [i.text for i in assignmentchoice])
+        writingassignment = self.browser.find_element_by_id('Unit Assignment')
+        writingassignment.click()
+        submitbutton = self.browser.find_element_by_id('assignmentsubmit')
+        submitbutton.send_keys(Keys.ENTER)
 
-        # Dr. chooses the different assignment
+        # Dr. sees tws student rubrics that are available to complete
+        studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
+        self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
+        studentname = self.browser.find_elements_by_tag_name('option')
+        self.assertIn("Bob DaBuilder", [i.text for i in studentname])
+        self.assertIn("Jane Doe", [i.text for i in studentname])
 
-        # Dr. sees that all student rubrics are available to complete
 
         # Dr. chooses a student
+        sleep(60)
+        submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
+        submitbuttonstudent.send_keys(Keys.ENTER)
+        sleep(60)
 
         # Dr. completes the rubric
 
@@ -192,8 +207,9 @@ class NewVisitorTest(FunctionalTest):
 
         # The mischevious professor tries to go back to a completed student url
 
-        self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/21743148'))
+        self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/unitassignment2/21743148'))
         bodytext = self.browser.find_element_by_tag_name('body')
+        sleep(40)
         self.assertIn("You have already completed a rubric for this student.", bodytext.text)
 
         # nonplussed, they return home

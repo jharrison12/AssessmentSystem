@@ -118,11 +118,11 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     # this returns the rubric associated with the class
     logging.info("Rubric pulled is {} {} {}".format(edclassenrolled, semester, assignmentname))
     logging.info("All the assignment names {} and pk {} ".format(Assignment.objects.all(), assignmentpk))
-    edclasssemester = Assignment.objects.get(pk=int(assignmentpk))#edclass=edclassenrolled, assignmentname=assignmentname)
-    rubricforclass = edclasssemester.keyrubric.get()
+    classassignment = Assignment.objects.get(pk=int(assignmentpk))#edclass=edclassenrolled, assignmentname=assignmentname)
+    rubricforclass = classassignment.keyrubric.get()
     # this returns the rows associated with the magic rubric
     rows = Row.objects.filter(rubric=rubricforclass)
-    greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled)
+    greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled, rubriccompleted=False)
     if request.method == 'POST':
         # this should return a single Enrollment object
         logging.info("Posting")
@@ -167,8 +167,8 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         # This view returns a brandnew copy of the rubric based upon
         # the rubric associated with the edclass
         # rubricforclass = edclassenrolled.keyrubric.get()
-        edclasssemester = Assignment.objects.get(pk=assignmentpk)#edclass=edclassenrolled,  assignmentname=assignmentname)
-        rubricforclass = edclasssemester.keyrubric.get()
+        classassignment = Assignment.objects.get(pk=assignmentpk)#edclass=edclassenrolled,  assignmentname=assignmentname)
+        rubricforclass = classassignment.keyrubric.get()
         oldrubricname = rubricforclass.name
         rows = Row.objects.filter(rubric=rubricforclass)
         logging.info("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass)) + " " + str(

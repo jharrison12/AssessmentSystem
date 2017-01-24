@@ -111,7 +111,7 @@ class Enrollment(models.Model):
         return 'Enrollment %s: %s' % (self.student, self.edclass)
 
     class Meta:
-        unique_together = (("student", "edclass"))
+       unique_together = (("student", "edclass"))
 
 
 
