@@ -41,7 +41,7 @@ class EdClasses(models.Model):
 	('ED', "Undergraduate Education"),
 	)
 
-	crn = models.IntegerField(unique=True, null=False)
+	crn = models.CharField(max_length=5, unique=True, null=False)
 	subject = models.CharField(max_length=4, choices=CHOICES, default="EG")
 	coursenumber = models.CharField(default='', blank=False, max_length=4)
 	sectionnumber = models.CharField(max_length=2, blank=False)
