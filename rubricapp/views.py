@@ -60,14 +60,13 @@ def assignment_page(request, semester, edclass):
                                         teacher=request.user,
                                         sectionnumber=edclasssectionnumber)
     logging.info("The classes pulled are %s" % (edclassesPulled))
-    assignments = Assignment.objects.filter(edclass=edclassesPulled,
-                                      semester__text=semester)
+    assignments = Assignment.objects.filter(edclass=edclassesPulled)
     for i in assignments:
-        logging.info("Assignments are %s" % (i.assignmentname))
+        logging.info("Assignments are %s with pk %s" % (i.assignmentname, i.pk))
     if request.method == 'POST':
         # Why is adding the forward slash unneccessary?
         # Why does the redirect no need the edclass added to the beginning?
-        return redirect(re.sub('[\s+]', '', request.POST['assignmentname']) + '/')
+        return redirect(re.sub('[\s+]', '', request.POST['assignment']) + '/')
     return render(request, 'rubricapp/assignment.html', {'assignments': assignments, 'semester': semester})
 
 
@@ -90,8 +89,7 @@ def student_page(request, edclass, semester, assignmentname):
                                         teacher=request.user,
                                         sectionnumber=edclasssectionnumber)
     logging.info("The classes pulled are %s" % (edclassesPulled))
-    students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False,
-                                      enrollment__semester__text=semester)
+    students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False)
     for i in students:
         logging.info("Students are %s" % (i.lnumber))
     if request.method == 'POST':
@@ -112,13 +110,15 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
     # This returns the class
     edclassenrolled = get_object_or_404(EdClasses, subject=edclasssubjectarea, coursenumber=edclasscoursenumber,
-                                        teacher=request.user, sectionnumber=edclasssectionnumber)
+                                        teacher=request.user, sectionnumber=edclasssectionnumber,semester__text=semester)
     # This returns the student
     student = Student.objects.get(lnumber=studentname)
+    # Separate out assignment name and pk
+    assignmentpk = re.search('[0-9]+', assignmentname).group(0)
     # this returns the rubric associated with the class
     logging.info("Rubric pulled is {} {} {}".format(edclassenrolled, semester, assignmentname))
-    logging.info("All the assignment names {}".format(Assignment.objects.all()))
-    edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester, assignmentname=assignmentname)
+    logging.info("All the assignment names {} and pk {} ".format(Assignment.objects.all(), assignmentpk))
+    edclasssemester = Assignment.objects.get(pk=int(assignmentpk))#edclass=edclassenrolled, assignmentname=assignmentname)
     rubricforclass = edclasssemester.keyrubric.get()
     # this returns the rows associated with the magic rubric
     rows = Row.objects.filter(rubric=rubricforclass)
@@ -128,7 +128,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         logging.info("Posting")
         RowFormSetWeb = RowFormSet(request.POST)
         try:
-            RowFormSetWeb.clean
+            RowFormSetWeb.clean()
             savedFormset = RowFormSetWeb.save(commit=False)
             # Not sure if the below is necessary.  But it works!
             for i in savedFormset:
@@ -144,10 +144,11 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             greatEnrollment.save()
             logging.info("Great enrollment rubric completed  is %s" % greatEnrollment.rubriccompleted)
             logging.info("Great enrollment id is %d" % greatEnrollment.pk)
-            return redirect('/assessment/' + semester + '/' + edclass + '/')
+            return redirect('/assessment/' + semester + '/' + edclass + '/' + assignmentname + '/')
         except ValidationError:
             # Hard coding error message not ideal, but I was having real issues
             # with having the RowFormSet to post an error message.
+            logging.info("You reached validation error")
             errorrow = "You must choose a value for all rows!"
             RowsForCompletedRubric = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
             # Zipping the two lists allows you to iterate both the RowFormSet and the rows once
@@ -156,6 +157,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             return render(request, 'rubricapp/rubricnotcompleted.html', {'studentlnumber': student.lnumber,
                                                                          'studentname': student.lastname + ", " + student.firstname,
                                                                          'RowFormSetWeb': RowsForCompletedRubric,
+                                                                         'assignmentname': assignmentname,
                                                                          'rows': zippedformandrows,
                                                                          'edclass': edclass,
                                                                          'semester': semester,
@@ -165,7 +167,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         # This view returns a brandnew copy of the rubric based upon
         # the rubric associated with the edclass
         # rubricforclass = edclassenrolled.keyrubric.get()
-        edclasssemester = Assignment.objects.get(edclass=edclassenrolled, semester__text=semester, assignmentname=assignmentname)
+        edclasssemester = Assignment.objects.get(pk=assignmentpk)#edclass=edclassenrolled,  assignmentname=assignmentname)
         rubricforclass = edclasssemester.keyrubric.get()
         oldrubricname = rubricforclass.name
         rows = Row.objects.filter(rubric=rubricforclass)
@@ -189,6 +191,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
                                                              'studentname': student.lastname + ", " + student.firstname,
                                                              'RowFormSetWeb': RowFormSetWeb, 'rows': rows,
+                                                             'assignmentname': assignmentname,
                                                              'edclass': edclass,
                                                              'rubricForClass': rubricForClassText.title(),
                                                              'semester': semester})
@@ -203,6 +206,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                 return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
                                                                  'studentname': student.lastname + ", " + student.firstname,
                                                                  'RowFormSetWeb': RowFormSetWeb,
+                                                                 'assignmentname': assignmentname,
                                                                  'rows': rows,
                                                                  'edclass': edclass,
                                                                  'rubricForClass': oldrubricname.title(),
@@ -213,6 +217,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                 return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
                                                                  'studentname': student.lastname + ", " + student.firstname,
                                                                  'rows': rows,
+                                                                 'assignmentname': assignmentname,
                                                                  'edclass': edclass,
                                                                  'rubricForClass': oldrubricname.title(),
                                                                  'semester': semester,

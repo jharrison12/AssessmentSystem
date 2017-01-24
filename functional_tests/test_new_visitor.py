@@ -6,55 +6,56 @@ from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, R
 from time import sleep
 from django.contrib.auth.models import User
 
-class NewVisitorTest(FunctionalTest):
 
+class NewVisitorTest(FunctionalTest):
     def create_two_classes_for_unit_tests(self):
         semester = Semester.objects.create(text="201530")
         semester2 = Semester.objects.create(text="201610")
-        edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", sectionnumber="01", teacher=self.test_user, crn=2222)
-        edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", sectionnumber="01", teacher=self.test_user, crn=3333)
-        #semester.classes.add(edclass1)
-        #semester.classes.add(edclass2)
-        edclasssemester1 = Assignment.objects.create(edclass=edclass1, semester=semester, assignmentname="Writing Assignment")
-        edclasssemester1assignment2 = Assignment.objects.create(edclass=edclass1, semester=semester, assignmentname="Unit Assignment")
-        edclasssemester2 = Assignment.objects.create(edclass=edclass2, semester=semester)
+        edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000", sectionnumber="01",
+                                            teacher=self.test_user, crn=2222, semester=semester)
+        edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", sectionnumber="01",
+                                            teacher=self.test_user, crn=3333, semester=semester)
+        # semester.classes.add(edclass1)
+        # semester.classes.add(edclass2)
+        edclasssemester1 = Assignment.objects.create(edclass=edclass1,
+                                                     assignmentname="Writing Assignment")
+        edclasssemester1assignment2 = Assignment.objects.create(edclass=edclass1,
+                                                                assignmentname="Unit Assignment")
+        edclasssemester2 = Assignment.objects.create(edclass=edclass2)
 
-        bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
-        jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
+        bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
+        jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
         jake = Student.objects.create(lastname="The Snake", firstname="Jake", lnumber="0000")
 
-        bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1, semester=semester)
-        bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
-        janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
-        janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
+        bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)
+        bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)
+        janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)
+        janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
         writingrubric = Rubric.objects.create(name="writingrubric")
         unitrubric = Rubric.objects.create(name="unitrubric")
 
         row1 = Row.objects.create(excellenttext="THE BEST!",
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+                                  unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
 
         row2 = Row.objects.create(excellenttext="THE GREATEST!",
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+                                  unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
 
         row3 = Row.objects.create(excellenttext="AMAZING!",
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST",rubric=unitrubric)
+                                  unsatisfactorytext="YOU'RE LAST", rubric=unitrubric)
 
-
-        #Many to many relationship must be added after creation of objects
-        #because the manyto-many relationship is not a column in the database
+        # Many to many relationship must be added after creation of objects
+        # because the manyto-many relationship is not a column in the database
         edclasssemester1.keyrubric.add(writingrubric)
         edclasssemester1assignment2.keyrubric.add(unitrubric)
         edclasssemester2.keyrubric.add(writingrubric)
 
-
     def test_user_visits_inital_page(self):
-
         # Dr. visits the webpage
         self.create_two_classes_for_unit_tests()
         self.browser.get(self.live_server_url + '/assessment/')
@@ -76,7 +77,7 @@ class NewVisitorTest(FunctionalTest):
         semesterchoice = self.browser.find_elements_by_tag_name('option')
         self.assertIn('201530', [i.text for i in semesterchoice])
 
-        #Dr. clicks submit to send a post request to a server
+        # Dr. clicks submit to send a post request to a server
         submitbutton = self.browser.find_element_by_id('semestersubmit')
         self.assertEqual(submitbutton.get_attribute('value'), "Submit")
         submitbutton.send_keys(Keys.ENTER)
@@ -86,26 +87,27 @@ class NewVisitorTest(FunctionalTest):
         header_text = self.browser.find_element_by_id('edclass').text
         self.assertIn("Choose a Class!", header_text)
 
-        #Dr. Chooses a class from a list of classes
+        # Dr. Chooses a class from a list of classes
         dropdown_list = self.browser.find_element_by_id('classdropdown')
         self.assertEqual(dropdown_list.get_attribute('name'), "edClass")
         classchoice = self.browser.find_elements_by_tag_name('option')
         self.assertIn("EG 5000 01", [i.text for i in classchoice])
 
-        #Dr. clicks on a "Choose" button and is taken to a new page
+        # Dr. clicks on a "Choose" button and is taken to a new page
         submitbutton = self.browser.find_element_by_id('classubmit')
         submitbutton.send_keys(Keys.ENTER)
 
-        #If there is more than one assignment, Dr. Chooses an assignment
-        assignmentchoice = self.browser.find_element_by_tag_name('option')
+        # If there is more than one assignment, Dr. Chooses an assignment
+        assignmentchoice = self.browser.find_elements_by_tag_name('option')
         self.assertIn("Writing Assignment", [i.text for i in assignmentchoice])
+        writingassignment = self.browser.find_element_by_id('Writing Assignment')
+        writingassignment.click()
         submitbutton = self.browser.find_element_by_id('assignmentsubmit')
-        submitbutton.send_keys(Keys.Enter)
+        submitbutton.send_keys(Keys.ENTER)
 
         chooseAStudent = self.browser.find_element_by_id('choosename')
 
-
-        #Dr. chooses a student name from a drop down list of student names
+        # Dr. chooses a student name from a drop down list of student names
         studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
         self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
         studentname = self.browser.find_elements_by_tag_name('option')
@@ -114,15 +116,14 @@ class NewVisitorTest(FunctionalTest):
         submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 
-        #A new page should appear with the students name
-
+        # A new page should appear with the students name
         studentnameheader = self.browser.find_element_by_id('studentheader')
-        self.assertIn("DaBuilder, Bob",studentnameheader.text )
+        self.assertIn("DaBuilder, Bob", studentnameheader.text)
 
-        #A rubric should appear based upon the key assignment
+        # A rubric should appear based upon the key assignment
         rubricheader = self.browser.find_element_by_id('rubricheader')
         self.assertIn("Writing Rubric", rubricheader.text)
-        #The rubric should allow the professor to click on a matrix of rows
+        # The rubric should allow the professor to click on a matrix of rows
 
         row1dropdown = self.browser.find_element_by_id('id_form-0-row_choice')
         row2dropdown = self.browser.find_element_by_id('id_form-1-row_choice')
@@ -135,27 +136,27 @@ class NewVisitorTest(FunctionalTest):
         excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[3]')
         excellent.click()
 
-        #The dr. clicks on "submit" the student data is submited to a database
+        # The dr. clicks on "submit" the student data is submitted to a database
         submitbutton = self.browser.find_element_by_id('rubricsubmit')
         submitbutton.send_keys(Keys.ENTER)
         bodytext = self.browser.find_element_by_tag_name('body')
         self.assertIn("THE BEST!", bodytext.text)
 
-        #Dr. discoveres that empty values are not accepted in the rubric
+        # Dr. discoveres that empty values are not accepted in the rubric
         bodytext = self.browser.find_element_by_tag_name('body')
         self.assertIn("You must choose a value for all rows!", bodytext.text)
 
-        #Dr. decides to fill out the entire rubric this time
+        # Dr. decides to fill out the entire rubric this time
         proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
         proficient.click()
         submitbutton = self.browser.find_element_by_id('rubricsubmit')
         submitbutton.send_keys(Keys.ENTER)
 
-        #Clicking submit should save rubric and return to the main student page
+        # Clicking submit should save rubric and return to the main student page
         studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
         self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
 
-        #Dr. chooses a different name and fills out a COMPLETELY new rubric
+        # Dr. chooses a different name and fills out a COMPLETELY new rubric
         studentnames = self.browser.find_elements_by_tag_name('option')
         janedoe = self.browser.find_element_by_id('21743149')
         janedoe.click()
@@ -163,8 +164,8 @@ class NewVisitorTest(FunctionalTest):
         submitbuttonstudent.send_keys(Keys.ENTER)
         excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
 
-        #First choice should not be excellent it should be null
-        #self.assertNotEqual(excellent.get_attribute("selected"), "true")
+        # First choice should not be excellent it should be null
+        # self.assertNotEqual(excellent.get_attribute("selected"), "true")
         excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
         excellent.click()
         proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
@@ -172,33 +173,31 @@ class NewVisitorTest(FunctionalTest):
         submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 
-        #The new webpage should say "No more students"
+        # The new webpage should say "No more students"
         bodytext = self.browser.find_element_by_tag_name('body')
-        self.assertIn("There are no more students",bodytext.text)
+        self.assertIn("There are no more students", bodytext.text)
 
-        #Dr. returns to the class page
+        # Dr. returns to the class page
 
-        #Dr. chooses the different assignment
+        # Dr. chooses the different assignment
 
-        #Dr. sees that all student rubrics are available to complete
+        # Dr. sees that all student rubrics are available to complete
 
-        #Dr. chooses a student
+        # Dr. chooses a student
 
-        #Dr. completes the rubric
+        # Dr. completes the rubric
 
-        #Dr. returns to assignment page to see that completed student is not there
+        # Dr. returns to assignment page to see that completed student is not there
 
 
-        #The mischevious professor tries to go back to a completed student url
+        # The mischevious professor tries to go back to a completed student url
 
         self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/21743148'))
         bodytext = self.browser.find_element_by_tag_name('body')
         self.assertIn("You have already completed a rubric for this student.", bodytext.text)
 
-        #nonplussed, they return home
+        # nonplussed, they return home
         home = self.browser.find_element_by_link_text("Return Home")
         home.click()
         semester_header_text = self.browser.find_element_by_id('semester').text
         self.assertIn("Choose a Semester!", semester_header_text)
-
-

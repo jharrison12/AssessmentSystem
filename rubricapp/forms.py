@@ -12,7 +12,7 @@ class RowForm(ModelForm):
 	def clean(self):
 		cleaned_data = super(RowForm, self).clean()
 		row_choice = cleaned_data.get('row_choice')
-		if row_choice == 0:
+		if row_choice == "0":
 			raise ValidationError('You must make a choice')
 	
 	class Meta:
@@ -40,7 +40,7 @@ class BaseRowFormSet(BaseModelFormSet):
 		for form in self.forms:
 			row_choice_data = form.cleaned_data['row_choice']
 			#note: line below does not work for None.  Must be 0. 
-			if form.cleaned_data['row_choice'] == '0' :
+			if form.cleaned_data['row_choice'] == '0':
 				raise forms.ValidationError('You must make a choice')
 		return row_choice_data
 				

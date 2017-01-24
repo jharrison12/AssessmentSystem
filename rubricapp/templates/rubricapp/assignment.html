@@ -1,13 +1,13 @@
 {% extends 'rubricapp/base.html' %}
 
-		{% block headerid%}choosename{% endblock %}{% block header_text %}Choose a Name{% endblock %}
+		{% block headerid%}choosename{% endblock %}{% block header_text %}Choose an Assignment{% endblock %}
 		
 		{% block form %}
 		{% if assignments|length > 0 %}
 		<form method="POST" action={{ assignment }}>
 			<select name="assignment" id="assignmentdropdown">
 					{% for assignment in assignments %}
-					<option value="{{ assignment }}" id={{ assignment.assignmentname }}>{{ assignment.assignmentname }}</option>
+					<option value="{{ assignment.assignmentname }}{{ assignment.pk }}" id="{{ assignment.assignmentname }}">{{ assignment.assignmentname }}</option>
 					{% endfor %}	
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="assignmentsubmit">

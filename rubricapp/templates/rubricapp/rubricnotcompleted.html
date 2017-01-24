@@ -4,7 +4,7 @@
 		{% block header_text %}Student name: {{ studentname }}{% endblock %}
 		{% block form %}
 		<h3 id="rubricheader">{{ rubricForClass }}</h3>
-		<form method="post" action= {% url 'rubricapp:rubricpage' edclass=edclass studentname=studentlnumber semester=semester%}>
+		<form method="post" action= {% url 'rubricapp:rubricpage' edclass=edclass studentname=studentlnumber semester=semester assignmentname=assignmentname %}>
 			
 			<table border="1" class="table table-striped" >
 		<!-- TODO fix this so that it pulls from forms.py -->

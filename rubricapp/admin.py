@@ -12,14 +12,14 @@ from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, Assig
 
 class EnrollmentAdmin(admin.ModelAdmin):
 	model = Enrollment
-	fields = ('student', 'rubriccompleted', 'semester', 'edclass')
+	fields = ('student', 'rubriccompleted','edclass')
 	#list_display = ('student', 'rubriccompleted', 'semester', 'edclass')
 	actions = None
 
 	# The method below turns a readonly field if the user is editing the semester instance
 	def get_readonly_fields(self, request, obj=None):
 		if obj:
-			return self.readonly_fields + ('semester','student','edclass',)
+			return self.readonly_fields + ('student','edclass',)
 		return self.readonly_fields
 	
 	def has_delete_permission(self, request, obj=None):

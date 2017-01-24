@@ -47,7 +47,7 @@ class EdClasses(models.Model):
     sectionnumber = models.CharField(max_length=2, blank=False)
     students = models.ManyToManyField(Student, through="Enrollment")
     #keyrubric = models.ManyToManyField(Rubric)
-    semester = models.ManyToManyField(Semester, through="Assignment")
+    semester = models.ForeignKey(Semester)
     teacher = models.ForeignKey(User)
 
     def __str__(self):
@@ -57,22 +57,22 @@ class EdClasses(models.Model):
 class Assignment(models.Model):
     assignmentname = models.CharField(default="None", max_length=30)
     edclass = models.ForeignKey(EdClasses, null=False)
-    semester = models.ForeignKey(Semester, null=False)
+    #semester = models.ForeignKey(Semester, null=False)
     keyrubric = models.ManyToManyField(Rubric)
 
     def __str__(self):
-        return "%s%s%s%s%s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.semester.text,self.assignmentname)
+        return "%s%s%s%s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.assignmentname)
 
-    def clean(self):
-        if self.assignmentname:
-            self.assignmentname = self.assignmentname.strip()
+    #def clean(self):
+    #    if self.assignmentname:
+    #      self.assignmentname = self.assignmentname.replace(" ", "")
 
-    def save(self, *args, **kwargs):
-        self.clean()
-        return super(Assignment, self).save(*args, **kwargs)
+    #def save(self, *args, **kwargs):
+    #    self.clean()
+    #    return super(Assignment, self).save(*args, **kwargs)
 
     class Meta:
-        unique_together = ("edclass", "semester", "assignmentname")
+        unique_together = ("edclass",  "assignmentname")
 
 
 
@@ -99,13 +99,13 @@ class Row(models.Model):
 class Enrollment(models.Model):
     student = models.ForeignKey(Student, null=False)
     edclass = models.ForeignKey(EdClasses, null=False)
-    semester = models.ForeignKey(Semester)
+    #semester = models.ForeignKey(Semester)
     #Will need to change completedrubric editable to False
     completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
     rubriccompleted = models.BooleanField(default=False)
 
     def encode_class_name_for_admin(self,obj):
-        return self.edclass.name + " " + self.semester.text
+        return self.edclass.name
 
     def __str__(self):
         return 'Enrollment %s: %s' % (self.student, self.edclass)
