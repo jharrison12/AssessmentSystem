@@ -85,7 +85,7 @@ class EdClassSemesterAdmin(admin.ModelAdmin):
 	
 	def get_readonly_fields(self, request, obj=None):
 		if obj:
-			return self.readonly_fields + ('edclass','semester','keyrubric')
+			return self.readonly_fields + ('edclass','keyrubric')
 		return self.readonly_fields
 		
 	def has_delete_permission(self, request, obj=None):

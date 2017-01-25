@@ -594,7 +594,7 @@ class StudentandRubricViewTest(TestCase):
     def test_rubric_for_different_semester_doesnt_shows_up_in_correct_semester(self):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
         newsemester = Semester.objects.create(text="201610")
-        bob = User.objects.create(username="Bob")
+        bob = User.objects.get(username="bob")
         badrubric = Rubric.objects.create()
         badrow = Row.objects.create(excellenttext="STOP",
                                     proficienttext="STOP",
@@ -607,7 +607,6 @@ class StudentandRubricViewTest(TestCase):
         george = Student.objects.create(lastname="Harrison", firstname="Georgeo", lnumber="21743444")
         newgeorgeenrollment = Enrollment.objects.create(student=george, edclass=edclass)#,semester=newsemester)
         response = self.client.get('/assessment/201610/EG500001/WritingAssignment'+ str(edclassnewsemester.pk) +'/21743444/')
-        print(response.content.decode())
         self.assertContains(response, "STOP")
 
     def test_rubric_for_different_semester_doesnt_show_up_wrong_semester(self):
