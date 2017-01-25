@@ -54,10 +54,10 @@ class StudentView(TestCase):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
 		jacob = User.objects.create(username="jacob")
-		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000",teacher=jacob, crn=2222, sectionnumber="01")
-		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000",teacher=jacob, crn=3333, sectionnumber="01")
-		edclasssemester1 = Assignment.objects.create(edclass=edclass1, semester=semester)
-		edclasssemester2 = Assignment.objects.create(edclass=edclass2, semester=semester)
+		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000",teacher=jacob, crn=2222, sectionnumber="01",semester=semester)
+		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000",teacher=jacob, crn=3333, sectionnumber="01", semester=semester)
+		edclasssemester1 = Assignment.objects.create(edclass=edclass1)#, semester=semester)
+		edclasssemester2 = Assignment.objects.create(edclass=edclass2)#, semester=semester)
 		
 		#semester.classes.add(edclass1)
 		#semester.classes.add(edclass2)
@@ -66,10 +66,10 @@ class StudentView(TestCase):
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
 		jake = Student.objects.create(lastname="The Snake", firstname="Jake", lnumber="0000")
 		
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1, semester=semester)
-		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
-		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
-		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)#, semester=semester)
+		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)#, semester=semester)
+		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)#, semester=semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)#, semester=semester)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 
 		row1 = Row.objects.create(excellenttext="THE BEST!", 

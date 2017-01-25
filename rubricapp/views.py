@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 
 
