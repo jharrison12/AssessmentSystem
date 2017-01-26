@@ -326,16 +326,38 @@ class AssignmentViewTest(TestCase):
         #first_semester.classes.add(edClass)
         #first_semester.classes.add(edClass2)
         #first_semester.classes.add(edClass1)
-        rubric = Rubric.objects.create(name="bob")
-        edclasssemester = Assignment.objects.create(edclass=edClass, assignmentname="Unit Plan")
-        edclasssemestersecond = Assignment.objects.create(edclass=edClass, assignmentname="Writing Assignment")
+        writingrubric = Rubric.objects.create(name="Writing Rubric")
+        unitrubric = Rubric.objects.create(name="Unit Rubric")
+        unitassignment = Assignment.objects.create(edclass=edClass, assignmentname="Unit Plan")
+        writingassignment = Assignment.objects.create(edclass=edClass, assignmentname="Writing Assignment")
         edclasssemester1 = Assignment.objects.create(edclass=edClass2)
         edclasssemester2 = Assignment.objects.create(edclass=edClass1)
 
-        edclasssemester.keyrubric.add(rubric)
-        edclasssemestersecond.keyrubric.add(rubric)
-        edclasssemester1.keyrubric.add(rubric)
-        edclasssemester2.keyrubric.add(rubric)
+        unitassignment.keyrubric.add(unitrubric)
+        writingassignment.keyrubric.add(writingrubric)
+        edclasssemester1.keyrubric.add(unitrubric)
+        edclasssemester2.keyrubric.add(unitrubric)
+
+        row1 = Row.objects.create(excellenttext="THE BEST!",
+                                  proficienttext="THE SECOND BEST!",
+                                  satisfactorytext="THE THIRD BEST!",
+                                  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+
+        row2 = Row.objects.create(excellenttext="THE GREATEST!",
+                                  proficienttext="THE SECOND BEST!",
+                                  satisfactorytext="THE THIRD BEST!",
+                                  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+
+        row1 = Row.objects.create(excellenttext="BAD!",
+                                  proficienttext="BAD!",
+                                  satisfactorytext="BAD!",
+                                  unsatisfactorytext="BAD!",rubric=unitrubric)
+
+        row2 = Row.objects.create(excellenttext="BAD!",
+                                  proficienttext="BAD!",
+                                  satisfactorytext="BAD!",
+                                  unsatisfactorytext="BAD!",rubric=unitrubric)
+
 
         bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
         jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
@@ -351,6 +373,27 @@ class AssignmentViewTest(TestCase):
         self.add_two_classes_to_semester_add_two_students_to_class()
         found = resolve('/assessment/201530/EG500001/writingassignment1/')
         self.assertEqual(found.func, student_page)
+
+    def test_student_can_have_more_than_one_assignment_in_course(self):
+        self.add_two_classes_to_semester_add_two_students_to_class()
+        edclass = EdClasses.objects.get(crn=2222)
+        writingassignment = Assignment.objects.get(assignmentname="Writing Assignment")
+        unitassignment = Assignment.objects.get(assignmentname="Unit Plan")
+        data ={"form-TOTAL_FORMS": "2",
+               "form-INITIAL_FORMS": "2",
+               "form-MIN_NUM_FORMS": "0",
+               "form-MAX_NUM_FORMS": "1000",
+               "form-0-row_choice":"2",
+               "form-1-row_choice":"2",
+               "form-0-id": "3",
+               "form-1-id": "4"}
+
+        response = self.client.post("/assessment/201530/EG500001/unitplan{}/21743148/".format(unitassignment.pk), data)
+        print(response.status_code)
+        found = self.client.get('/assessment/201530/EG500001/writingassignment{}/21743148/'.format(writingassignment.pk))
+        print(found.content.decode())
+        self.assertContains(found, "BAD!")
+
 
 
 class StudentandRubricViewTest(TestCase):
