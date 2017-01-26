@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubric, Assignment
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Row, Rubric, Assignment,RubricData
 from rubricapp.forms import RowForm, RowFormSet
 import re, logging
 from copy import deepcopy
@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 
 
 
@@ -89,14 +89,28 @@ def student_page(request, edclass, semester, assignmentname):
                                         teacher=request.user,
                                         sectionnumber=edclasssectionnumber)
     logging.info("The classes pulled are %s" % (edclassesPulled))
-    students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubriccompleted=False)
-    for i in students:
-        logging.info("Students are %s" % (i.lnumber))
+    assignmentpk = re.search('[0-9]+', assignmentname).group(0)
+    assignment = Assignment.objects.get(pk=assignmentpk)
     if request.method == 'POST':
         # Why is adding the forward slash unneccessary?
         # Why does the redirect no need the edclass added to the beginning?
         return redirect(re.sub('[\s+]', '', request.POST['studentnames']) + '/')
-    return render(request, 'rubricapp/student.html', {'students': students, 'semester': semester})
+    else:
+        #If not a post, the app pulls all students in the class
+        studentsinclass = Student.objects.filter(edclasses=edclassesPulled)
+        #For each student in the class it obtains the enrollment object and the assignment
+        #and creates the Rubric Data object if it doesn't exist
+        #TODO: Fix this language it seems very inefficent
+        for i in studentsinclass:
+            enrollment = Enrollment.objects.get(student=i, edclass=edclassesPulled)
+            logging.warning("Students are {} and enrollment is {}".format(i.lnumber, enrollment))
+            if RubricData.objects.filter(enrollment=enrollment, assignment=assignment).exists():
+                pass
+            else:
+                RubricData.objects.create(enrollment=enrollment, assignment=assignment)
+                logging.warning("Rubric object data created")
+        students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubricdata__rubricdata__rubriccompleted=False)
+        return render(request, 'rubricapp/student.html', {'students': students, 'semester': semester})
 
 
 # TODO fix studentname variable.  Change to studentlnumber
@@ -105,6 +119,7 @@ def student_page(request, edclass, semester, assignmentname):
 @login_required
 def rubric_page(request, edclass, studentname, semester, assignmentname):
     # edclassspaceadded = re.sub('([A-Z]+)', r'\1 ', edclass)
+    # parse out the edclass name
     edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
     edclasscoursenumber = re.search('([0-9]{4})', edclass).group(0)
     edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
@@ -118,11 +133,12 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     # this returns the rubric associated with the class
     logging.info("Rubric pulled is {} {} {}".format(edclassenrolled, semester, assignmentname))
     logging.info("All the assignment names {} and pk {} ".format(Assignment.objects.all(), assignmentpk))
-    classassignment = Assignment.objects.get(pk=int(assignmentpk))#edclass=edclassenrolled, assignmentname=assignmentname)
+    classassignment = Assignment.objects.get(pk=int(assignmentpk))
     rubricforclass = classassignment.keyrubric.get()
     # this returns the rows associated with the magic rubric
     rows = Row.objects.filter(rubric=rubricforclass)
-    greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled, rubriccompleted=False)
+    greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled)#, rubricdata__rubricdata__rubriccompleted=False)
+    rubricdata = RubricData.objects.get_or_create(enrollment=greatEnrollment, assignment=classassignment)
     if request.method == 'POST':
         # this should return a single Enrollment object
         logging.info("Posting")
@@ -138,7 +154,9 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                 i.save(update_fields=['row_choice'])
                 logging.info("The rubric associated with the row is %d" % i.rubric.id)
                 rubricid = i.rubric.id
-            greatEnrollment.rubriccompleted = True
+            #greatEnrollment.rubriccompleted = True
+            rubricdata[0].rubriccompleted = True
+            rubricdata[0].save()
             # Set the enrollment object to the new rubric created by accessing the page
             greatEnrollment.completedrubric = Rubric.objects.get(pk=rubricid)
             greatEnrollment.save()
@@ -198,7 +216,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         except ValidationError:
             # Validationerror because a name for the rubric as already been completed
             # Checks if rubriccompleted is False.  Shows rubric if it is
-            if greatEnrollment.rubriccompleted == False:
+            if rubricdata[0].rubriccompleted == False:
                 rubricname = "%s%s%s" % (edclass, studentname, semester)
                 noncompletedrubric = Rubric.objects.get(name=rubricname)
                 rows = Row.objects.filter(rubric=noncompletedrubric)
@@ -213,7 +231,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                                                                  'semester': semester,})
             else:
                 error = "You have already completed a rubric for this student."
-                greatEnrollment.save()
+                rubricdata.save()
                 return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
                                                                  'studentname': student.lastname + ", " + student.firstname,
                                                                  'rows': rows,

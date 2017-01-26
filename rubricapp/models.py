@@ -103,6 +103,7 @@ class Enrollment(models.Model):
     #Will need to change completedrubric editable to False
     completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
     rubriccompleted = models.BooleanField(default=False)
+    rubricdata = models.ManyToManyField(Assignment, through="RubricData")
 
     def encode_class_name_for_admin(self,obj):
         return self.edclass.name
@@ -113,6 +114,7 @@ class Enrollment(models.Model):
     class Meta:
        unique_together = (("student", "edclass"))
 
-
-
-
+class RubricData(models.Model):
+    rubriccompleted = models.BooleanField(default=False)
+    enrollment = models.ForeignKey(Enrollment)
+    assignment = models.ForeignKey(Assignment)

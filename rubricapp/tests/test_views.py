@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment,RubricData
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase, Client
@@ -250,8 +250,9 @@ class ClassViewTest(TestCase):
     def test_semester_page_can_show_without_redirecting(self):
         #TODO setup semester/class/ url
         self.add_two_classes_to_semester_add_two_students_to_class()
-        response = self.client.get("/assessment/201530/EG500001/writingassignment1/")
-
+        assignmentname = Assignment.objects.get(assignmentname="Writing Assignment")
+        response = self.client.get("/assessment/201530/EG500001/writingassignment{}/".format(assignmentname.pk))
+        print(response.content.decode())
         self.assertContains(response, 'Bob DaBuilder')
 
     def test_class_page_can_take_post_request(self):
@@ -262,8 +263,9 @@ class ClassViewTest(TestCase):
         request.user = Bob
         bob = Student.objects.get(lnumber="21743148")
         request.POST['studentnames'] = bob.lnumber
+        assignment= Assignment.objects.get(assignmentname="Writing Assignment")
 
-        response = student_page(request, "EG500001", "201530", "Writing Assignment")
+        response = student_page(request, "EG500001", "201530", "Writing Assignment{}".format(assignment.pk))
 
         self.assertEqual(response.status_code, 302)
 
@@ -275,8 +277,9 @@ class ClassViewTest(TestCase):
         request.user = Bob
         student = Student.objects.get(lnumber="21743148")
         request.POST['studentnames'] = student.lnumber
+        assignment = Assignment.objects.get(assignmentname="Writing Assignment")
 
-        response = student_page(request, "EG500001", "201530", "Writing Assignment")
+        response = student_page(request, "EG500001", "201530", "Writing Assignment{}".format(assignment.pk))
 
         self.assertEqual(response.status_code, 302)
 
@@ -285,11 +288,15 @@ class ClassViewTest(TestCase):
     def test_class_page_shows_url_if_no_students(self):
         self.add_two_classes_to_semester_add_two_students_to_class()
         bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__subject="EG", edclass__coursenumber="5000")
-        bobenrollment.rubriccompleted = True
-        bobenrollment.save()
+        assignment = Assignment.objects.get("Writing Assignment")
+        bobrubric = RubricData.objects.create(assignment=assignment, enrollment=bobenrollment)
+        bobrubric.rubriccompleted = True
+        bobrubric.save()
+
         janeenrollment = Enrollment.objects.get(student__lastname="Doe", edclass__subject="EG", edclass__coursenumber="5000")
-        janeenrollment.rubriccompleted = True
-        janeenrollment.save()
+        janerubric = RubricData.objects.create(assignment=assignment, enrollment=bobenrollment)
+        janerubric.rubriccompleted = True
+        janerubric.save()
 
         response = self.client.get("/assessment/201530/EG500001/writingassignment1/")
         self.assertIn("Return to the semester page", response.content.decode())
@@ -369,6 +376,8 @@ class AssignmentViewTest(TestCase):
         janeenrollment2 = Enrollment.objects.create(student=jane,edclass=edClass2)#, semester=first_semester)
         kellyenrollment = Enrollment.objects.create(student=kelly, edclass=edClass1)#, semester=first_semester)
 
+
+
     def test_assignment_page_resolves_to_assingment_function(self):
         self.add_two_classes_to_semester_add_two_students_to_class()
         found = resolve('/assessment/201530/EG500001/writingassignment1/')
@@ -388,10 +397,8 @@ class AssignmentViewTest(TestCase):
                "form-0-id": "3",
                "form-1-id": "4"}
 
-        response = self.client.post("/assessment/201530/EG500001/unitplan{}/21743148/".format(unitassignment.pk), data)
-        print(response.status_code)
-        found = self.client.get('/assessment/201530/EG500001/writingassignment{}/21743148/'.format(writingassignment.pk))
-        print(found.content.decode())
+        response = self.client.post("/assessment/201530/EG500001/writingassignment{}/21743148/".format(writingassignment.pk), data)
+        found = self.client.get('/assessment/201530/EG500001/unitplan{}/21743148/'.format(unitassignment.pk))
         self.assertContains(found, "BAD!")
 
 
