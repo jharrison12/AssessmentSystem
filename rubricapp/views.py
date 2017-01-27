@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 
 
@@ -77,10 +77,10 @@ def student_page(request, edclass, semester, assignmentname):
     ##TODO fix this so it will only return non-complete rubrics
     logging.warning("In the student page edclass:%s, semester %s" % (edclass, semester))
     edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
-    logging.warning("In the student page edclass:%s, semester %s" % (edclass, semester))
+    logging.info("In the student page edclass:%s, semester %s" % (edclass, semester))
     edclasscoursenumber = re.search('([0-9]{4})', edclass).group(0)
     edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
-    logging.warning("In the student page subject:%s, course %s section %s" % (
+    logging.info("In the student page subject:%s, course %s section %s" % (
     edclasssubjectarea, edclasscoursenumber, edclasssectionnumber))
     # Filter the class basedupon semester and name of the class
     edclassesPulled = get_object_or_404(EdClasses, semester__text=semester,
@@ -88,7 +88,7 @@ def student_page(request, edclass, semester, assignmentname):
                                         coursenumber=edclasscoursenumber,
                                         teacher=request.user,
                                         sectionnumber=edclasssectionnumber)
-    logging.info("The classes pulled are %s" % (edclassesPulled))
+    logging.warning("The classes pulled are %s" % (edclassesPulled))
     assignmentpk = re.search('[0-9]+', assignmentname).group(0)
     assignment = Assignment.objects.get(pk=assignmentpk)
     if request.method == 'POST':
@@ -98,18 +98,37 @@ def student_page(request, edclass, semester, assignmentname):
     else:
         #If not a post, the app pulls all students in the class
         studentsinclass = Student.objects.filter(edclasses=edclassesPulled)
+        logging.warning("Number of students in class {}".format(len(studentsinclass)))
         #For each student in the class it obtains the enrollment object and the assignment
         #and creates the Rubric Data object if it doesn't exist
         #TODO: Fix this language it seems very inefficent
+        logging.warning(len(RubricData.objects.all()))#delete this
+        iteration = 0
         for i in studentsinclass:
+            iteration += 1
+            logging.warning("Iteration number {}".format(iteration))
             enrollment = Enrollment.objects.get(student=i, edclass=edclassesPulled)
-            logging.warning("Students are {} and enrollment is {}".format(i.lnumber, enrollment))
-            if RubricData.objects.filter(enrollment=enrollment, assignment=assignment).exists():
-                pass
+            logging.warning("\tStudent is {} and enrollment is {}\n".format(i.lnumber, enrollment))
+            rubricdatastudent = RubricData.objects.filter(enrollment=enrollment, assignment=assignment)
+            logging.warning(len(RubricData.objects.all()))
+            logging.warning("Rubric data student is pulled.  It IHA {} \n".format(rubricdatastudent))
+            if len(rubricdatastudent) != 0:
+                logging.warning("BOOL IS ".format(True))
+                continue
             else:
                 RubricData.objects.create(enrollment=enrollment, assignment=assignment)
-                logging.warning("Rubric object data created")
-        students = Student.objects.filter(edclasses=edclassesPulled, enrollment__rubricdata__rubricdata__rubriccompleted=False)
+                logging.warning("Should be 2 {}".format(len(RubricData.objects.all())))
+                logging.warning("{} and assignment {} Rubric object data created \n".format(enrollment, assignment))
+        #Delete below
+        enrollmentsfalse = Enrollment.objects.filter(rubricdata__rubriccompleted=False)
+        logging.warning("How many false enrollments when filtered? {}".format(len(enrollmentsfalse)))
+        teststudents = Student.objects.filter(enrollment=enrollmentsfalse, edclasses=edclassesPulled)
+        logging.warning("The number of students pulled for long query is {} and they are {}".format(len(teststudents), teststudents))
+        logging.warning("Even though 4 students are pulled the length of RubricData is {}".format(len(RubricData.objects.all())))
+        #How come this didn't work?
+        #students = Student.objects.filter(enrollment__dataforrubric__rubricdata__rubriccompleted=False, enrollment__edclass=edclassesPulled)
+        students = Student.objects.filter(enrollment=enrollmentsfalse, edclasses=edclassesPulled)
+        logging.warning("Students pulled {}\n\n".format(students))
         return render(request, 'rubricapp/student.html', {'students': students, 'semester': semester})
 
 

@@ -252,7 +252,6 @@ class ClassViewTest(TestCase):
         self.add_two_classes_to_semester_add_two_students_to_class()
         assignmentname = Assignment.objects.get(assignmentname="Writing Assignment")
         response = self.client.get("/assessment/201530/EG500001/writingassignment{}/".format(assignmentname.pk))
-        print(response.content.decode())
         self.assertContains(response, 'Bob DaBuilder')
 
     def test_class_page_can_take_post_request(self):
@@ -288,17 +287,19 @@ class ClassViewTest(TestCase):
     def test_class_page_shows_url_if_no_students(self):
         self.add_two_classes_to_semester_add_two_students_to_class()
         bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__subject="EG", edclass__coursenumber="5000")
-        assignment = Assignment.objects.get("Writing Assignment")
-        bobrubric = RubricData.objects.create(assignment=assignment, enrollment=bobenrollment)
-        bobrubric.rubriccompleted = True
-        bobrubric.save()
+        edclass= EdClasses.objects.get(crn=2222)
+        assignment = Assignment.objects.get(assignmentname="Writing Assignment", edclass=edclass)
+        bobrubric = RubricData.objects.get_or_create(assignment=assignment, enrollment=bobenrollment)
+        bobrubric[0].rubriccompleted = True
+        bobrubric[0].save()
 
         janeenrollment = Enrollment.objects.get(student__lastname="Doe", edclass__subject="EG", edclass__coursenumber="5000")
-        janerubric = RubricData.objects.create(assignment=assignment, enrollment=bobenrollment)
-        janerubric.rubriccompleted = True
-        janerubric.save()
+        janerubric = RubricData.objects.get_or_create(assignment=assignment, enrollment=janeenrollment)
+        janerubric[0].rubriccompleted = True
+        janerubric[0].save()
 
         response = self.client.get("/assessment/201530/EG500001/writingassignment1/")
+        print(response.content.decode())
         self.assertIn("Return to the semester page", response.content.decode())
 
     def test_class_page_does_not_show_students_from_other_semesters(self):
@@ -630,7 +631,6 @@ class StudentandRubricViewTest(TestCase):
         edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 
         bobenrollment = Enrollment.objects.filter(student=student, edclass=edclass)
-        print(bobenrollment.count())
         self.assertEqual(bobenrollment.count(), 1)
 
     def test_get_request_for_student_rubric_page_returns_rubric_if_completedrubric_false(self):
