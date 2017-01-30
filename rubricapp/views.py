@@ -250,7 +250,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                                                                  'semester': semester,})
             else:
                 error = "You have already completed a rubric for this student."
-                rubricdata.save()
+                rubricdata[0].save()
                 return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,
                                                                  'studentname': student.lastname + ", " + student.firstname,
                                                                  'rows': rows,

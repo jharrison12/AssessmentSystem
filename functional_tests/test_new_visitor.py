@@ -181,35 +181,62 @@ class NewVisitorTest(FunctionalTest):
         self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/'))
         assignmentchoice = self.browser.find_elements_by_tag_name('option')
         self.assertIn("Unit Assignment", [i.text for i in assignmentchoice])
-        writingassignment = self.browser.find_element_by_id('Unit Assignment')
-        writingassignment.click()
+        unitassignment = self.browser.find_element_by_id('Unit Assignment')
+        unitassignment.click()
         submitbutton = self.browser.find_element_by_id('assignmentsubmit')
         submitbutton.send_keys(Keys.ENTER)
 
-        # Dr. sees tws student rubrics that are available to complete
+        # Dr. sees two student rubrics that are available to complete
         studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
         self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
         studentname = self.browser.find_elements_by_tag_name('option')
         self.assertIn("Bob DaBuilder", [i.text for i in studentname])
         self.assertIn("Jane Doe", [i.text for i in studentname])
 
-
         # Dr. chooses a student
-        sleep(60)
+        bob = self.browser.find_element_by_id('21743148')
+        bob.click()
         submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
-        sleep(60)
 
         # Dr. completes the rubric
 
-        # Dr. returns to assignment page to see that completed student is not there
+        excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
+        excellent.click()
+        proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
+        proficient.click()
+        submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
+        submitbuttonstudent.send_keys(Keys.ENTER)
 
+        # Dr. returns to assignment page to see that completed student is not there
+        studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
+        self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
+        studentname = self.browser.find_elements_by_tag_name('option')
+        self.assertNotIn("Bob DaBuilder", [i.text for i in studentname])
+        self.assertIn("Jane Doe", [i.text for i in studentname])
+
+        # Dr. chooses Jane Doe
+        jane = self.browser.find_element_by_id('21743149')
+        jane.click()
+        submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
+        submitbuttonstudent.send_keys(Keys.ENTER)
+
+        #Dr. completes rubric
+        excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
+        excellent.click()
+        proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
+        proficient.click()
+        submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
+        submitbuttonstudent.send_keys(Keys.ENTER)
+
+        #Dr. returns to the student page.  There should be no more students
+        bodytext = self.browser.find_element_by_tag_name('body')
+        self.assertIn("There are no more students", bodytext.text)
 
         # The mischevious professor tries to go back to a completed student url
-
-        self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/unitassignment2/21743148'))
+        unit = Assignment.objects.get(assignmentname="Unit Assignment")
+        self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/unitassignment{}/21743148'.format(unit.pk)))
         bodytext = self.browser.find_element_by_tag_name('body')
-        sleep(40)
         self.assertIn("You have already completed a rubric for this student.", bodytext.text)
 
         # nonplussed, they return home
