@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment
 import re, logging, collections, copy
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 from django.contrib.auth.decorators import login_required,user_passes_test
 # Create your views here.
 
@@ -13,7 +13,9 @@ def home_page(request):
 @login_required	
 @user_passes_test(lambda u: u.is_superuser)
 def student_view(request):
-	students = Student.objects.filter(enrollment__rubriccompleted=True)
+	enrollmentstrue = Enrollment.objects.filter(rubricdata__rubriccompleted=True)
+	students = Student.objects.filter(enrollment=enrollmentstrue)
+	logging.warning("Students filtered {}".format(students))
 	if request.method == "POST":
 		return redirect(request.POST['studentnames']+ '/')
 	return render(request, 'dataview/studentview.html', {"students": students})
@@ -22,7 +24,7 @@ def student_view(request):
 @user_passes_test(lambda u: u.is_superuser)
 def student_data_view(request, lnumber):
 	student = Student.objects.get(lnumber=lnumber)
-	enrollments = Enrollment.objects.filter(student__lnumber=lnumber, rubriccompleted=True)
+	enrollments = Enrollment.objects.filter(student__lnumber=lnumber, rubricdata__rubriccompleted=True)
 	if request.method == "POST":
 		return redirect(re.sub('[\s+]', '', request.POST['rubricname'])+'/')
 	return render(request, 'dataview/studentdataview.html', {"student": student, "enrollments":enrollments})
@@ -58,8 +60,8 @@ def ed_class_data_view(request, edclass, semester):
 	edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
 	logging.info("%s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber))
 	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber)
-	edclasssemester = Assignment.objects.get(edclass=edclasspulled, semester__text=semester)
-	classrubric = edclasssemester.keyrubric.get()
+	assignment = Assignment.objects.filter(edclass=edclasspulled)#, semester__text=semester)
+	classrubric = assignment.keyrubric.get()
 	templaterows = Row.objects.filter(rubric=classrubric)
 	#Questions about whether the below query actually works the way it should
 	#logging.info("Semester %s EdClass %s" %(semester, edclasspulled))

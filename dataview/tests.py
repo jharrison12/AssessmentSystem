@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, semester_ed_class_view
-from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment
+from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment, RubricData
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 import re
@@ -56,8 +56,8 @@ class StudentView(TestCase):
 		jacob = User.objects.create(username="jacob")
 		edclass1 = EdClasses.objects.create(subject="EG", coursenumber="5000",teacher=jacob, crn=2222, sectionnumber="01",semester=semester)
 		edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000",teacher=jacob, crn=3333, sectionnumber="01", semester=semester)
-		edclasssemester1 = Assignment.objects.create(edclass=edclass1)#, semester=semester)
-		edclasssemester2 = Assignment.objects.create(edclass=edclass2)#, semester=semester)
+		unitplan = Assignment.objects.create(edclass=edclass1, assignmentname="Unit Plan")#, semester=semester)
+		writingassignment = Assignment.objects.create(edclass=edclass2, assignmentname="Writing Assignment")#, semester=semester)
 		
 		#semester.classes.add(edclass1)
 		#semester.classes.add(edclass2)
@@ -86,8 +86,8 @@ class StudentView(TestCase):
 		#because the manyto-many relationship is not a column in the database
 		#edclass1.keyrubric.add(writingrubric)
 		#edclass2.keyrubric.add(writingrubric)
-		edclasssemester1.keyrubric.add(writingrubric)
-		edclasssemester2.keyrubric.add(writingrubric)
+		unitplan.keyrubric.add(writingrubric)
+		writingassignment.keyrubric.add(writingrubric)
 		
 		completedrubricforbob = Rubric.objects.create(name="EG50000121743148201530", template=False)
 		row1 = Row.objects.create(name="Fortitude",
@@ -103,7 +103,10 @@ class StudentView(TestCase):
 								  unsatisfactorytext="YOU'RE LAST",rubric=completedrubricforbob, row_choice=1)
 		
 		bobenrollment.completedrubric = completedrubricforbob
-		bobenrollment.rubriccompleted = True
+		#TODO Complete this below
+		bobenrollmentrubricdata = RubricData.objects.get_or_create(enrollment=bobenrollment, assignment=unitplan)
+		bobenrollmentrubricdata[0].rubriccompleted = True
+		bobenrollmentrubricdata[0].save()
 		bobenrollment.save()
 		self.client = Client()
 		self.username = 'bob'
@@ -244,12 +247,12 @@ class EdClass(TestCase):
 		semester = Semester.objects.create(text="201530")
 		semester2 = Semester.objects.create(text="201610")
 		kelly = User.objects.create(username="kelly")
-		edclass1 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly, crn=2222)
-		edclass2 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly, crn=3333)
-		edclasssemester1 = Assignment.objects.create(edclass=edclass1, semester=semester)
-		edclasssemester2 = Assignment.objects.create(edclass=edclass2, semester=semester)
-		edclasssemester3 = Assignment.objects.create(edclass=edclass1, semester=semester2)
-		edclasssemester4 = Assignment.objects.create(edclass=edclass2, semester=semester2)
+		edclass1 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly, crn=2222, semester=semester)
+		edclass2 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly, crn=3333, semester=semester)
+		writingassignmentfirst = Assignment.objects.create(edclass=edclass1, assignmentname="Writing Assignment")#, semester=semester)
+		writingassignmentsecond = Assignment.objects.create(edclass=edclass2, assignmentname="Leader Paper")#, semester=semester)
+		writingassignmentthird = Assignment.objects.create(edclass=edclass1, assignmentname="Non-leader paper")#m semester=semester2)
+		writingassignmentfourth = Assignment.objects.create(edclass=edclass2, assignmentname="Loser Paper")#, semester=semester2)
 		
 		#semester.classes.add(edclass1)
 		#semester.classes.add(edclass2)
@@ -258,11 +261,11 @@ class EdClass(TestCase):
 		jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
 		jake = Student.objects.create(lastname="The Snake", firstname="Jake", lnumber="0000")
 		
-		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1, semester=semester)
-		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2, semester=semester)
-		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1, semester=semester)
-		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2, semester=semester)
-		jakeenrollment = Enrollment.objects.create(student=jake, edclass=edclass1, semester=semester2)
+		bobenrollment = Enrollment.objects.create(student=bob, edclass=edclass1)#, semester=semester)
+		bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)#, semester=semester)
+		janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)#, semester=semester)
+		janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)#, semester=semester)
+		jakeenrollment = Enrollment.objects.create(student=jake, edclass=edclass1)#, semester=semester2)
 		writingrubric = Rubric.objects.create(name="writingrubric")
 
 		row1 = Row.objects.create(name="Fortitude",
@@ -281,10 +284,10 @@ class EdClass(TestCase):
 		#because the manyto-many relationship is not a column in the database
 		#edclass1.keyrubric.add(writingrubric)
 		#edclass2.keyrubric.add(writingrubric)
-		edclasssemester1.keyrubric.add(writingrubric)
-		edclasssemester2.keyrubric.add(writingrubric)
-		edclasssemester3.keyrubric.add(writingrubric)
-		edclasssemester4.keyrubric.add(writingrubric)
+		writingassignmentfirst.keyrubric.add(writingrubric)
+		writingassignmentsecond.keyrubric.add(writingrubric)
+		writingassignmentthird.keyrubric.add(writingrubric)
+		writingassignmentfourth.keyrubric.add(writingrubric)
 		
 		completedrubricforbob = Rubric.objects.create(name="EG50000121743148201530", template=False)
 		row1 = Row.objects.create(name="Fortitude",
@@ -493,7 +496,7 @@ class EdClass(TestCase):
 	def test_same_class_different_semester_different_rubric_data(self):
 		twentyseventeen = Semester.objects.create(text="201710")
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05")
-		edclasssemester = Assignment.objects.create(semester=twentyseventeen, edclass=edclass)
+		edclasssemester = Assignment.objects.create(edclass=edclass, assignmentname="Huge leader paper")
 		completedrubricforgeorge = Rubric.objects.create(name="EG500001555201710", template=False)
 		edclasssemester.keyrubric.add(completedrubricforgeorge)
 		badrow = Row.objects.create(excellenttext="STOP", 
@@ -512,7 +515,7 @@ class EdClass(TestCase):
 	def test_EG6000_201530_rubric_only_shows_two_decimal_places(self):
 		summer2016 = Semester.objects.get(text="201530")
 		edclass = EdClasses.objects.get(subject="EG", coursenumber="6000", sectionnumber="04")
-		edclasssemester = Assignment.objects.get(semester=summer2016, edclass=edclass)
+		edclasssemester = Assignment.objects.get(edclass=edclass)
 		completedrubricforgeorge = Rubric.objects.create(name="EG6000045555201530", template=False)
 		#edclasssemester.keyrubric.add(completedrubricforgeorge)
 		
