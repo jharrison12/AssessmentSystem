@@ -1,0 +1,77 @@
+......FE...E.FE....F.....E..............................
+======================================================================
+ERROR: test_EG6000_201530_rubric_only_shows_two_decimal_places (dataview.tests.EdClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\python33\assessmenttoolstaging\source\dataview\tests.py", line 535, in test_EG6000_201530_rubric_only_shows_two_decimal_places
+    edclass = EdClasses.objects.get(subject="EG", coursenumber="6000", sectionnumber="04")
+  File "C:\Python33\lib\site-packages\django\db\models\manager.py", line 127, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Python33\lib\site-packages\django\db\models\query.py", line 338, in get
+    (self.model._meta.object_name, num)
+rubricapp.models.MultipleObjectsReturned: get() returned more than one EdClasses -- it returned 2!
+
+======================================================================
+ERROR: test_class_assignment_page_uses_correct_template (dataview.tests.EdClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\python33\assessmenttoolstaging\source\dataview\tests.py", line 461, in test_class_assignment_page_uses_correct_template
+    edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05")
+  File "C:\Python33\lib\site-packages\django\db\models\manager.py", line 127, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Python33\lib\site-packages\django\db\models\query.py", line 338, in get
+    (self.model._meta.object_name, num)
+rubricapp.models.MultipleObjectsReturned: get() returned more than one EdClasses -- it returned 2!
+
+======================================================================
+ERROR: test_class_data_page_uses_correct_template (dataview.tests.EdClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\python33\assessmenttoolstaging\source\dataview\tests.py", line 468, in test_class_data_page_uses_correct_template
+    edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05")
+  File "C:\Python33\lib\site-packages\django\db\models\manager.py", line 127, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Python33\lib\site-packages\django\db\models\query.py", line 338, in get
+    (self.model._meta.object_name, num)
+rubricapp.models.MultipleObjectsReturned: get() returned more than one EdClasses -- it returned 2!
+
+======================================================================
+ERROR: test_same_class_different_semester_different_rubric_data (dataview.tests.EdClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\python33\assessmenttoolstaging\source\dataview\tests.py", line 516, in test_same_class_different_semester_different_rubric_data
+    edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05")
+  File "C:\Python33\lib\site-packages\django\db\models\manager.py", line 127, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "C:\Python33\lib\site-packages\django\db\models\query.py", line 338, in get
+    (self.model._meta.object_name, num)
+rubricapp.models.MultipleObjectsReturned: get() returned more than one EdClasses -- it returned 2!
+
+======================================================================
+FAIL: test_EG500005_201610_rubric_shows_only_jake_score (dataview.tests.EdClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\python33\assessmenttoolstaging\source\dataview\tests.py", line 508, in test_EG500005_201610_rubric_shows_only_jake_score
+    self.assertIn("4.0", response.content.decode())
+AssertionError: '4.0' not found in '<!DOCTYPE html>\n<html lang="en">\n\t<head>\n\t\t<meta charset="utf-8">\n\t\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\n\t\t<meta name="viewport" content="width=device-width, inital-scale=1">\n\t\t<title>Data View</title>\n\t\t<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">\n\t</head>\n\t<body>\n\t<div class="container">\n\t\t<div class="row">\n\t\t\t\t<div class="col-md-6 col-md-offset-3">\n\t\t\t\t\t<div class="text-center">\n\t\t\t\t\t\t<h1 class="jumbotron">Data View</h1>\n\t\t\t\t\t\t<h3 id="">Here is your class rubric</h3>\t\t\n\t\t\t\t\t\t\n\n\t\t\t\n\t\t\t\t\n\t\t\t\t<table border="1px" class="table table-striped">\n\t\t\t\t\t<th>Name</th>\n\t\t\t\t\t<th>Score</th>\n\t\t\t\t\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td>Fortitude</td>\n\t\t\t\t\t\t<td>2.33</td>\n\t\t\t\t\t</tr>\n\t\t\t\t\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td>Excellenceisahabit</td>\n\t\t\t\t\t\t<td>3.00</td>\n\t\t\t\t\t</tr>\n\t\t\t\t\n\t\t\t\t</table>\n\t\t\t\n\t\t\t<p>Number of values per row:</p>\n\t\t\t<ul style="list-style: none;">\n\t\t\t\n\t\t\t\t<li>Fortitude: 3</li>\n\t\t\t\n\t\t\t\t<li>Excellenceisahabit: 3</li>\n\t\t\t\n\t\t\t</ul>\n\t\t\t\t\n\t\t\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t</body>\n\t<footer>\n\t\t<ul>\n\t\t\t<li><a href="/data/">Return to data home</a></li>\n\t\t\t<li><a href="/logout/?next=/login">Logout of Assessment App</a></li>\n\t\t\t<li><a href="/user/">User Page</a></li>\n\t\t</ul>\n\t</footer>\n</html>'
+
+======================================================================
+FAIL: test_class_data_page_shows_aggregated_score (dataview.tests.EdClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\python33\assessmenttoolstaging\source\dataview\tests.py", line 498, in test_class_data_page_shows_aggregated_score
+    self.assertIn("1.5", response.content.decode())
+AssertionError: '1.5' not found in '<!DOCTYPE html>\n<html lang="en">\n\t<head>\n\t\t<meta charset="utf-8">\n\t\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\n\t\t<meta name="viewport" content="width=device-width, inital-scale=1">\n\t\t<title>Data View</title>\n\t\t<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">\n\t</head>\n\t<body>\n\t<div class="container">\n\t\t<div class="row">\n\t\t\t\t<div class="col-md-6 col-md-offset-3">\n\t\t\t\t\t<div class="text-center">\n\t\t\t\t\t\t<h1 class="jumbotron">Data View</h1>\n\t\t\t\t\t\t<h3 id="">Here is your class rubric</h3>\t\t\n\t\t\t\t\t\t\n\n\t\t\t\n\t\t\t\t\n\t\t\t\t<p>There is no data for this class</p>\n\t\t\t\t\n\t\t\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t</body>\n\t<footer>\n\t\t<ul>\n\t\t\t<li><a href="/data/">Return to data home</a></li>\n\t\t\t<li><a href="/logout/?next=/login">Logout of Assessment App</a></li>\n\t\t\t<li><a href="/user/">User Page</a></li>\n\t\t</ul>\n\t</footer>\n</html>'
+
+======================================================================
+FAIL: test_class_rubric_view_shows_assignment (dataview.tests.EdClass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\python33\assessmenttoolstaging\source\dataview\tests.py", line 494, in test_class_rubric_view_shows_assignment
+    self.assertIn("Writing Assignment", response.content.decode())
+AssertionError: 'Writing Assignment' not found in '<!DOCTYPE html>\n<html lang="en">\n\t<head>\n\t\t<meta charset="utf-8">\n\t\t<meta http-equiv="X-UA-Compatible" content="IE=edge">\n\t\t<meta name="viewport" content="width=device-width, inital-scale=1">\n\t\t<title>Data View</title>\n\t\t<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">\n\t</head>\n\t<body>\n\t<div class="container">\n\t\t<div class="row">\n\t\t\t\t<div class="col-md-6 col-md-offset-3">\n\t\t\t\t\t<div class="text-center">\n\t\t\t\t\t\t<h1 class="jumbotron">Data View</h1>\n\t\t\t\t\t\t<h3 id="chooseclassid">Choose a class!</h3>\t\t\n\t\t\t\t\t\t\n\t<form method="POST" action=>\n\t\t<select name="assignment" id="assignmentdropdown">\n\t\t\n\t\t</select>\n\t\t<input name="submitbutton" type="submit" name="submit" value="Submit" id="assignmentsubmit">\n\t\t<input type=\'hidden\' name=\'csrfmiddlewaretoken\' value=\'AOKLRmwjAi3rjdmqHg4SkBQ4Xj4Emp4w\' />\n\t</form>\n\t\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t</body>\n\t<footer>\n\t\t<ul>\n\t\t\t<li><a href="/data/">Return to data home</a></li>\n\t\t\t<li><a href="/logout/?next=/login">Logout of Assessment App</a></li>\n\t\t\t<li><a href="/user/">User Page</a></li>\n\t\t</ul>\n\t</footer>\n</html>'
+
+----------------------------------------------------------------------
+Ran 56 tests in 12.208s
+
+FAILED (failures=3, errors=4)

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment
 import re, logging, collections, copy
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 from django.contrib.auth.decorators import login_required,user_passes_test
 # Create your views here.
 
@@ -15,7 +15,7 @@ def home_page(request):
 def student_view(request):
 	enrollmentstrue = Enrollment.objects.filter(rubricdata__rubriccompleted=True)
 	students = Student.objects.filter(enrollment=enrollmentstrue)
-	logging.warning("Students filtered {}".format(students))
+	logging.info("Students filtered {}".format(students))
 	if request.method == "POST":
 		return redirect(request.POST['studentnames']+ '/')
 	return render(request, 'dataview/studentview.html', {"students": students})
@@ -54,13 +54,26 @@ def ed_class_view(request, semester):
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
-def ed_class_data_view(request, edclass, semester):
+def ed_class_assignment_view(request,edclass,semester):
 	edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
 	edclasscoursenumber = re.search('([0-9]{4})', edclass).group(0)
 	edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
-	logging.info("%s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber))
-	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber)
+	semester= Semester.objects.get(text=semester)
+	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber, semester=semester)
 	assignment = Assignment.objects.filter(edclass=edclasspulled)#, semester__text=semester)
+	return render(request,'dataview/classassignmentdataview.html', {'assignments': assignment})
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def ed_class_data_view(request, edclass, semester, assignmentname):
+	edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
+	edclasscoursenumber = re.search('([0-9]{4})', edclass).group(0)
+	edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
+	assignmentforclass = re.search('[0-9]+', assignmentname).group(0)
+	semesterobj = Semester.objects.get(text=semester)
+	logging.warning("%s %s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber, assignmentforclass))
+	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber, semester=semesterobj)
+	assignment = Assignment.objects.get(pk=assignmentforclass)#, semester__text=semester)
 	classrubric = assignment.keyrubric.get()
 	templaterows = Row.objects.filter(rubric=classrubric)
 	#Questions about whether the below query actually works the way it should
@@ -68,7 +81,7 @@ def ed_class_data_view(request, edclass, semester):
 	#TODO Figure out why filtering rows by the query object below works in django 1.8 but not 1.10
 	#rubrics = Rubric.objects.filter(enrollment__semester__text=semester, enrollment__edclass=edclasspulled)
 	#logging.info("Rubric num is %d" % rubrics.count())
-	rows = Row.objects.filter(rubric__enrollment__semester__text=semester, rubric__enrollment__edclass=edclasspulled)
+	rows = Row.objects.filter(rubric__enrollment__edclass=edclasspulled)
 	logging.info("Row num is %d" % rows.count())
 	for row in rows:
 		logging.info("Row choices %s" % (row.row_choice))
