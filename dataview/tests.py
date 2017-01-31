@@ -108,6 +108,7 @@ class StudentView(TestCase):
         bobenrollment.completedrubric = completedrubricforbob
         # TODO Complete this below
         bobenrollmentrubricdata = RubricData.objects.get_or_create(enrollment=bobenrollment, assignment=unitplan)
+        bobenrollmentrubricdata1 = RubricData.objects.get_or_create(enrollment=bobenrollment1, assignment=unitplan)
         bobenrollmentrubricdata[0].rubriccompleted = True
         bobenrollmentrubricdata[0].save()
         bobenrollment.save()
@@ -117,6 +118,12 @@ class StudentView(TestCase):
         self.password = 'test'
         self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
         login = self.client.login(username=self.username, password=self.password)
+
+    def test_student_appears_only_once(self):
+        response = self.client.get('/data/student/')
+        numbob = re.findall("Bob", response.content.decode())
+        self.fail("THIS SHOULD FAIL")
+        self.assertEquals(len(numbob), 1)
 
     def test_student_view_uses_student_view_function(self):
         found = resolve('/data/student/')
@@ -339,7 +346,7 @@ class EdClass(TestCase):
                                   unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforbob, row_choice=4)
 
         bobenrollment.completedrubric = completedrubricforbob
-        bobenrollment.rubriccompleted = True
+        #bobenrollment.rubriccompleted = True
         bobenrollment.save()
 
         completedrubricforbobeg6000 = Rubric.objects.create(name="EG600021743148201530", template=False)
@@ -371,7 +378,7 @@ class EdClass(TestCase):
                                   unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforjane, row_choice=1)
 
         janeenrollment.completedrubric = completedrubricforjane
-        janeenrollment.rubriccompleted = True
+        #janeenrollment.rubriccompleted = True
         janeenrollment.save()
 
         completedrubricforjake = Rubric.objects.create(name="EG5000010000201610", template=False)
@@ -387,7 +394,7 @@ class EdClass(TestCase):
                                   unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforjake, row_choice=4)
 
         jakeenrollment.completedrubric = completedrubricforjake
-        jakeenrollment.rubriccompleted = True
+        #jakeenrollment.rubriccompleted = True
         jakeenrollment.save()
         self.client = Client()
         self.username = 'bob'
@@ -494,7 +501,6 @@ class EdClass(TestCase):
     def test_class_assignment_page_uses_correct_template(self):
         edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05", semester__text="201530")
         edclass = re.sub('[\s+]', '', str(edclass))
-        print(edclass)
         response = self.client.get("/data/class/201530/%s/" % (edclass))
         self.assertTemplateUsed(response, 'dataview/classassignmentdataview.html')
 
@@ -530,7 +536,6 @@ class EdClass(TestCase):
 
     def test_class_data_page_shows_aggregated_score(self):
         response = self.client.get('/data/class/201530/EG500005/writingassignment1/')
-        #print(response.content.decode())
         self.assertIn("2.0", response.content.decode())
 
     def test_EG500005_201610_rubric_data_does_not_appear_in_wrong_semester(self):
@@ -567,7 +572,6 @@ class EdClass(TestCase):
         georgeenrollment.rubriccompleted = True
         georgeenrollment.save()
         response = self.client.get('/data/class/201710/EG500005/hugeleaderpaper{}/'.format(hugeleaderpaper.pk))
-        print(response.content.decode())
         self.assertContains(response, "3.0")
 
 

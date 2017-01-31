@@ -13,6 +13,7 @@ def home_page(request):
 @login_required	
 @user_passes_test(lambda u: u.is_superuser)
 def student_view(request):
+	#TODO Still pulls students multiple times
 	enrollmentstrue = Enrollment.objects.filter(rubricdata__rubriccompleted=True)
 	students = Student.objects.filter(enrollment=enrollmentstrue)
 	logging.info("Students filtered {}".format(students))
