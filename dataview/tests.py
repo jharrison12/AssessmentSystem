@@ -49,6 +49,7 @@ class DataViewHome(TestCase):
         self.assertRedirects(response, '/login/?next=/data/', status_code=302)
 
 
+
 class StudentView(TestCase):
     def setUp(self):
         semester = Semester.objects.create(text="201530")
@@ -107,10 +108,8 @@ class StudentView(TestCase):
 
         bobenrollment.completedrubric = completedrubricforbob
         # TODO Complete this below
-        bobenrollmentrubricdata = RubricData.objects.get_or_create(enrollment=bobenrollment, assignment=unitplan)
-        bobenrollmentrubricdata1 = RubricData.objects.get_or_create(enrollment=bobenrollment1, assignment=unitplan)
-        bobenrollmentrubricdata[0].rubriccompleted = True
-        bobenrollmentrubricdata[0].save()
+        bobenrollmentrubricdata = RubricData.objects.get_or_create(enrollment=bobenrollment, assignment=unitplan, rubriccompleted=True)
+        bobenrollmentrubricdata1 = RubricData.objects.get_or_create(enrollment=bobenrollment1, assignment=writingassignment, rubriccompleted=True)
         bobenrollment.save()
         self.client = Client()
         self.username = 'bob'
@@ -122,7 +121,6 @@ class StudentView(TestCase):
     def test_student_appears_only_once(self):
         response = self.client.get('/data/student/')
         numbob = re.findall("Bob", response.content.decode())
-        self.fail("THIS SHOULD FAIL")
         self.assertEquals(len(numbob), 1)
 
     def test_student_view_uses_student_view_function(self):
@@ -622,3 +620,21 @@ class EdClass(TestCase):
 
         response = self.client.get('/data/class/201530/EG600004/')
         self.assertNotIn("2.666", response.content.decode())
+
+    def test_class_page_can_take_post_request(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_user
+        request.POST['assignment'] = "Writing Assignment"
+        response = ed_class_assignment_view(request, "EG500005" ,"201530")
+        self.assertEqual(response.status_code, 302)
+
+    def test_class_page_redirects_to_right_page(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_user
+        request.POST['assignment'] = "Writing Assignment"
+        response = ed_class_assignment_view(request, "EG500005", "201530")
+        self.assertEqual(response['location'], 'writingassignment1/')
+
+

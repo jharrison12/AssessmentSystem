@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment
 import re, logging, collections, copy
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 from django.contrib.auth.decorators import login_required,user_passes_test
 # Create your views here.
 
@@ -15,7 +15,7 @@ def home_page(request):
 def student_view(request):
 	#TODO Still pulls students multiple times
 	enrollmentstrue = Enrollment.objects.filter(rubricdata__rubriccompleted=True)
-	students = Student.objects.filter(enrollment=enrollmentstrue)
+	students = Student.objects.filter(enrollment=enrollmentstrue).distinct()
 	logging.info("Students filtered {}".format(students))
 	if request.method == "POST":
 		return redirect(request.POST['studentnames']+ '/')
@@ -62,6 +62,10 @@ def ed_class_assignment_view(request,edclass,semester):
 	semester= Semester.objects.get(text=semester)
 	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber, semester=semester)
 	assignment = Assignment.objects.filter(edclass=edclasspulled)#, semester__text=semester)
+	logging.warning(request.POST.dict())
+	if request.POST:
+		assignment = Assignment.objects.get(assignmentname=request.POST['assignment'], edclass=edclasspulled)
+		return redirect(re.sub(' ', '', assignment.assignmentname).lower() + str(assignment.pk) + '/')
 	return render(request,'dataview/classassignmentdataview.html', {'assignments': assignment})
 
 @login_required
@@ -72,7 +76,7 @@ def ed_class_data_view(request, edclass, semester, assignmentname):
 	edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
 	assignmentforclass = re.search('[0-9]+', assignmentname).group(0)
 	semesterobj = Semester.objects.get(text=semester)
-	logging.warning("%s %s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber, assignmentforclass))
+	logging.info("%s %s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber, assignmentforclass))
 	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber, semester=semesterobj)
 	assignment = Assignment.objects.get(pk=assignmentforclass)#, semester__text=semester)
 	classrubric = assignment.keyrubric.get()
