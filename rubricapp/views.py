@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 
 
@@ -175,10 +175,13 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                 rubricid = i.rubric.id
             #greatEnrollment.rubriccompleted = True
             rubricdata[0].rubriccompleted = True
+            rubricdata[0].completedrubric = Rubric.objects.get(pk=rubricid)
             rubricdata[0].save()
             # Set the enrollment object to the new rubric created by accessing the page
-            greatEnrollment.completedrubric = Rubric.objects.get(pk=rubricid)
-            greatEnrollment.save()
+            #The three lines below may not be necessary
+            #savedrubric = Rubric.objects.get(pk=rubricid)
+            #greatEnrollment.completedrubric = savedrubric
+            #greatEnrollment.save()
             logging.info("Great enrollment rubric completed  is %s" % greatEnrollment.rubriccompleted)
             logging.info("Great enrollment id is %d" % greatEnrollment.pk)
             return redirect('/assessment/' + semester + '/' + edclass + '/' + assignmentname + '/')
@@ -236,6 +239,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             # Validationerror because a name for the rubric as already been completed
             # Checks if rubriccompleted is False.  Shows rubric if it is
             if rubricdata[0].rubriccompleted == False:
+                logging.info("Rubric completed but not saved so showing rubric")
                 rubricname = "%s%s%s" % (edclass, studentname, semester)
                 noncompletedrubric = Rubric.objects.get(name=rubricname)
                 rows = Row.objects.filter(rubric=noncompletedrubric)
@@ -249,6 +253,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                                                                  'rubricForClass': oldrubricname.title(),
                                                                  'semester': semester,})
             else:
+                logging.info("Rubric already completed")
                 error = "You have already completed a rubric for this student."
                 rubricdata[0].save()
                 return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,

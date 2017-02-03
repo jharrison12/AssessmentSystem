@@ -542,7 +542,8 @@ class EdClass(TestCase):
         self.assertNotIn("2.5", response.content.decode())
 
     def test_EG500005_201610_rubric_shows_only_jake_score(self):
-        response = self.client.get('/data/class/201610/EG500005/writingassignment1/')
+        assignment = Assignment.objects.get(assignmentname="Nonleader paper")
+        response = self.client.get('/data/class/201610/EG500005/{}{}/'.format("nonleaderpaper",assignment.pk))
         # should only show score of 4.0
         self.assertIn("4.0", response.content.decode())
 
@@ -571,7 +572,6 @@ class EdClass(TestCase):
         georgeenrollment.save()
         response = self.client.get('/data/class/201710/EG500005/hugeleaderpaper{}/'.format(hugeleaderpaper.pk))
         self.assertContains(response, "3.0")
-
 
     def test_EG6000_201530_rubric_only_shows_two_decimal_places(self):
         summer2016 = Semester.objects.get(text="201530")
@@ -620,6 +620,50 @@ class EdClass(TestCase):
 
         response = self.client.get('/data/class/201530/EG600004/')
         self.assertNotIn("2.666", response.content.decode())
+
+    def test_class_data_view_shows_same_class_different_assignment(self):
+        eg5000 = EdClasses.objects.get(crn=2222)
+        semester= Semester.objects.get(text='201530')
+        unitplan = Assignment.objects.create(edclass=eg5000, assignmentname="Unit Plan")
+        unitrubric = Rubric.objects.create(name="unitrubric")
+
+        row1 = Row.objects.create(excellenttext="UNIT PLAN!",
+                                  proficienttext="UNIQUE!",
+                                  satisfactorytext="THE THIRD BEST!",
+                                  unsatisfactorytext="YOU'RE LAST", rubric=unitrubric)
+
+        row2 = Row.objects.create(excellenttext="THE GREATEST!",
+                                  proficienttext="THE SECOND BEST!",
+                                  satisfactorytext="THE THIRD BEST!",
+                                  unsatisfactorytext="YOU'RE LAST", rubric=unitrubric)
+
+        unitplan.keyrubric.add(unitrubric)
+
+        completedunitrubricforbob = Rubric.objects.create(name="EG50000121743148201530Unit", template=False)
+        row1 = Row.objects.create(name="Fortitude",
+                                  excellenttext="UNIT PLAN!",
+                                  proficienttext="UNIQUE!",
+                                  satisfactorytext="THE THIRD BEST!",
+                                  unsatisfactorytext="YOU'RE LAST", rubric=completedunitrubricforbob, row_choice=2)
+
+        row2 = Row.objects.create(name="Excellenceisahabit",
+                                  excellenttext="THE GREATEST!",
+                                  proficienttext="THE SECOND BEST!",
+                                  satisfactorytext="THE THIRD BEST!",
+                                  unsatisfactorytext="YOU'RE LAST", rubric=completedunitrubricforbob, row_choice=1)
+
+        bobenrollment = Enrollment.objects.get(student__lnumber="21743148", edclass__crn=2222)
+
+        bobenrollment.completedrubric = completedunitrubricforbob
+        bobenrollment.save()
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_user
+
+        bobenrollmentrubricdata = RubricData.objects.get_or_create(enrollment=bobenrollment, assignment=unitplan, rubriccompleted=True)
+        response = ed_class_data_view(request,edclass="EG500005", semester="201530",assignmentname="{}".format(unitplan.pk) )
+        self.assertIn("UNIQUE", response.content.decode())
 
     def test_class_page_can_take_post_request(self):
         request = HttpRequest()

@@ -535,10 +535,11 @@ class StudentandRubricViewTest(TestCase):
         response = self.client.post("/assessment/201530/EG500001/writingassignment1/21743148/", data)
         student = Student.objects.get(lnumber="21743148")
         edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="01")
+        writingassignment = Assignment.objects.get(pk=1)
+        bobenroll = Enrollment.objects.get(edclass=edclass, student=student)
+        bobrubricobject = RubricData.objects.get(assignment=writingassignment, enrollment=bobenroll)
 
-        bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
-
-        self.assertEqual(bobenrollment.completedrubric.name, "EG50000121743148201530")
+        self.assertEqual(bobrubricobject.completedrubric.name, "EG50000121743148201530")
 
     def test_rubric_page_redirects_correct_page(self):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
@@ -578,7 +579,8 @@ class StudentandRubricViewTest(TestCase):
         edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
 
         bobenrollment = Enrollment.objects.get(student=student, edclass=edclass)
-        row = Row.objects.get(excellenttext="THE BEST!", rubric__name=bobenrollment.completedrubric.name)
+        bobrubricenroll = RubricData.objects.get(assignment__pk=1, enrollment=bobenrollment)
+        row = Row.objects.get(excellenttext="THE BEST!", rubric__name=bobrubricenroll.completedrubric.name)
         self.assertEqual(row.row_choice, "1")
 
     def test_post_request_does_not_take_0_value(self):

@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment, RubricData
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
@@ -88,15 +88,14 @@ class RubricModel(TestCase):
         edClass = EdClasses.objects.get(subject="EG", coursenumber="5000", semester__text="201530")
         writingrubric = Rubric.objects.create(name="writingrubric2")
         writingrubric1 = Rubric.objects.create(name="writingrubric1")
+        newassignment = Assignment.objects.create(assignmentname="New Assignment", edclass=edClass)
         bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
         janeenrollment = Enrollment.objects.get(student=jane, edclass=edClass)
-        bobenrollment.completedrubric = writingrubric
-        bobenrollment.save()
-        janeenrollment.completedrubric = writingrubric1
-        janeenrollment.save()
+        bobrubricdata = RubricData.objects.create(assignment=newassignment, enrollment=bobenrollment,completedrubric=writingrubric)
+        janerubricdata = RubricData.objects.create(assignment=newassignment, enrollment=janeenrollment,completedrubric=writingrubric1)
 
-        janerubric = Rubric.objects.get(enrollment__student=jane)
-        bobrubric = Rubric.objects.get(enrollment__student=bob)
+        janerubric = Rubric.objects.get(rubricdata__enrollment__student=jane)
+        bobrubric = Rubric.objects.get(rubricdata__enrollment__student=bob)
 
         self.assertNotEqual(bobrubric, janerubric)
     #TODO fix this

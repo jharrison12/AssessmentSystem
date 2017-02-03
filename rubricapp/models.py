@@ -101,7 +101,7 @@ class Enrollment(models.Model):
     edclass = models.ForeignKey(EdClasses, null=False)
     #semester = models.ForeignKey(Semester)
     #Will need to change completedrubric editable to False
-    completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
+    #completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
     rubriccompleted = models.BooleanField(default=False)
     dataforrubric = models.ManyToManyField(Assignment, through="RubricData")
 
@@ -118,6 +118,7 @@ class RubricData(models.Model):
     rubriccompleted = models.BooleanField(default=False)
     enrollment = models.ForeignKey(Enrollment)
     assignment = models.ForeignKey(Assignment)
+    completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
 
     class Meta:
         unique_together = ("enrollment", "assignment")

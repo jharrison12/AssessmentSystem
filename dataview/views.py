@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment
+from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment, CompletedRubric
 import re, logging, collections, copy
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 from django.contrib.auth.decorators import login_required,user_passes_test
@@ -62,7 +62,6 @@ def ed_class_assignment_view(request,edclass,semester):
 	semester= Semester.objects.get(text=semester)
 	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber, semester=semester)
 	assignment = Assignment.objects.filter(edclass=edclasspulled)#, semester__text=semester)
-	logging.warning(request.POST.dict())
 	if request.POST:
 		assignment = Assignment.objects.get(assignmentname=request.POST['assignment'], edclass=edclasspulled)
 		return redirect(re.sub(' ', '', assignment.assignmentname).lower() + str(assignment.pk) + '/')
@@ -76,7 +75,7 @@ def ed_class_data_view(request, edclass, semester, assignmentname):
 	edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
 	assignmentforclass = re.search('[0-9]+', assignmentname).group(0)
 	semesterobj = Semester.objects.get(text=semester)
-	logging.info("%s %s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber, assignmentforclass))
+	logging.warning("Class and assignmentpk: %s %s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber, assignmentforclass))
 	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber, semester=semesterobj)
 	assignment = Assignment.objects.get(pk=assignmentforclass)#, semester__text=semester)
 	classrubric = assignment.keyrubric.get()
@@ -86,15 +85,15 @@ def ed_class_data_view(request, edclass, semester, assignmentname):
 	#TODO Figure out why filtering rows by the query object below works in django 1.8 but not 1.10
 	#rubrics = Rubric.objects.filter(enrollment__semester__text=semester, enrollment__edclass=edclasspulled)
 	#logging.info("Rubric num is %d" % rubrics.count())
-	rows = Row.objects.filter(rubric__enrollment__edclass=edclasspulled)
+	rows = Row.objects.filter(rubric__rubricdata__assignment=assignment)
 	logging.info("Row num is %d" % rows.count())
 	for row in rows:
-		logging.info("Row choices %s" % (row.row_choice))
+		logging.warning("Row choices %s" % (row.row_choice))
 	#Must be ordereddict or the rows will rearrange themselves in alphabetical order on page
 	scores = collections.OrderedDict()
 	for row in rows:
 		if row.name not in scores:
-			logging.info("First if for row in rows %s" % row.row_choice)
+			logging.warning("First if for row in rows %s" % row.row_choice)
 			scores[row.name] = list((row.row_choice))
 		else:
 			logging.info("Adding %s" % row.row_choice)
@@ -103,12 +102,12 @@ def ed_class_data_view(request, edclass, semester, assignmentname):
 	#average the scores for all of the items in scores
 	for key, rowscores in scores.items():
 		try:
-			logging.info("Rowscores processed " + str(rowscores) )
+			logging.warning("Rowscores processed " + str(rowscores) )
 			rowscores = [int(x) for x in rowscores]
 			rowscores = sum(rowscores)/len(rowscores)
 			rowscores = '{:03.2f}'.format(rowscores)
 			scores[key] = rowscores	
-			logging.info("Rowscores now " + str(rowscores) )
+			logging.warning("Rowscores now " + str(rowscores) )
 		except ValueError:
 			pass
 	return render(request, 'dataview/classdataview.html', {'rows': templaterows, 'scores':rows, 'finalscores': scores, 'test':scores1})
