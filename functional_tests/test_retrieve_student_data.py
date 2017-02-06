@@ -14,6 +14,14 @@ class DataView(FunctionalTest):
             edclassobj = EdClasses.objects.get(crn=i)
             Enrollment.objects.create(student=student, edclass=edclassobj)
 
+    def createrubricrow(self, name,excellenttext, rubric, row_choice):
+        rowname = Row.objects.create(name=name,
+                                     excellenttext=excellenttext,
+                                     proficienttext="THE SECOND BEST!",
+                                     satisfactorytext="THE THIRD BEST!",
+                                     unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice )
+        return rowname
+
 
     def create_two_classes_for_unit_tests(self):
         semester = Semester.objects.create(text="201530")
@@ -34,42 +42,32 @@ class DataView(FunctionalTest):
 
         writingrubric = Rubric.objects.create(name="writingrubric")
 
-        row1 = Row.objects.create(name="Excellence",
-                                  excellenttext="THE BEST!",
-                                  proficienttext="THE SECOND BEST!",
-                                  satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
+        row1 = self.createrubricrow("Excellence","THE BEST!",writingrubric, 0)
+        row2 = self.createrubricrow("NONE", "THE GREATEST!", writingrubric,0)
 
-        row2 = Row.objects.create(excellenttext="THE GREATEST!",
-                                  proficienttext="THE SECOND BEST!",
-                                  satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
 
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
         writingassignment.keyrubric.add(writingrubric)
         unitplan.keyrubric.add(writingrubric)
 
-        completedrubricforbob = Rubric.objects.create(name="EG500021743148201530", template=False)
-        row1 = Row.objects.create(name="Excellence",
-                                  excellenttext="THE BEST!",
-                                  proficienttext="THE SECOND BEST!",
-                                  satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforbob, row_choice=1)
+        completedrubricforbobwriting = Rubric.objects.create(name="EG50000121743148201530WritingAssignment4", template=False)
+        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 1)
+        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 1)
 
-        row2 = Row.objects.create(excellenttext="THE GREATEST!",
-                                  proficienttext="THE SECOND BEST!",
-                                  satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforbob, row_choice=1)
+        completedrubricforbobunit = Rubric.objects.create(name="EG50000121743148201530UnitPlan5", template=False)
+        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 4)
+        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 4)
+
+
 
         bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
-        RubricData.objects.create(assignment=writingassignment, enrollment=bobenrollment, rubriccompleted=True)
-        RubricData.objects.create(assignment=unitplan, enrollment=bobenrollment, rubriccompleted=True)
+        RubricData.objects.create(assignment=writingassignment, enrollment=bobenrollment, rubriccompleted=True, completedrubric=completedrubricforbobwriting)
+        RubricData.objects.create(assignment=unitplan, enrollment=bobenrollment, rubriccompleted=True, completedrubric=completedrubricforbobunit)
 
-        bobenrollment.completedrubric = completedrubricforbob
-        bobenrollment.rubriccompleted = True
-
-        bobenrollment.save()
+        #bobenrollment.completedrubric = completedrubricforbobwriting
+       # bobenrollment.rubriccompleted = True
+        #bobenrollment.save()
 
     def test_professor_visits_the_main_page(self):
         # Professor pulls up the data view
@@ -109,7 +107,7 @@ class DataView(FunctionalTest):
         studentnameheader = self.browser.find_element_by_tag_name('h3')
         self.assertIn("Bob DaBuilder", studentnameheader.text)
         rubricnames = self.browser.find_elements_by_tag_name('option')
-        self.assertIn("EG500021743148201530", [i.text for i in rubricnames])
+        self.assertIn("EG50000121743148201530WritingAssignment4", [i.text for i in rubricnames])
         submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 
@@ -146,6 +144,8 @@ class DataView(FunctionalTest):
 
         # The next page should show the completed rubric for the class
         bodytext = self.browser.find_element_by_tag_name('body')
+        #http://localhost:8081/data/class/201530/EG500001/unitplan5/
+        sleep(20)
         self.assertIn("Excellence", bodytext.text)
         self.assertIn("1", bodytext.text)
 
@@ -162,6 +162,7 @@ class DataView(FunctionalTest):
         submitbutton.send_keys(Keys.ENTER)
         #Excellence Should not be in the body of this text.  That is the writing rubric.
         bodytext = self.browser.find_element_by_tag_name('body')
+        sleep(20)
         self.assertNotIn("Excellence", bodytext.text)
 
         unitplan = self.browser.find_element_by_id("unitplan")

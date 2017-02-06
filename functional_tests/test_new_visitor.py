@@ -203,8 +203,8 @@ class NewVisitorTest(FunctionalTest):
 
         excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
         excellent.click()
-        proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
-        proficient.click()
+        #proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
+        #proficient.click()
         submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 
@@ -224,8 +224,8 @@ class NewVisitorTest(FunctionalTest):
         #Dr. completes rubric
         excellent = self.browser.find_element_by_xpath('//*[@id="id_form-0-row_choice"]/option[2]')
         excellent.click()
-        proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
-        proficient.click()
+        #proficient = self.browser.find_element_by_xpath('//*[@id="id_form-1-row_choice"]/option[3]')
+        #proficient.click()
         submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 

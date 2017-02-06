@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 
 
@@ -46,12 +46,12 @@ def semester_page(request, semester):
 def assignment_page(request, semester, edclass):
     # REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the
     # course code
-    logging.warning("In the student page edclass:%s, semester %s" % (edclass, semester))
+    logging.info("In the student page edclass:%s, semester %s" % (edclass, semester))
     edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
-    logging.warning("In the student page edclass:%s, semester %s" % (edclass, semester))
+    logging.info("In the student page edclass:%s, semester %s" % (edclass, semester))
     edclasscoursenumber = re.search('([0-9]{4})', edclass).group(0)
     edclasssectionnumber = re.search('[0-9]{2}$', edclass).group(0)
-    logging.warning("In the student page subject:%s, course %s section %s" % (
+    logging.info("In the student page subject:%s, course %s section %s" % (
     edclasssubjectarea, edclasscoursenumber, edclasssectionnumber))
     # Filter the class basedupon semester and name of the class
     edclassesPulled = get_object_or_404(EdClasses, semester__text=semester,
@@ -75,7 +75,7 @@ def student_page(request, edclass, semester, assignmentname):
     # REGEX below finds EG,ED, EGSE, etc. in edclass and then adds a space to the
     # course code
     ##TODO fix this so it will only return non-complete rubrics
-    logging.warning("In the student page edclass:%s, semester %s" % (edclass, semester))
+    logging.info("In the student page edclass:%s, semester %s" % (edclass, semester))
     edclasssubjectarea = re.match('([A-Z]+)', edclass).group(0)
     logging.info("In the student page edclass:%s, semester %s" % (edclass, semester))
     edclasscoursenumber = re.search('([0-9]{4})', edclass).group(0)
@@ -88,7 +88,7 @@ def student_page(request, edclass, semester, assignmentname):
                                         coursenumber=edclasscoursenumber,
                                         teacher=request.user,
                                         sectionnumber=edclasssectionnumber)
-    logging.warning("The classes pulled are %s" % (edclassesPulled))
+    logging.info("The classes pulled are %s" % (edclassesPulled))
     assignmentpk = re.search('[0-9]+', assignmentname).group(0)
     assignment = Assignment.objects.get(pk=assignmentpk)
     if request.method == 'POST':
@@ -98,37 +98,37 @@ def student_page(request, edclass, semester, assignmentname):
     else:
         #If not a post, the app pulls all students in the class
         studentsinclass = Student.objects.filter(edclasses=edclassesPulled)
-        logging.warning("Number of students in class {}".format(len(studentsinclass)))
+        logging.info("Number of students in class {}".format(len(studentsinclass)))
         #For each student in the class it obtains the enrollment object and the assignment
         #and creates the Rubric Data object if it doesn't exist
         #TODO: Fix this language it seems very inefficent
-        logging.warning(len(RubricData.objects.all()))#delete this
+        logging.info(len(RubricData.objects.all()))#delete this
         iteration = 0
         for i in studentsinclass:
             iteration += 1
-            logging.warning("Iteration number {}".format(iteration))
+            logging.info("Iteration number {}".format(iteration))
             enrollment = Enrollment.objects.get(student=i, edclass=edclassesPulled)
-            logging.warning("\tStudent is {} and enrollment is {}\n".format(i.lnumber, enrollment))
+            logging.info("\tStudent is {} and enrollment is {}\n".format(i.lnumber, enrollment))
             rubricdatastudent = RubricData.objects.filter(enrollment=enrollment, assignment=assignment)
-            logging.warning(len(RubricData.objects.all()))
-            logging.warning("Rubric data student is pulled.  It IHA {} \n".format(rubricdatastudent))
+            logging.info(len(RubricData.objects.all()))
+            logging.info("Rubric data student is pulled.  It IHA {} \n".format(rubricdatastudent))
             if len(rubricdatastudent) != 0:
-                logging.warning("BOOL IS ".format(True))
+                logging.info("BOOL IS ".format(True))
                 continue
             else:
                 RubricData.objects.create(enrollment=enrollment, assignment=assignment)
-                logging.warning("Should be 2 {}".format(len(RubricData.objects.all())))
-                logging.warning("{} and assignment {} Rubric object data created \n".format(enrollment, assignment))
+                logging.info("Should be 2 {}".format(len(RubricData.objects.all())))
+                logging.info("{} and assignment {} Rubric object data created \n".format(enrollment, assignment))
         #Delete below
         enrollmentsfalse = Enrollment.objects.filter(rubricdata__rubriccompleted=False)
-        logging.warning("How many false enrollments when filtered? {}".format(len(enrollmentsfalse)))
+        logging.info("How many false enrollments when filtered? {}".format(len(enrollmentsfalse)))
         teststudents = Student.objects.filter(enrollment=enrollmentsfalse, edclasses=edclassesPulled)
-        logging.warning("The number of students pulled for long query is {} and they are {}".format(len(teststudents), teststudents))
-        logging.warning("Even though 4 students are pulled the length of RubricData is {}".format(len(RubricData.objects.all())))
+        logging.info("The number of students pulled for long query is {} and they are {}".format(len(teststudents), teststudents))
+        logging.info("Even though 4 students are pulled the length of RubricData is {}".format(len(RubricData.objects.all())))
         #How come this didn't work?
         #students = Student.objects.filter(enrollment__dataforrubric__rubricdata__rubriccompleted=False, enrollment__edclass=edclassesPulled)
         students = Student.objects.filter(enrollment=enrollmentsfalse, edclasses=edclassesPulled)
-        logging.warning("Students pulled {}\n\n".format(students))
+        logging.info("Students pulled {}\n\n".format(students))
         return render(request, 'rubricapp/student.html', {'students': students, 'semester': semester})
 
 
@@ -211,19 +211,21 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         rubricforclass = classassignment.keyrubric.get()
         oldrubricname = rubricforclass.name
         rows = Row.objects.filter(rubric=rubricforclass)
-        logging.info("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass)) + " " + str(
+        logging.warning("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass)) + " " + str(
             [row for row in rows]) + "\n")
         rubricforclass.pk = None
-        rubricforclass.name = "%s%s%s" % (edclass, studentname, semester)
+        rubricforclass.id = None
+        rubricforclass.name = "{}{}{}{}".format(edclass, studentname, semester, re.sub(' ', '', classassignment.assignmentname))
         rubricforclass.template = False
         try:
+            logging.warning("First part of try statement")
             rubricforclass.full_clean()
             rubricforclass.save()
-            logging.info("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
+            logging.warning("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
             for row in rows:
                 row.pk = None
                 row.rubric = rubricforclass
-                logging.info("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
+                logging.warning("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
                 row.save()
             RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
             rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)
@@ -235,9 +237,10 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                                                              'edclass': edclass,
                                                              'rubricForClass': rubricForClassText.title(),
                                                              'semester': semester})
-        except ValidationError:
+        except ValidationError as e:
             # Validationerror because a name for the rubric as already been completed
             # Checks if rubriccompleted is False.  Shows rubric if it is
+            logging.warning("The validation error is {}".format(e))
             if rubricdata[0].rubriccompleted == False:
                 logging.info("Rubric completed but not saved so showing rubric")
                 rubricname = "%s%s%s" % (edclass, studentname, semester)

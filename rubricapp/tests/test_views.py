@@ -539,7 +539,7 @@ class StudentandRubricViewTest(TestCase):
         bobenroll = Enrollment.objects.get(edclass=edclass, student=student)
         bobrubricobject = RubricData.objects.get(assignment=writingassignment, enrollment=bobenroll)
 
-        self.assertEqual(bobrubricobject.completedrubric.name, "EG50000121743148201530")
+        self.assertEqual(bobrubricobject.completedrubric.name, "EG50000121743148201530WritingAssignment")
 
     def test_rubric_page_redirects_correct_page(self):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()

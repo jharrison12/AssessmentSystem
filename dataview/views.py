@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment, CompletedRubric
+from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment, CompletedRubric,RubricData
 import re, logging, collections, copy
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
 from django.contrib.auth.decorators import login_required,user_passes_test
@@ -13,7 +13,6 @@ def home_page(request):
 @login_required	
 @user_passes_test(lambda u: u.is_superuser)
 def student_view(request):
-	#TODO Still pulls students multiple times
 	enrollmentstrue = Enrollment.objects.filter(rubricdata__rubriccompleted=True)
 	students = Student.objects.filter(enrollment=enrollmentstrue).distinct()
 	logging.info("Students filtered {}".format(students))
@@ -25,10 +24,12 @@ def student_view(request):
 @user_passes_test(lambda u: u.is_superuser)
 def student_data_view(request, lnumber):
 	student = Student.objects.get(lnumber=lnumber)
-	enrollments = Enrollment.objects.filter(student__lnumber=lnumber, rubricdata__rubriccompleted=True)
+	#enrollments = Rubric.objects.filter(student__lnumber=lnumber)#, rubricdata__rubriccompleted=True)
+	rubricdataobj = RubricData.objects.filter(enrollment__student=student, rubriccompleted=True )
+	logging.info("Rubricdataobjs are {}".format(rubricdataobj.values()))
 	if request.method == "POST":
 		return redirect(re.sub('[\s+]', '', request.POST['rubricname'])+'/')
-	return render(request, 'dataview/studentdataview.html', {"student": student, "enrollments":enrollments})
+	return render(request, 'dataview/studentdataview.html', {"student": student, "rubricdataobjs":rubricdataobj})
 
 @login_required	
 @user_passes_test(lambda u: u.is_superuser)
