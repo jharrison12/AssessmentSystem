@@ -33,6 +33,7 @@ class Semester(models.Model):
 
 
 class EdClasses(models.Model):
+
     CHOICES = (
     ('EG', "Graduate Education",),
     ('EGSE', "Special Education",),
@@ -41,7 +42,7 @@ class EdClasses(models.Model):
     ('ED', "Undergraduate Education"),
     )
 
-    crn = models.IntegerField(unique=True, null=False)
+    crn = models.CharField(max_length=5, unique=True, null=False)
     subject = models.CharField(max_length=4, choices=CHOICES, default="EG")
     coursenumber = models.CharField(default='', blank=False, max_length=4)
     sectionnumber = models.CharField(max_length=2, blank=False)
@@ -62,15 +63,7 @@ class Assignment(models.Model):
 
     def __str__(self):
         return "%s%s%s%s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.assignmentname)
-
-    #def clean(self):
-    #    if self.assignmentname:
-    #      self.assignmentname = self.assignmentname.replace(" ", "")
-
-    #def save(self, *args, **kwargs):
-    #    self.clean()
-    #    return super(Assignment, self).save(*args, **kwargs)
-
+      
     class Meta:
         unique_together = ("edclass",  "assignmentname")
 
