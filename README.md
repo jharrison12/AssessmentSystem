@@ -19,13 +19,13 @@ The application's data page gives the user two viewing options.  The first optio
 
 The admin page, accessible by administrative user only, allows the user to create different models based upon the needs of the user.  The different models are below:
 
-<h3>Ed class Semester</h3>
-
-An itermediate model that allows a class to be associated with a particular semester.  This allows the user to change the rubric rather than particular being statically associated with a class
-
 <h3>Ed classes</h3>
 
 A model that represents a single entity of a class.  The class creation requires a unique identification number (i.e. crn), a subject, a course number (maximum four characters), a section number and a teacher associated with the course.  
+
+<h3>Assignment</h3>
+
+A model that allows the user to associate an assignment with each class.  The assignment must link to the assignment name and the edclass name.  The assignment can also have a keyrubric associated with it.
 
 <h3>Enrollment</h3>
 
@@ -34,6 +34,12 @@ An intermediate model that represents a particular students enrollment in a clas
 <h3>Rubrics</h3>
 
 The rubric model allows the user to create a rubric to be used for each course.  The rubric model consists of rows where the user can edit the name of the row and add descriptive text for each row/column intersection.  The user must enable the "Template" box to allow the rubric to be used in a course.  The template box differentiate's the blank rubric from a student's completed rubric (both based on the same model).  Rubric rows cannot be edited after creation except to add more rows.   
+
+
+<h3>RubricData</h3>
+
+This model houses metadata about each completed rubric.  Each RubricData object is associated with an enrollment object and assignment object.  The RubricData object can also be linked to a completed rubric and boolean value which tells the system where the student in the associated enrollment has completed the assignment or not. 
+
 
 <h3>Semester</h3>
 
