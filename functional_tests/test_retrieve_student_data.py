@@ -45,7 +45,6 @@ class DataView(FunctionalTest):
         row1 = self.createrubricrow("Excellence","THE BEST!",writingrubric, 0)
         row2 = self.createrubricrow("NONE", "THE GREATEST!", writingrubric,0)
 
-
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
         writingassignment.keyrubric.add(writingrubric)
@@ -56,18 +55,33 @@ class DataView(FunctionalTest):
         row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 1)
 
         completedrubricforbobunit = Rubric.objects.create(name="EG50000121743148201530UnitPlan5", template=False)
-        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 4)
-        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 4)
-
-
+        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobunit, 4)
+        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobunit, 4)
 
         bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
         RubricData.objects.create(assignment=writingassignment, enrollment=bobenrollment, rubriccompleted=True, completedrubric=completedrubricforbobwriting)
         RubricData.objects.create(assignment=unitplan, enrollment=bobenrollment, rubriccompleted=True, completedrubric=completedrubricforbobunit)
 
-        #bobenrollment.completedrubric = completedrubricforbobwriting
-       # bobenrollment.rubriccompleted = True
-        #bobenrollment.save()
+    def create_more_student_data_for_second_test(self):
+        semester201610 = Semester.objects.get(text="201610")
+        EG9000201610 = EdClasses.objects.create(sectionnumber="01", subject="EG", coursenumber="9000",
+                                            teacher=self.test_user, crn=5555, semester=semester201610)
+        communicationplan = Assignment.objects.create(edclass=EG9000201610,assignmentname="Communication Plan")
+        communicationrubric = Rubric.objects.create(name="communicationrubric")
+
+        row1 = self.createrubricrow("Skills","STUPDENDOUS!",communicationrubric, 0)
+        row2 = self.createrubricrow("Karate", "AMAZING!", communicationrubric,0)
+        communicationplan.keyrubric.add(communicationrubric)
+
+        jake = Student.objects.get(lastname="The Snake")
+
+        jakeenrollment = Enrollment.objects.create(edclass=EG9000201610, student=jake)
+        completedrubricforjakecommunication = Rubric.objects.create(name="EG9000010000CommunicationPlan6", template=False)
+        row1 = self.createrubricrow("Skills","STUPDENDOUS!",completedrubricforjakecommunication, 3)
+        row2 = self.createrubricrow("Karate", "AMAZING!", completedrubricforjakecommunication,3)
+
+        RubricData.objects.create(assignment=communicationplan, enrollment=jakeenrollment,rubriccompleted=True, completedrubric=completedrubricforjakecommunication)
+
 
     def test_professor_visits_the_main_page(self):
         # Professor pulls up the data view
@@ -108,6 +122,7 @@ class DataView(FunctionalTest):
         self.assertIn("Bob DaBuilder", studentnameheader.text)
         rubricnames = self.browser.find_elements_by_tag_name('option')
         self.assertIn("EG50000121743148201530WritingAssignment4", [i.text for i in rubricnames])
+        self.assertIn("EG50000121743148201530UnitPlan5", [i.text for i in rubricnames])
         submitbuttonstudent = self.browser.find_element_by_id('rubricsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 
@@ -145,7 +160,6 @@ class DataView(FunctionalTest):
         # The next page should show the completed rubric for the class
         bodytext = self.browser.find_element_by_tag_name('body')
         #http://localhost:8081/data/class/201530/EG500001/unitplan5/
-        sleep(20)
         self.assertIn("Excellence", bodytext.text)
         self.assertIn("1", bodytext.text)
 
@@ -154,27 +168,71 @@ class DataView(FunctionalTest):
         bodytext = self.browser.find_element_by_tag_name('body')
         self.assertNotIn("Unit Plan", bodytext.text)
 
-        # Professor goes to right url and sees no rubric there
+        # Professor goes to right url and sees Unit Plan Rubric rubric there
         self.browser.get("{}{}".format(self.live_server_url, '/data/class/201530/EG5000001/'))
         unitplandrop = self.browser.find_element_by_name('Unit Plan')
         unitplandrop.click()
         submitbutton = self.browser.find_element_by_id('assignmentsubmit')
         submitbutton.send_keys(Keys.ENTER)
-        #Excellence Should not be in the body of this text.  That is the writing rubric.
+
+        #1.0 Should not be in the body of this text.  That is the writing assignment.
+        #However 4.0 should be in the assignment because it is the correct rubric.
         bodytext = self.browser.find_element_by_tag_name('body')
-        sleep(20)
-        self.assertNotIn("Excellence", bodytext.text)
-
-        unitplan = self.browser.find_element_by_id("unitplan")
-        unitplan.click()
-        submitbutton = self.browser.find_element_by_id("assignmentsubmit")
-        submitbutton.click()
-
-        # Unit Plan Page should have data lol
-        self.fail()
+        self.assertNotIn("1.0", bodytext.text)
+        self.assertIn("4.0", bodytext.text)
 
         # Professor Decides to go back to the home page
         self.assertIn("Return to data home", bodytext.text)
         self.browser.find_element_by_link_text('Return to data home').click()
 
-    # Prof
+    def test_professor_looks_at_data_for_multiple_students(self):
+        self.create_two_classes_for_unit_tests()
+        self.create_more_student_data_for_second_test()
+        self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+        # Prof must first login to the assessment system
+        idusername = self.browser.find_element_by_id('id_username')
+        idusername.send_keys('bob')
+        passwordbox = self.browser.find_element_by_id('id_password')
+        passwordbox.send_keys('bob')
+        submitbutton = self.browser.find_element_by_xpath('/html/body/div[1]/div/div/div/h3[2]/form/input[2]')
+        submitbutton.send_keys(Keys.ENTER)
+
+        ##TODO logging takes user back to assessmentpage
+        self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+        # Prof finds several options for how to view rubrics
+        headertext = self.browser.find_element_by_id('headertext')
+        self.assertEquals(headertext.text, "Choose a data retrieval method")
+        studentchoice = self.browser.find_element_by_id('studentlink')
+        self.assertEquals(studentchoice.text, "Look at one student's rubrics")
+        classchoice = self.browser.find_element_by_id('classlink')
+        self.assertEquals(classchoice.text, "Look at aggregated class data")
+        classchoice.click()
+
+        # Prof must choose by a semester.  OH MY
+        semesterdropdown = self.browser.find_element_by_id('semesterselectid')
+        semesternames = self.browser.find_elements_by_tag_name('option')
+        self.assertIn('201610', [i.text for i in semesternames])
+        submitbutton = self.browser.find_element_by_id('semestersubmit')
+        semester201610 = self.browser.find_element_by_xpath('//*[@id="semesterselectid"]/option[2]')
+        semester201610.click()
+        submitbutton.send_keys(Keys.ENTER)
+
+        # Prof sees that there is a class there
+        classdropdown = self.browser.find_element_by_id('edlcassdropdown')
+        self.assertEqual(classdropdown.get_attribute('name'), 'edclass')
+        classnames = self.browser.find_elements_by_tag_name('option')
+        self.assertIn("EG 9000 01", [i.text for i in classnames])
+        submitbutton = self.browser.find_element_by_id('classsubmit')
+        submitbutton.send_keys(Keys.ENTER)
+
+        # The following page should show a list of assignments
+        bodytext = self.browser.find_element_by_tag_name('body')
+        self.assertIn("Communication Plan", bodytext.text)
+        submitbutton = self.browser.find_element_by_id('assignmentsubmit')
+        submitbutton.send_keys(Keys.ENTER)
+
+        # The next page should show one score
+        bodytext = self.browser.find_element_by_tag_name('body')
+        self.assertIn("Karate", bodytext.text)
+        self.assertIn("3.0", bodytext.text)
+

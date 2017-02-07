@@ -3,6 +3,7 @@ from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, \
     semester_ed_class_view, ed_class_assignment_view
+from rubricapp.views import rubric_page
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment, RubricData
 from django.contrib.auth.models import User
 from django.http import HttpRequest
@@ -317,9 +318,6 @@ class EdClass(TestCase):
         row1 = self.createrubricrow("Fortitude", "THE BEST!", writingrubric,0)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", writingrubric,0)
 
-        #row1 = Row.objects.create(name="Fortitude",excellenttext="THE BEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!" unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
-        #row2 = Row.objects.create(name="Excellenceisahabit",excellenttext="THE GREATEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
-
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
 
@@ -346,45 +344,21 @@ class EdClass(TestCase):
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforbob, 4)
         RubricData.objects.create(enrollment=bobenrollment, assignment=writingassignmentfirst, rubriccompleted=True, completedrubric=completedrubricforbob)
 
-        #row1 = Row.objects.create(name="Fortitude",excellenttext="THE BEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforbob, row_choice=2)
-        #row2 = Row.objects.create(name="Excellenceisahabit", excellenttext="THE GREATEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforbob, row_choice=4)
-        #bobenrollment.completedrubric = completedrubricforbob
-        #bobenrollment.rubriccompleted = True
-        #bobenrollment.save()
-
         #Create EG 6000 04 Loser Paper
-
         completedrubricforjaneEG6000 = Rubric.objects.create(name="EG60000421743148201530LoserPaper", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjaneEG6000, 1)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforjaneEG6000, 1)
         RubricData.objects.create(enrollment=janeenrollment, assignment=writingassignmentfourth, rubriccompleted=True, completedrubric=completedrubricforjaneEG6000)
-
-        #row1 = Row.objects.create(name="Fortitude",excellenttext="THE BEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforjaneEG6000, row_choice=1)
-        #row2 = Row.objects.create(name="Excellenceisahabit",excellenttext="THE GREATEST!",proficienttext="THE SECOND BEST!", satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforjaneEG6000, row_choice=1)
-        #bobenrollment1.completedrubric = completedrubricforbobeg6000
-        #bobenrollment1.save()
 
         completedrubricforjane = Rubric.objects.create(name="EG50000121743149201530WritingAssignment", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjane, 1)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforjane, 1)
         RubricData.objects.create(enrollment=janeenrollment, assignment=writingassignmentfirst, rubriccompleted=True, completedrubric=completedrubricforjane)
 
-        #row1 = Row.objects.create(name="Fortitude", excellenttext="THE BEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforjane, row_choice=1)
-        #row2 = Row.objects.create(name="Excellenceisahabit",excellenttext="THE GREATEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforjane, row_choice=1)
-        #janeenrollment.completedrubric = completedrubricforjane
-        #janeenrollment.rubriccompleted = True
-        #janeenrollment.save()
-
         completedrubricforjake = Rubric.objects.create(name="EG5000010000201610", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjake, 4)
         row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjake, 4)
         RubricData.objects.create(enrollment=jakeenrollment, assignment=writingassignmentthird, rubriccompleted=True, completedrubric=completedrubricforjake)
-
-        #row1 = Row.objects.create(name="Fortitude",excellenttext="THE BEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforjake, row_choice=4)
-        #row2 = Row.objects.create(name="Excellenceisahabit",excellenttext="THE GREATEST!",proficienttext="THE SECOND BEST!",satisfactorytext="THE THIRD BEST!",unsatisfactorytext="YOU'RE LAST", rubric=completedrubricforjake, row_choice=4)
-        #jakeenrollment.completedrubric = completedrubricforjake
-        #jakeenrollment.rubriccompleted = True
-        #jakeenrollment.save()
 
         self.client = Client()
         self.username = 'bob'
@@ -674,5 +648,47 @@ class EdClass(TestCase):
         request.POST['assignment'] = "Writing Assignment"
         response = ed_class_assignment_view(request, "EG500005", "201530")
         self.assertEqual(response['location'], 'writingassignment1/')
+
+    def test_two_assignments_in_the_same_class(self):
+        semester = Semester.objects.get(text="201610")
+        eg500005201610 = EdClasses.objects.get(semester=semester, crn=9999)
+        lessonplan = Assignment.objects.create(assignmentname="Lesson Plan",edclass=eg500005201610)
+        jakeenrollment = Enrollment.objects.get(student__lastname="The Snake", edclass=eg500005201610)
+
+        lessonplanrubric = Rubric.objects.create(name="lessonplanrubric")
+
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", lessonplanrubric,0)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", lessonplanrubric,0)
+
+        lessonplan.keyrubric.add(lessonplanrubric)
+
+        completedrubricforjakelessonplan = Rubric.objects.create(name="EG5000050000201610", template=False)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjakelessonplan, 1)
+        row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjakelessonplan, 1)
+        RubricData.objects.create(enrollment=jakeenrollment, assignment=lessonplan, rubriccompleted=True, completedrubric=completedrubricforjakelessonplan)
+
+        response = self.client.get('/data/class/201610/EG500005/lessonplan{}/'.format(lessonplan.pk))
+        self.assertNotIn('4', response.content.decode())
+
+    def test_two_assignments_in_the_same_class_using_same_rubric(self):
+        semester = Semester.objects.get(text="201610")
+        eg500005201610 = EdClasses.objects.get(semester=semester, crn=9999)
+        lessonplan = Assignment.objects.create(assignmentname="Lesson Plan",edclass=eg500005201610)
+        jakeenrollment = Enrollment.objects.get(student__lastname="The Snake", edclass=eg500005201610)
+
+        writingrubric = Rubric.objects.get(name="writingrubric")
+
+        lessonplan.keyrubric.add(writingrubric)
+
+        completedrubricforjakelessonplan = Rubric.objects.create(name="EG5000050000201610", template=False)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjakelessonplan, 1)
+        row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjakelessonplan, 1)
+        RubricData.objects.create(enrollment=jakeenrollment, assignment=lessonplan, rubriccompleted=True, completedrubric=completedrubricforjakelessonplan)
+
+        response = self.client.get('/data/class/201610/EG500005/lessonplan{}/'.format(lessonplan.pk))
+        self.assertNotIn('4', response.content.decode())
+
+
+
 
 

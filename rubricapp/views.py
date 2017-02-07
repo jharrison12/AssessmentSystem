@@ -243,7 +243,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             logging.warning("The validation error is {}".format(e))
             if rubricdata[0].rubriccompleted == False:
                 logging.info("Rubric completed but not saved so showing rubric")
-                rubricname = "%s%s%s" % (edclass, studentname, semester)
+                rubricname = "{}{}{}{}".format(edclass, studentname, semester, re.sub(' ', '', classassignment.assignmentname))
                 noncompletedrubric = Rubric.objects.get(name=rubricname)
                 rows = Row.objects.filter(rubric=noncompletedrubric)
                 RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=noncompletedrubric))

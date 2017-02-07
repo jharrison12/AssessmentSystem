@@ -299,7 +299,6 @@ class ClassViewTest(TestCase):
         janerubric[0].save()
 
         response = self.client.get("/assessment/201530/EG500001/writingassignment1/")
-        print(response.content.decode())
         self.assertIn("Return to the semester page", response.content.decode())
 
     def test_class_page_does_not_show_students_from_other_semesters(self):
@@ -402,6 +401,30 @@ class AssignmentViewTest(TestCase):
         found = self.client.get('/assessment/201530/EG500001/unitplan{}/21743148/'.format(unitassignment.pk))
         self.assertContains(found, "BAD!")
 
+    def test_two_assignments_same_class_same_rubric(self):
+        self.add_two_classes_to_semester_add_two_students_to_class()
+        edclass = EdClasses.objects.get(crn=2222)
+        writingrubric = Rubric.objects.get(name="Writing Rubric")
+        happypaper = Assignment.objects.create(assignmentname="Happy Paper", edclass=edclass)
+        happypaper.keyrubric.add(writingrubric)
+
+        bobenrollment = Enrollment.objects.get(edclass=edclass, student__lastname="DaBuilder")
+
+        writingassignment = Assignment.objects.get(assignmentname="Writing Assignment")
+
+        data ={"form-TOTAL_FORMS": "2",
+               "form-INITIAL_FORMS": "2",
+               "form-MIN_NUM_FORMS": "0",
+               "form-MAX_NUM_FORMS": "1000",
+               "form-0-row_choice":"2",
+               "form-1-row_choice":"2",
+               "form-0-id": "3",
+               "form-1-id": "4"}
+
+        self.client.get("/assessment/201530/EG500001/happypaper{}/21743148/".format(happypaper.pk))
+        self.client.get("/assessment/201530/EG500001/writingassignment{}/21743148/".format(writingassignment.pk))
+        allrubricobjs = RubricData.objects.filter(assignment=writingassignment, enrollment=bobenrollment)
+        self.assertEqual(allrubricobjs.count(),1)
 
 
 class StudentandRubricViewTest(TestCase):
@@ -677,8 +700,6 @@ class StudentandRubricViewTest(TestCase):
         newgeorgeenrollment = Enrollment.objects.create(student=george, edclass=edclass)#,semester=newsemester)
         response = self.client.get('/assessment/201530/EG500001/writingassignment1/21743148/')
         self.assertNotContains(response, "STOP")
-
-
 
 class UserLoginTest(TestCase):
 
