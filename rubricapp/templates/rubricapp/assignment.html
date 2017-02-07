@@ -1,0 +1,21 @@
+{% extends 'rubricapp/base.html' %}
+
+		{% block headerid%}choosename{% endblock %}{% block header_text %}Choose an Assignment{% endblock %}
+		
+		{% block form %}
+		{% if assignments|length > 0 %}
+		<form method="POST" action={{ assignment }}>
+			<select name="assignment" id="assignmentdropdown">
+					{% for assignment in assignments %}
+					<option value="{{ assignment.assignmentname }}{{ assignment.pk }}" id="{{ assignment.assignmentname }}">{{ assignment.assignmentname }}</option>
+					{% endfor %}	
+			</select>
+			<input name="submitbutton" type="submit" name="submit" value="Submit" id="assignmentsubmit">
+			{% csrf_token %}
+		</form>
+				{% else %}
+				<p>There are no assignments for this course</p>
+				<a href={% url 'rubricapp:semester' semester=semester %}>Return to the semester page</a>
+				{% endif %}
+		{% endblock %}
+						

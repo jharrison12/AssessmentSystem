@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import models
 
-from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, EdClassSemester
+from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, Assignment
 #For user creation
 
 
@@ -12,14 +12,14 @@ from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, EdCla
 
 class EnrollmentAdmin(admin.ModelAdmin):
 	model = Enrollment
-	fields = ('student', 'rubriccompleted', 'semester', 'edclass')
+	fields = ('student', 'rubriccompleted','edclass')
 	#list_display = ('student', 'rubriccompleted', 'semester', 'edclass')
 	actions = None
 
 	# The method below turns a readonly field if the user is editing the semester instance
 	def get_readonly_fields(self, request, obj=None):
 		if obj:
-			return self.readonly_fields + ('semester','student','edclass',)
+			return self.readonly_fields + ('student','edclass',)
 		return self.readonly_fields
 	
 	def has_delete_permission(self, request, obj=None):
@@ -85,7 +85,7 @@ class EdClassSemesterAdmin(admin.ModelAdmin):
 	
 	def get_readonly_fields(self, request, obj=None):
 		if obj:
-			return self.readonly_fields + ('edclass','semester','keyrubric')
+			return self.readonly_fields + ('edclass','keyrubric')
 		return self.readonly_fields
 		
 	def has_delete_permission(self, request, obj=None):
@@ -131,7 +131,7 @@ class SemesterAdmin(admin.ModelAdmin):
 
 # Register your models here.
 
-admin.site.register(EdClassSemester, EdClassSemesterAdmin)
+admin.site.register(Assignment, EdClassSemesterAdmin)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(EdClasses, EdClassAdmin)
 admin.site.register(Student)

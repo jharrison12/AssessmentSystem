@@ -6,8 +6,8 @@
 		{% block form %}
 		<form method="POST" action="">
 			<select name="rubricname" value="rubric">
-			{% for enrollment in enrollments %}
-				<option value="{{ enrollment.completedrubric }}" id={{ enrollment.completedrubric }}>{{ enrollment.completedrubric }}</option>
+			{% for rubricdataobj in rubricdataobjs %}
+				<option value="{{ rubricdataobj.completedrubric }}" id={{ rubricdataobj.completedrubric }}>{{ rubricdataobj.completedrubric }}</option>
 			{% endfor %}
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="rubricsubmit">

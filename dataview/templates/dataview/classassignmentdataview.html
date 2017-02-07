@@ -1,0 +1,15 @@
+{% extends 'dataview/base.html' %}
+	
+	{% block headerid %}chooseassignmentid{% endblock %}
+	{% block header_text %}Choose an assignment!{% endblock %}
+	{% block form %}
+	<form method="POST" action=>
+		<select name="assignment" id="assignmentdropdown">
+		{% for assignment in assignments %}
+			<option name="{{ assignment.assignmentname }}">{{ assignment.assignmentname }}</option>
+		{% endfor %}
+		</select>
+		<input name="submitbutton" type="submit" name="submit" value="Submit" id="assignmentsubmit">
+		{% csrf_token %}
+	</form>
+	{% endblock %}
