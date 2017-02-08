@@ -153,7 +153,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     logging.info("Rubric pulled is {} {} {}".format(edclassenrolled, semester, assignmentname))
     logging.info("All the assignment names {} and pk {} ".format(Assignment.objects.all(), assignmentpk))
     classassignment = Assignment.objects.get(pk=int(assignmentpk))
-    rubricforclass = classassignment.keyrubric.get()
+    rubricforclass = classassignment.keyrubric
     # this returns the rows associated with the magic rubric
     rows = Row.objects.filter(rubric=rubricforclass)
     greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled)#, rubricdata__rubricdata__rubriccompleted=False)
@@ -207,7 +207,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         # the rubric associated with the edclass
         # rubricforclass = edclassenrolled.keyrubric.get()
         classassignment = Assignment.objects.get(pk=assignmentpk)#edclass=edclassenrolled,  assignmentname=assignmentname)
-        rubricforclass = classassignment.keyrubric.get()
+        rubricforclass = classassignment.keyrubric
         oldrubricname = rubricforclass.name
         rows = Row.objects.filter(rubric=rubricforclass)
         logging.warning("Get Rubric: " + str(rubricforclass.pk) + " " + str(type(rubricforclass)) + " " + str(

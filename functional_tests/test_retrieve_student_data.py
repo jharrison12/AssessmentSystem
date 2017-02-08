@@ -30,8 +30,7 @@ class DataView(FunctionalTest):
                                             teacher=self.test_user, crn=2222, semester=semester)
         edclass2 = EdClasses.objects.create(sectionnumber="01", subject="EG", coursenumber="6000",
                                             teacher=self.test_user, crn=3333, semester=semester)
-        writingassignment = Assignment.objects.create(edclass=edclass1, assignmentname="Writing Assignment")
-        unitplan = Assignment.objects.create(edclass=edclass1, assignmentname="Unit Plan")
+
 
         bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
         jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
@@ -47,8 +46,10 @@ class DataView(FunctionalTest):
 
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
-        writingassignment.keyrubric.add(writingrubric)
-        unitplan.keyrubric.add(writingrubric)
+        #writingassignment.keyrubric.add(writingrubric)
+        #unitplan.keyrubric.add(writingrubric)
+        writingassignment = Assignment.objects.create(edclass=edclass1, assignmentname="Writing Assignment", keyrubric=writingrubric)
+        unitplan = Assignment.objects.create(edclass=edclass1, assignmentname="Unit Plan", keyrubric=writingrubric)
 
         completedrubricforbobwriting = Rubric.objects.create(name="EG50000121743148201530WritingAssignment4", template=False)
         row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 1)
@@ -66,12 +67,13 @@ class DataView(FunctionalTest):
         semester201610 = Semester.objects.get(text="201610")
         EG9000201610 = EdClasses.objects.create(sectionnumber="01", subject="EG", coursenumber="9000",
                                             teacher=self.test_user, crn=5555, semester=semester201610)
-        communicationplan = Assignment.objects.create(edclass=EG9000201610,assignmentname="Communication Plan")
+
         communicationrubric = Rubric.objects.create(name="communicationrubric")
+        communicationplan = Assignment.objects.create(edclass=EG9000201610,assignmentname="Communication Plan", keyrubric=communicationrubric)
 
         row1 = self.createrubricrow("Skills","STUPDENDOUS!",communicationrubric, 0)
         row2 = self.createrubricrow("Karate", "AMAZING!", communicationrubric,0)
-        communicationplan.keyrubric.add(communicationrubric)
+        #communicationplan.keyrubric.add(communicationrubric)
 
         jake = Student.objects.get(lastname="The Snake")
 

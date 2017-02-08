@@ -17,8 +17,8 @@ class RubricModel(TestCase):
         edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333, semester=semester)
         #semester.classes.add(edclass1)
         #semester.classes.add(edclass2)
-        edclasssemester1 = Assignment.objects.create(edclass=edclass1)
-        edclasssemester2 = Assignment.objects.create(edclass=edclass2)
+        #edclasssemester1 = Assignment.objects.create(edclass=edclass1, keyrubric=writingrubric)
+        #edclasssemester2 = Assignment.objects.create(edclass=edclass2, keyrubric=writingrubric)
 
         bob = Student.objects.create(lastname="DaBuilder", firstname="Bob",lnumber="21743148")
         jane = Student.objects.create(lastname="Doe", firstname="Jane",lnumber="21743149")
@@ -28,6 +28,8 @@ class RubricModel(TestCase):
         janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)#, semester=semester), semester=semester)
         janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)#, semester=semester), semester=semester)
         writingrubric = Rubric.objects.create(name="writingrubric")
+        edclasssemester1 = Assignment.objects.create(edclass=edclass1, keyrubric=writingrubric)
+        edclasssemester2 = Assignment.objects.create(edclass=edclass2, keyrubric=writingrubric)
 
         row1 = Row.objects.create(excellenttext="THE BEST!",
                                   proficienttext="THE SECOND BEST!",
@@ -36,8 +38,8 @@ class RubricModel(TestCase):
 
         #Many to many relationship must be added after creation of objects
         #because the manyto-many relationship is not a column in the database
-        edclasssemester1.keyrubric.add(writingrubric)
-        edclasssemester2.keyrubric.add(writingrubric)
+        #edclasssemester1.keyrubric.add(writingrubric)
+        #edclasssemester2.keyrubric.add(writingrubric)
 
     def test_rubric_connected_with_enrollment_class(self):
         self.create_rubric_and_rows_connect_to_class()
@@ -50,7 +52,7 @@ class RubricModel(TestCase):
         edClass = EdClasses.objects.get(sectionnumber="01",subject='EG', coursenumber='5000')#, semester="201530")
         edclasssemesterobj = Assignment.objects.get(edclass=edClass)
         #should get the only rubric attached to the object
-        writingrubric = edclasssemesterobj.keyrubric.get()
+        writingrubric = edclasssemesterobj.keyrubric
         self.assertEqual(writingrubric.name, "writingrubric")
 
     def test_rubric_object_only_has_one_row(self):
@@ -86,9 +88,10 @@ class RubricModel(TestCase):
         jane = Student.objects.get(lnumber="21743149")
         bob = Student.objects.get(lnumber="21743148")
         edClass = EdClasses.objects.get(subject="EG", coursenumber="5000", semester__text="201530")
+        blankrubic = Rubric.objects.create(name="NOt a rubric")
         writingrubric = Rubric.objects.create(name="writingrubric2")
         writingrubric1 = Rubric.objects.create(name="writingrubric1")
-        newassignment = Assignment.objects.create(assignmentname="New Assignment", edclass=edClass)
+        newassignment = Assignment.objects.create(assignmentname="New Assignment", edclass=edClass, keyrubric=blankrubic)
         bobenrollment = Enrollment.objects.get(student=bob, edclass=edClass)
         janeenrollment = Enrollment.objects.get(student=jane, edclass=edClass)
         bobrubricdata = RubricData.objects.create(assignment=newassignment, enrollment=bobenrollment,completedrubric=writingrubric)
@@ -116,8 +119,7 @@ class ClassAndSemesterModelTest(TestCase):
         edclass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333, semester=semester)
         #semester.classes.add(edclass1)
         #semester.classes.add(edclass2)
-        edclasssemester1 = Assignment.objects.create(edclass=edclass1)#, semester=semester)
-        edclasssemester2 = Assignment.objects.create(edclass=edclass2)#, semester=semester)
+
 
 
 
@@ -130,6 +132,9 @@ class ClassAndSemesterModelTest(TestCase):
         janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)#, semester=semester), semester=semester)
         writingrubric = Rubric.objects.create(name="writingrubric")
 
+        edclasssemester1 = Assignment.objects.create(edclass=edclass1, keyrubric=writingrubric)
+        edclasssemester2 = Assignment.objects.create(edclass=edclass2, keyrubric=writingrubric)#, semester=semester)
+
         row1 = Row.objects.create(excellenttext="THE BEST!",
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
@@ -137,7 +142,7 @@ class ClassAndSemesterModelTest(TestCase):
 
         #Many to many relationship must be added after creation of objects
         #because the manyto-many relationship is not a column in the database
-        edclasssemester1.keyrubric.add(writingrubric)
+        #edclasssemester1.keyrubric.add(writingrubric)
 
     def test_class_model_identifier_is_crn(self):
         self.create_rubric_and_rows_connect_to_class()
@@ -157,8 +162,9 @@ class EnrollmentModelTest(TestCase):
         janeteacher = User.objects.create(username="Jane")
         edClass = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=bob, crn=2222, semester=first_semester)
         edClass2 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="6000", teacher=bob, crn=3333, semester=first_semester)
-        edclasssemester1 = Assignment.objects.create(edclass=edClass)
-        edclasssemester2 = Assignment.objects.create(edclass=edClass2)
+        keyrubric = Rubric.objects.create(name="Blank Rubric")
+        edclasssemester1 = Assignment.objects.create(edclass=edClass, keyrubric=keyrubric)
+        edclasssemester2 = Assignment.objects.create(edclass=edClass2, keyrubric=keyrubric)
         #first_semester.classes.add(edClass)
         #first_semester.classes.add(edClass2)
 
@@ -250,7 +256,8 @@ class EnrollmentModelTest(TestCase):
         self.add_two_classes_to_semester_add_two_students_to_class()
         edclass1 = EdClasses.objects.get(subject="EG", coursenumber="5000")
         bob = Student.objects.get(lnumber="21743148")
-        writing = Assignment.objects.create(assignmentname="Writing Assignment", edclass=edclass1)
+        rubric = Rubric.objects.get(name="Blank Rubric")
+        writing = Assignment.objects.create(assignmentname="Writing Assignment", edclass=edclass1, keyrubric=rubric)
         bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
         bobenrollmentrubric = RubricData.objects.create(enrollment=bobenrollment, assignment=writing)
         self.assertEqual(bobenrollmentrubric.rubriccompleted, False)

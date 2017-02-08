@@ -59,7 +59,7 @@ class Assignment(models.Model):
     assignmentname = models.CharField(default="None", max_length=30)
     edclass = models.ForeignKey(EdClasses, null=False)
     #semester = models.ForeignKey(Semester, null=False)
-    keyrubric = models.ManyToManyField(Rubric)
+    keyrubric = models.ForeignKey(Rubric)
 
     def __str__(self):
         return "%s%s%s%s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.assignmentname)

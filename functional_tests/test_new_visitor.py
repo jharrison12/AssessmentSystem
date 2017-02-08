@@ -17,11 +17,7 @@ class NewVisitorTest(FunctionalTest):
                                             teacher=self.test_user, crn=3333, semester=semester)
         # semester.classes.add(edclass1)
         # semester.classes.add(edclass2)
-        edclasssemester1 = Assignment.objects.create(edclass=edclass1,
-                                                     assignmentname="Writing Assignment")
-        edclasssemester1assignment2 = Assignment.objects.create(edclass=edclass1,
-                                                                assignmentname="Unit Assignment")
-        edclasssemester2 = Assignment.objects.create(edclass=edclass2)
+
 
         bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
         jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
@@ -51,9 +47,15 @@ class NewVisitorTest(FunctionalTest):
 
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
-        edclasssemester1.keyrubric.add(writingrubric)
-        edclasssemester1assignment2.keyrubric.add(unitrubric)
-        edclasssemester2.keyrubric.add(writingrubric)
+        #edclasssemester1.keyrubric.add(writingrubric)
+        #edclasssemester1assignment2.keyrubric.add(unitrubric)
+        #edclasssemester2.keyrubric.add(writingrubric)
+
+        edclasssemester1 = Assignment.objects.create(edclass=edclass1,
+                                                     assignmentname="Writing Assignment", keyrubric=writingrubric)
+        edclasssemester1assignment2 = Assignment.objects.create(edclass=edclass1,
+                                                                assignmentname="Unit Assignment", keyrubric=unitrubric)
+        edclasssemester2 = Assignment.objects.create(edclass=edclass2, keyrubric=writingrubric)
 
     def test_user_visits_inital_page(self):
         # Dr. visits the webpage

@@ -60,9 +60,7 @@ class StudentView(TestCase):
                                             sectionnumber="01", semester=semester)
         edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=jacob, crn=3333,
                                             sectionnumber="01", semester=semester)
-        unitplan = Assignment.objects.create(edclass=edclass1, assignmentname="Unit Plan")  # , semester=semester)
-        writingassignment = Assignment.objects.create(edclass=edclass2,
-                                                      assignmentname="Writing Assignment")  # , semester=semester)
+  # , semester=semester)
 
         # semester.classes.add(edclass1)
         # semester.classes.add(edclass2)
@@ -86,13 +84,15 @@ class StudentView(TestCase):
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
                                   unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
-
+        unitplan = Assignment.objects.create(edclass=edclass1, assignmentname="Unit Plan", keyrubric=writingrubric)  # , semester=semester)
+        writingassignment = Assignment.objects.create(edclass=edclass2,
+                                                      assignmentname="Writing Assignment", keyrubric=writingrubric)
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
         # edclass1.keyrubric.add(writingrubric)
         # edclass2.keyrubric.add(writingrubric)
-        unitplan.keyrubric.add(writingrubric)
-        writingassignment.keyrubric.add(writingrubric)
+        #unitplan.keyrubric.add(writingrubric)
+        #writingassignment.keyrubric.add(writingrubric)
 
         completedrubricforbob = Rubric.objects.create(name="EG50000121743148201530UnitPlan", template=False)
         row1 = Row.objects.create(name="Fortitude",
@@ -271,14 +271,7 @@ class EdClass(TestCase):
                                             crn=3333, semester=semester2)
         edclass4 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly,
                                             crn=8888, semester=semester)
-        writingassignmentfirst = Assignment.objects.create(edclass=edclass1,
-                                                           assignmentname="Writing Assignment")  # , semester=semester)
-        writingassignmentsecond = Assignment.objects.create(edclass=edclass2,
-                                                            assignmentname="Leader Paper")  # , semester=semester)
-        writingassignmentthird = Assignment.objects.create(edclass=edclass3,
-                                                           assignmentname="Nonleader paper")  # m semester=semester2)
-        writingassignmentfourth = Assignment.objects.create(edclass=edclass4,
-                                                            assignmentname="Loser Paper")  # , semester=semester2)
+
 
 
         """
@@ -318,13 +311,22 @@ class EdClass(TestCase):
         row1 = self.createrubricrow("Fortitude", "THE BEST!", writingrubric,0)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", writingrubric,0)
 
+        writingassignmentfirst = Assignment.objects.create(edclass=edclass1,
+                                                           assignmentname="Writing Assignment", keyrubric=writingrubric)  # , semester=semester)
+        writingassignmentsecond = Assignment.objects.create(edclass=edclass2,
+                                                            assignmentname="Leader Paper", keyrubric=writingrubric)  # , semester=semester)
+        writingassignmentthird = Assignment.objects.create(edclass=edclass3,
+                                                           assignmentname="Nonleader paper", keyrubric=writingrubric)  # m semester=semester2)
+        writingassignmentfourth = Assignment.objects.create(edclass=edclass4,
+                                                            assignmentname="Loser Paper", keyrubric=writingrubric)  # , semester=semester2)
+
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
 
-        writingassignmentfirst.keyrubric.add(writingrubric)
-        writingassignmentsecond.keyrubric.add(writingrubric)
-        writingassignmentthird.keyrubric.add(writingrubric)
-        writingassignmentfourth.keyrubric.add(writingrubric)
+        #writingassignmentfirst.keyrubric.add(writingrubric)
+        #writingassignmentsecond.keyrubric.add(writingrubric)
+        #writingassignmentthird.keyrubric.add(writingrubric)
+        #writingassignmentfourth.keyrubric.add(writingrubric)
 
         #Create EG 6000 04 Jane, Leader Paper
         completedrubricforEG600004Jane = Rubric.objects.create(name="EG60000421743149201610LeaderPaper", template=False)
@@ -524,9 +526,10 @@ class EdClass(TestCase):
         kelly = User.objects.get(username="kelly")
         edclass = EdClasses.objects.create(subject="EG", coursenumber="5000", sectionnumber="05", semester=twentyseventeen,
                                            crn=0000, teacher=kelly)
-        hugeleaderpaper = Assignment.objects.create(edclass=edclass, assignmentname="Huge leader paper")
+        blankrubric = Rubric.objects.create()
+        hugeleaderpaper = Assignment.objects.create(edclass=edclass, assignmentname="Huge leader paper", keyrubric=blankrubric)
         completedrubricforgeorge = Rubric.objects.create(name="EG500001555201710", template=False)
-        hugeleaderpaper.keyrubric.add(completedrubricforgeorge)
+        #hugeleaderpaper.keyrubric.add(completedrubricforgeorge)
         badrow = Row.objects.create(excellenttext="STOP",
                                     proficienttext="STOP",
                                     satisfactorytext="STOP",
@@ -583,7 +586,7 @@ class EdClass(TestCase):
     def test_class_data_view_shows_same_class_different_assignment(self):
         eg5000 = EdClasses.objects.get(crn=2222)
         semester= Semester.objects.get(text='201530')
-        unitplan = Assignment.objects.create(edclass=eg5000, assignmentname="Unit Plan")
+
         unitrubric = Rubric.objects.create(name="unitrubric")
 
         row1 = Row.objects.create(excellenttext="UNIT PLAN!",
@@ -595,8 +598,8 @@ class EdClass(TestCase):
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
                                   unsatisfactorytext="YOU'RE LAST", rubric=unitrubric)
-
-        unitplan.keyrubric.add(unitrubric)
+        unitplan = Assignment.objects.create(edclass=eg5000, assignmentname="Unit Plan", keyrubric=unitrubric)
+        #unitplan.keyrubric.add(unitrubric)
 
         completedunitrubricforbob = Rubric.objects.create(name="EG50000121743148201530Unit", template=False)
         row1 = Row.objects.create(name="UNIQUE",
@@ -640,15 +643,15 @@ class EdClass(TestCase):
     def test_two_assignments_in_the_same_class(self):
         semester = Semester.objects.get(text="201610")
         eg500005201610 = EdClasses.objects.get(semester=semester, crn=9999)
-        lessonplan = Assignment.objects.create(assignmentname="Lesson Plan",edclass=eg500005201610)
+
         jakeenrollment = Enrollment.objects.get(student__lastname="The Snake", edclass=eg500005201610)
 
         lessonplanrubric = Rubric.objects.create(name="lessonplanrubric")
-
+        lessonplan = Assignment.objects.create(assignmentname="Lesson Plan",edclass=eg500005201610, keyrubric=lessonplanrubric)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", lessonplanrubric,0)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", lessonplanrubric,0)
 
-        lessonplan.keyrubric.add(lessonplanrubric)
+        #lessonplan.keyrubric.add(lessonplanrubric)
 
         completedrubricforjakelessonplan = Rubric.objects.create(name="EG5000050000201610", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjakelessonplan, 1)
@@ -661,12 +664,12 @@ class EdClass(TestCase):
     def test_two_assignments_in_the_same_class_using_same_rubric(self):
         semester = Semester.objects.get(text="201610")
         eg500005201610 = EdClasses.objects.get(semester=semester, crn=9999)
-        lessonplan = Assignment.objects.create(assignmentname="Lesson Plan",edclass=eg500005201610)
+
         jakeenrollment = Enrollment.objects.get(student__lastname="The Snake", edclass=eg500005201610)
 
         writingrubric = Rubric.objects.get(name="writingrubric")
-
-        lessonplan.keyrubric.add(writingrubric)
+        lessonplan = Assignment.objects.create(assignmentname="Lesson Plan",edclass=eg500005201610, keyrubric=writingrubric)
+        #lessonplan.keyrubric.add(writingrubric)
 
         completedrubricforjakelessonplan = Rubric.objects.create(name="EG5000050000201610", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjakelessonplan, 1)

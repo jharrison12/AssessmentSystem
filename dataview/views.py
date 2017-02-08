@@ -79,7 +79,7 @@ def ed_class_data_view(request, edclass, semester, assignmentname):
 	logging.warning("Class and assignmentpk: %s %s %s %s " % (edclasssubjectarea, edclasscoursenumber, edclasssectionnumber, assignmentforclass))
 	edclasspulled = EdClasses.objects.get(subject=edclasssubjectarea, coursenumber=edclasscoursenumber, sectionnumber=edclasssectionnumber, semester=semesterobj)
 	assignment = Assignment.objects.get(pk=assignmentforclass)#, semester__text=semester)
-	classrubric = assignment.keyrubric.get()
+	classrubric = assignment.keyrubric
 	templaterows = Row.objects.filter(rubric=classrubric)
 	#Questions about whether the below query actually works the way it should
 	#logging.info("Semester %s EdClass %s" %(semester, edclasspulled))
