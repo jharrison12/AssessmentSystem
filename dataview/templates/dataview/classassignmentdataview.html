@@ -3,6 +3,7 @@
 	{% block headerid %}chooseassignmentid{% endblock %}
 	{% block header_text %}Choose an assignment!{% endblock %}
 	{% block form %}
+    {% if assignments|length > 0 %}
 	<form method="POST" action=>
 		<select name="assignment" id="assignmentdropdown">
 		{% for assignment in assignments %}
@@ -12,4 +13,7 @@
 		<input name="submitbutton" type="submit" name="submit" value="Submit" id="assignmentsubmit">
 		{% csrf_token %}
 	</form>
+    {% else %}
+        <p>There are no assignments for this course</p>
+    {% endif %}
 	{% endblock %}

@@ -166,7 +166,7 @@ class DataView(FunctionalTest):
         # Professor needs to look at unit plan, but goes to wrong course
         self.browser.get("%s%s" % (self.live_server_url, '/data/class/201530/EG600001/'))
         bodytext = self.browser.find_element_by_tag_name('body')
-        self.assertNotIn("Unit Plan", bodytext.text)
+        self.assertIn("There are no assignments for this course", bodytext.text)
 
         # Professor goes to right url and sees Unit Plan Rubric rubric there
         self.browser.get("{}{}".format(self.live_server_url, '/data/class/201530/EG5000001/'))
