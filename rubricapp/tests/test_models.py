@@ -250,8 +250,10 @@ class EnrollmentModelTest(TestCase):
         self.add_two_classes_to_semester_add_two_students_to_class()
         edclass1 = EdClasses.objects.get(subject="EG", coursenumber="5000")
         bob = Student.objects.get(lnumber="21743148")
+        writing = Assignment.objects.create(assignmentname="Writing Assignment", edclass=edclass1)
         bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
-        self.assertEqual(bobenrollment.rubriccompleted, False)
+        bobenrollmentrubric = RubricData.objects.create(enrollment=bobenrollment, assignment=writing)
+        self.assertEqual(bobenrollmentrubric.rubriccompleted, False)
 
     def test_students_are_pulled_by_class_and_semester(self):
         self.add_two_classes_to_semester_add_two_students_to_class()

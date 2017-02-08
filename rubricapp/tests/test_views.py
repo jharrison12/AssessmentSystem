@@ -662,7 +662,7 @@ class StudentandRubricViewTest(TestCase):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
         bobenrollment = Enrollment.objects.get(student__lastname="DaBuilder", edclass__subject="EG", edclass__coursenumber="5000")
         Rubric.objects.create(name="EG50000121743148201530")
-        bobenrollment.rubriccompleted = False
+        #bobenrollment.rubriccompleted = False
         response = self.client.get("/assessment/201530/EG500001/WritingAssignment1/21743148/")
         self.assertContains(response, "id_form-TOTAL_FORMS")
 

@@ -95,7 +95,7 @@ class Enrollment(models.Model):
     #semester = models.ForeignKey(Semester)
     #Will need to change completedrubric editable to False
     #completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
-    rubriccompleted = models.BooleanField(default=False)
+    #rubriccompleted = models.BooleanField(default=False)
     dataforrubric = models.ManyToManyField(Assignment, through="RubricData")
 
     def encode_class_name_for_admin(self,obj):

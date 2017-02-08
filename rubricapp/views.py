@@ -182,7 +182,6 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             #savedrubric = Rubric.objects.get(pk=rubricid)
             #greatEnrollment.completedrubric = savedrubric
             #greatEnrollment.save()
-            logging.info("Great enrollment rubric completed  is %s" % greatEnrollment.rubriccompleted)
             logging.info("Great enrollment id is %d" % greatEnrollment.pk)
             return redirect('/assessment/' + semester + '/' + edclass + '/' + assignmentname + '/')
         except ValidationError:

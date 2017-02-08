@@ -534,9 +534,7 @@ class EdClass(TestCase):
 
         george = Student.objects.create(lastname="Harrison", firstname="George", lnumber="5555")
         georgeenrollment = Enrollment.objects.create(student=george, edclass=edclass)  # ,semester=twentyseventeen)
-        #georgeenrollment.completedrubric = completedrubricforgeorge
-        #georgeenrollment.rubriccompleted = True
-        #georgeenrollment.save()
+
         RubricData.objects.create(enrollment=georgeenrollment, assignment=hugeleaderpaper, rubriccompleted=True, completedrubric=completedrubricforgeorge)
         response = self.client.get('/data/class/201710/EG500005/hugeleaderpaper{}/'.format(hugeleaderpaper.pk))
         self.assertContains(response, "3.0")
@@ -546,7 +544,6 @@ class EdClass(TestCase):
         edclass = EdClasses.objects.get(subject="EG", coursenumber="6000", sectionnumber="04", semester=summer2016)
         edclasssemester = Assignment.objects.filter(edclass=edclass)
         completedrubricforgeorge = Rubric.objects.create(name="EG6000045555201530", template=False)
-        # edclasssemester.keyrubric.add(completedrubricforgeorge)
 
         row1 = Row.objects.create(name="Fortitude",
                                   excellenttext="THE BEST!",
@@ -562,9 +559,6 @@ class EdClass(TestCase):
 
         george = Student.objects.create(lastname="Harrison", firstname="George", lnumber="5555")
         georgeenrollment = Enrollment.objects.create(student=george, edclass=edclass)  # ,semester=summer2016)
-        georgeenrollment.completedrubric = completedrubricforgeorge
-        georgeenrollment.rubriccompleted = True
-        georgeenrollment.save()
 
         completedrubricforharry = Rubric.objects.create(name="EG6000044444201530", template=False)
 
@@ -582,9 +576,6 @@ class EdClass(TestCase):
 
         harry = Student.objects.create(lastname="Harrison", firstname="Harry", lnumber="4444")
         harryenrollment = Enrollment.objects.create(student=harry, edclass=edclass)  # ,semester=summer2016)
-        harryenrollment.completedrubric = completedrubricforharry
-        harryenrollment.rubriccompleted = True
-        harryenrollment.save()
 
         response = self.client.get('/data/class/201530/EG600004/')
         self.assertNotIn("2.666", response.content.decode())
@@ -621,9 +612,6 @@ class EdClass(TestCase):
                                   unsatisfactorytext="YOU'RE LAST", rubric=completedunitrubricforbob, row_choice=1)
 
         bobenrollment = Enrollment.objects.get(student__lnumber="21743148", edclass__crn=2222)
-
-        #bobenrollment.completedrubric = completedunitrubricforbob
-        #bobenrollment.save()
 
         request = HttpRequest()
         request.method = "POST"

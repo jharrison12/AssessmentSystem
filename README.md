@@ -29,11 +29,11 @@ A model that allows the user to associate an assignment with each class.  The as
 
 <h3>Enrollment</h3>
 
-An intermediate model that represents a particular students enrollment in a class and semester. "Rubriccompleted" indicates that the students rubric has been completed.  If the rubric needs to be edited after submission, you will need to disable rubric completed and resubmit the rubric.
+An intermediate model that represents a particular students enrollment in a class and semester. If the rubric needs to be edited after submission, you will need to disable rubric completed and resubmit the rubric.
 
 <h3>Rubrics</h3>
 
-The rubric model allows the user to create a rubric to be used for each course.  The rubric model consists of rows where the user can edit the name of the row and add descriptive text for each row/column intersection.  The user must enable the "Template" box to allow the rubric to be used in a course.  The template box differentiate's the blank rubric from a student's completed rubric (both based on the same model).  Rubric rows cannot be edited after creation except to add more rows.   
+The rubric model allows the user to create a rubric to be used for each course.  The rubric model consists of rows where the user can edit the name of the row and add descriptive text for each row/column intersection.  The user must enable the "Template" box to allow the rubric to be used in a course.  The template box differentiate's the blank rubric from a student's completed rubric (both based on the same model).  Rubric rows cannot be edited after creation; however, rows can be added to rubrics after rubric creation.
 
 
 <h3>RubricData</h3>
