@@ -25,7 +25,7 @@ class CompletedRubric(Rubric):
         return self.name
 
 class Semester(models.Model):
-    text = models.TextField(default='201530')
+    text = models.TextField(default='201530', unique=True)
     #classes = models.ManyToManyField(EdClasses)
 
     def __str__(self):

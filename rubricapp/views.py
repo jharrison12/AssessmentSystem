@@ -215,6 +215,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         rubricforclass.pk = None
         rubricforclass.id = None
         rubricforclass.name = "{}{}{}{}".format(edclass, studentname, semester, re.sub(' ', '', classassignment.assignmentname))
+        logging.critical("The rubriclass.template value is {}".format(rubricforclass.template))
         rubricforclass.template = False
         try:
             logging.warning("First part of try statement")
