@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment
 from time import sleep
 from django.contrib.auth.models import User
+import sys
 
 
 class NewVisitorTest(FunctionalTest):
@@ -60,7 +61,7 @@ class NewVisitorTest(FunctionalTest):
     def test_user_visits_inital_page(self):
         # Dr. visits the webpage
         self.create_two_classes_for_unit_tests()
-        self.browser.get(self.live_server_url + '/assessment/')
+        self.browser.get(self.server_url + '/assessment/')
         # Dr. must first login to the assessment system
         idusername = self.browser.find_element_by_id('id_username')
         idusername.send_keys('bob')
@@ -180,7 +181,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn("There are no more students", bodytext.text)
 
         # Dr. returns to the class page and chooses different assignment
-        self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/'))
+        self.browser.get("%s%s" % (self.server_url, '/assessment/201530/EG500001/'))
         assignmentchoice = self.browser.find_elements_by_tag_name('option')
         self.assertIn("Unit Assignment", [i.text for i in assignmentchoice])
         unitassignment = self.browser.find_element_by_id('Unit Assignment')
@@ -237,7 +238,7 @@ class NewVisitorTest(FunctionalTest):
 
         # The mischevious professor tries to go back to a completed student url
         unit = Assignment.objects.get(assignmentname="Unit Assignment")
-        self.browser.get("%s%s" % (self.live_server_url, '/assessment/201530/EG500001/unitassignment{}/21743148'.format(unit.pk)))
+        self.browser.get("%s%s" % (self.server_url, '/assessment/201530/EG500001/unitassignment{}/21743148'.format(unit.pk)))
         bodytext = self.browser.find_element_by_tag_name('body')
         self.assertIn("You have already completed a rubric for this student.", bodytext.text)
 
@@ -246,3 +247,5 @@ class NewVisitorTest(FunctionalTest):
         home.click()
         semester_header_text = self.browser.find_element_by_id('semester').text
         self.assertIn("Choose a Semester!", semester_header_text)
+
+

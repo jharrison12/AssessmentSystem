@@ -88,7 +88,7 @@ class DataView(FunctionalTest):
     def test_professor_visits_the_main_page(self):
         # Professor pulls up the data view
         self.create_two_classes_for_unit_tests()
-        self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+        self.browser.get("%s%s" % (self.server_url, '/data/'))
         # Prof must first login to the assessment system
         idusername = self.browser.find_element_by_id('id_username')
         idusername.send_keys('bob')
@@ -97,7 +97,7 @@ class DataView(FunctionalTest):
         submitbutton = self.browser.find_element_by_xpath('/html/body/div[1]/div/div/div/h3[2]/form/input[2]')
         submitbutton.send_keys(Keys.ENTER)
         ##TODO logging takes user back to assessmentpage
-        self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+        self.browser.get("%s%s" % (self.server_url, '/data/'))
         # Prof finds several options for how to view rubrics
         headertext = self.browser.find_element_by_id('headertext')
         self.assertEquals(headertext.text, "Choose a data retrieval method")
@@ -133,7 +133,7 @@ class DataView(FunctionalTest):
         self.assertIn("Excellence", bodytext.text)
 
         # Prof changes their minds.  They want to look at all the rubrics from a particular course
-        self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+        self.browser.get("%s%s" % (self.server_url, '/data/'))
         classchoice = self.browser.find_element_by_id('classlink')
         classchoice.click()
 
@@ -166,12 +166,12 @@ class DataView(FunctionalTest):
         self.assertIn("1", bodytext.text)
 
         # Professor needs to look at unit plan, but goes to wrong course
-        self.browser.get("%s%s" % (self.live_server_url, '/data/class/201530/EG600001/'))
+        self.browser.get("%s%s" % (self.server_url, '/data/class/201530/EG600001/'))
         bodytext = self.browser.find_element_by_tag_name('body')
         self.assertIn("There are no assignments for this course", bodytext.text)
 
         # Professor goes to right url and sees Unit Plan Rubric rubric there
-        self.browser.get("{}{}".format(self.live_server_url, '/data/class/201530/EG5000001/'))
+        self.browser.get("{}{}".format(self.server_url, '/data/class/201530/EG5000001/'))
         unitplandrop = self.browser.find_element_by_name('Unit Plan')
         unitplandrop.click()
         submitbutton = self.browser.find_element_by_id('assignmentsubmit')
@@ -190,7 +190,7 @@ class DataView(FunctionalTest):
     def test_professor_looks_at_data_for_multiple_students(self):
         self.create_two_classes_for_unit_tests()
         self.create_more_student_data_for_second_test()
-        self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+        self.browser.get("%s%s" % (self.server_url, '/data/'))
         # Prof must first login to the assessment system
         idusername = self.browser.find_element_by_id('id_username')
         idusername.send_keys('bob')
@@ -200,7 +200,7 @@ class DataView(FunctionalTest):
         submitbutton.send_keys(Keys.ENTER)
 
         ##TODO logging takes user back to assessmentpage
-        self.browser.get("%s%s" % (self.live_server_url, '/data/'))
+        self.browser.get("%s%s" % (self.server_url, '/data/'))
         # Prof finds several options for how to view rubrics
         headertext = self.browser.find_element_by_id('headertext')
         self.assertEquals(headertext.text, "Choose a data retrieval method")
