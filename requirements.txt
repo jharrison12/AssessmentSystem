@@ -1,3 +1,10 @@
-Django==1.8
+beautifulsoup4==4.5.1
+Django==1.10.1
 django-password-strength==1.2.1
+django-password-validation==0.1.1
+gunicorn==19.6.0
+requests==2.10.0
 selenium==2.53.6
+virtualenv==1.11.5
+virtualenvwrapper==4.7.2
+virtualenvwrapper-win==1.2.1
