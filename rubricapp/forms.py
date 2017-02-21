@@ -24,7 +24,7 @@ class RowForm(ModelForm):
 class RubricForm(ModelForm):
 	class Meta:
 		model = Rubric
-		fields = ['name']
+		fields = ['name',]
 		error_messages = {
 			NON_FIELD_ERRORS: {
 				'unique': "This rubric has already been completed"

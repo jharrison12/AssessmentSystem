@@ -582,7 +582,7 @@ class StudentandRubricViewTest(TestCase):
                "form-1-id": "4"}
         response = self.client.post("/assessment/201530/EG500001/writingassignment1/21743148/", data)
 
-        self.assertEqual(response['location'], 'http://testserver/assessment/201530/EG500001/writingassignment1/')
+        self.assertEqual(response['location'], '/assessment/201530/EG500001/writingassignment1/')
 
     def test_post_request_updates_correct_model(self):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
