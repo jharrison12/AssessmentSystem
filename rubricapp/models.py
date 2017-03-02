@@ -3,9 +3,9 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 
 class Student(models.Model):
-    firstname = models.CharField(default="", max_length=30)
-    lastname = models.CharField(default="", max_length=30)
-    lnumber = models.CharField(default="", unique=True, max_length=8)
+    firstname = models.CharField(default="", max_length=1)
+    lastname = models.CharField(default="", max_length=1)
+    lnumber = models.CharField(default="", unique=True, max_length=4)
 
     def __str__(self):
         return self.firstname + " " + self.lastname

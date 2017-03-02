@@ -4,7 +4,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+#TEMPLATE_DEBUG = DEBUG
 
 LOGIN_URL = '/login/'
 
@@ -95,9 +95,9 @@ SECRET_KEY = 's1=6!pp*n^pn9!#flyz)qc!1!7kqwqdx+v3u#dv_)e2&($l)ym'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+ 'django.template.loaders.filesystem.Loader',
+ 'django.template.loaders.app_directories.Loader',
+#  'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -194,7 +194,10 @@ TEMPLATES = [
             # insert your TEMPLATE_DIRS here
         ],
         'APP_DIRS': True,
+        #'TEMPLATE_LOADERS': TEMPLATE_LOADERS,
         'OPTIONS': {
+            'debug': DEBUG,
+
             'context_processors': [
                 # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
                 # list if you haven't customized them:
