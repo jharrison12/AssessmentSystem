@@ -67,7 +67,9 @@ class Assignment(models.Model):
     class Meta:
         unique_together = ("edclass",  "assignmentname")
 
-
+class Standard(models.Model):
+    name = models.TextField(null=False)
+    detail = models.TextField(null=False)
 
 class Row(models.Model):
     CHOICES = (
@@ -84,6 +86,7 @@ class Row(models.Model):
     proficienttext = models.TextField(default="", blank=True)
     satisfactorytext = models.TextField(default="", blank=True)
     unsatisfactorytext = models.TextField(default="", blank=True)
+    standards = models.ManyToManyField(Standard)
 
     def __str__(self):
         return self.row_choice
@@ -115,3 +118,8 @@ class RubricData(models.Model):
 
     class Meta:
         unique_together = ("enrollment", "assignment")
+
+
+class Standard(models.Model):
+    name = models.TextField(null=False)
+    detail = models.TextField(null=False)
