@@ -8,3 +8,4 @@ dbcopy.sqlite3
 rubricapp.json
 dataviewerrors
 test
+migrations/

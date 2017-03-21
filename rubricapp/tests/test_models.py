@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment, RubricData
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment, RubricData, Standard
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
@@ -295,3 +295,36 @@ class EnrollmentModelTest(TestCase):
 
 
 
+class StandardsTest(TestCase):
+
+    def create_rubric_and_row(self):
+        writingrubric = Rubric.objects.create(name="writingrubric")
+        row1 = Row.objects.create(name="ROW 1",
+                                  excellenttext="THE BEST!",
+                                  proficienttext="THE SECOND BEST!",
+                                  satisfactorytext="THE THIRD BEST!",
+                                  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+
+    def test_standard_aligns_to_rubric(self):
+        self.create_rubric_and_row()
+        standard1 = Standard.objects.create(name="INTASC 1.0")
+        row1 = Row.objects.get(name="ROW 1")
+        row1.standards.add(standard1)
+        self.assertEqual(row1.standards.count(),1)
+
+
+    def test_standards_align_to_more_than_one_rubric(self):
+        self.create_rubric_and_row()
+        standard1 = Standard.objects.create(name="INTASC 1")
+        row1 = Row.objects.get(name="ROW 1")
+        row1.standards.add(standard1)
+
+        unitrubric = Rubric.objects.create(name="Unit Rubric")
+        row2 = Row.objects.create(name="ROW 2",
+                                  excellenttext="THE BEST!",
+                                  proficienttext="THE SECOND BEST!",
+                                  satisfactorytext="THE THIRD BEST!",
+                                  unsatisfactorytext="YOU'RE LAST",rubric=unitrubric)
+
+        row2.standards.add(standard1)
+        self.assertEqual(Row.objects.filter(standards__name="INTASC 1").count(), 2)

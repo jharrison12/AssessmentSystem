@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import models
 
-from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, Assignment, RubricData
+from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, Assignment, RubricData, Standard
 
 
 # For user creation
@@ -156,3 +156,4 @@ admin.site.register(EdClasses, EdClassAdmin)
 admin.site.register(Student)
 admin.site.register(Rubric, RubricAdmin)
 admin.site.register(Enrollment, EnrollmentAdmin)
+admin.site.register(Standard)

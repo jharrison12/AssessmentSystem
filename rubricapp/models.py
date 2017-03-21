@@ -68,8 +68,14 @@ class Assignment(models.Model):
         unique_together = ("edclass",  "assignmentname")
 
 class Standard(models.Model):
-    name = models.TextField(null=False)
+    name = models.CharField(null=False, max_length=50)
     detail = models.TextField(null=False)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        unique_together = ("name", "detail")
 
 class Row(models.Model):
     CHOICES = (
@@ -120,6 +126,3 @@ class RubricData(models.Model):
         unique_together = ("enrollment", "assignment")
 
 
-class Standard(models.Model):
-    name = models.TextField(null=False)
-    detail = models.TextField(null=False)
