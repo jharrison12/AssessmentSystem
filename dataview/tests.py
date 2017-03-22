@@ -154,6 +154,17 @@ class StudentView(TestCase):
         response = self.client.get("/data/student/")
         self.assertIn("Bob DaBuilder", response.content.decode())
 
+    def test_student_page_shows_multiple_students(self):
+        jane = Student.objects.get(lastname="Doe")
+        edclass1 = EdClasses.objects.get(crn=2222)
+        janeenrollment = Enrollment.objects.get(student=jane, edclass=edclass1)
+        unitplan = Assignment.objects.get(assignmentname="Unit Plan")
+        completedrubricforjane = Rubric.objects.create(name="EG50000121743149201530UnitPlan", template=False)
+        RubricData.objects.create(enrollment=janeenrollment, assignment=unitplan, rubriccompleted=True, completedrubric=completedrubricforjane)
+        janeenrollment.save()
+        response = self.client.get("/data/student/")
+        self.assertIn("Jane Doe", response.content.decode())
+
     def test_student_page_has_submit_button(self):
         response = self.client.get("/data/student/")
         self.assertIn("Submit", response.content.decode())
