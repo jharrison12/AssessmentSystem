@@ -2,9 +2,9 @@ from django.test import TestCase, Client
 from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, \
-    semester_ed_class_view, ed_class_assignment_view
+    semester_ed_class_view, ed_class_assignment_view, standards_view
 from rubricapp.views import rubric_page
-from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment, RubricData
+from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment, RubricData, Standard
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 import re
@@ -691,6 +691,57 @@ class EdClass(TestCase):
         self.assertNotIn('4', response.content.decode())
 
 
+class StandardView(TestCase):
+
+    def setUp(self):
+        Standard.objects.create(name='INTASC 1')
+        Semester.objects.create(text="201530")
+        Semester.objects.create(text="201610")
+        self.client = Client()
+        self.username = 'bob'
+        self.email = 'test@test.com'
+        self.password = 'test'
+        self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
+        login = self.client.login(username=self.username, password=self.password)
+
+    def test_data_view_home_has_standard_link(self):
+        response = self.client.get('/data/')
+        self.assertContains(response, "standards data", status_code=200)
+
+    def test_standard_view_uses_standard_view_function(self):
+        found = resolve('/data/standards/')
+        self.assertEqual(found.func, standards_view)
+
+    def test_standards_view_home(self):
+        response = self.client.get('/data/standards/')
+        self.assertContains(response, 'Standards', status_code=200)
+
+    def test_standard_view_uses_correct_template(self):
+        response = self.client.get('/data/standards/')
+        self.assertTemplateUsed(response, 'dataview/standardsview.html')
+
+    def test_standards_view_shows_a_standard(self):
+        response = self.client.get('/data/standards/')
+        self.assertContains(response, 'INTASC 1')
+
+    def test_standards_view_can_take_post_request(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_user
+        request.POST['standardsname'] = "INTASC 1"
+        response = standards_view(request)
+        self.assertEqual(response.status_code, 302)
+
+    #def test_standards_view_redirects to correctpage(self):
 
 
+"""
+    def test_class_page_redirects_to_right_page(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_user
+        request.POST['assignment'] = "Writing Assignment"
+        response = ed_class_assignment_view(request, "EG500005", "201530")
+        self.assertEqual(response['location'], 'writingassignment1/')
 
+"""

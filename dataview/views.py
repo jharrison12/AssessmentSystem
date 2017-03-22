@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment, CompletedRubric,RubricData
+from rubricapp.models import Student, Enrollment, Row, Rubric, EdClasses, Semester, Assignment, CompletedRubric,RubricData, Standard
 import re, logging, collections, copy
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 from django.contrib.auth.decorators import login_required,user_passes_test
 # Create your views here.
 
@@ -112,3 +112,9 @@ def ed_class_data_view(request, edclass, semester, assignmentname):
 		except ValueError:
 			pass
 	return render(request, 'dataview/classdataview.html', {'rows': templaterows, 'scores':rows, 'finalscores': scores, 'test':scores1})
+
+def standards_view(request):
+    standards = Standard.objects.all()
+    if request.POST:
+        return redirect('/data/')
+    return render(request, 'dataview/standardsview.html', {"standards": standards})
