@@ -8,3 +8,5 @@ dbcopy.sqlite3
 rubricapp.json
 dataviewerrors
 test
+rubricapp/migrations/__init__.py rubricapp/migrations/__pycache__ rubricapp/migrations/0001_initial.py rubricapp/migrations/0002_auto_20170321_1009.py
+rubricapp/migrations/
