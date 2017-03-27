@@ -115,6 +115,15 @@ def ed_class_data_view(request, edclass, semester, assignmentname):
 
 def standards_view(request):
     standards = Standard.objects.all()
+    semesters = Semester.objects.all()
     if request.POST:
         return redirect('/data/')
-    return render(request, 'dataview/standardsview.html', {"standards": standards})
+    return render(request, 'dataview/standardsview.html', {"standards": standards, "semesters": semesters})
+
+def standards_semester_view(request, semester):
+    standards = Standard.objects.all()
+    return render(request, 'dataview/standardssemesterview.html', {"standards": standards})
+
+# this display what standards are used for what rubric
+def rubric_standard_view(request):
+	pass

@@ -3,13 +3,12 @@
 		{% block header_text %}Standards View!{% endblock %}
 		{% block form %}
 		<form method="POST" action="">
-			<select name="semestername" value="semesterdropdown" id="semestername">
-					{% for semester in semesters %}
-					<option value="{{ semester.text }}" id={{ semester.text }}>{{ semester.text }}</option>
+			<select name="standardsname" value="standardsdropdown" id="standardsname">
+					{% for standard in standards %}
+					<option value="{{ standard.name }}" id={{ standard.name }}>{{ standard.name }}</option>
 					{% endfor %}
 			</select>
 		<input name="submitbutton" type="submit" name="submit" value="Submit" id="studentsubmit">
 		{% csrf_token %}
 		</form>
-        <a href={% url 'dataview:rubric_standard_view' %} id="rubric_standard_view">See what rubrics use what standards</a>
 		{% endblock %}

@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, \
-    semester_ed_class_view, ed_class_assignment_view, standards_view
+    semester_ed_class_view, ed_class_assignment_view, standards_view, standards_semester_view
 from rubricapp.views import rubric_page
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment, RubricData, Standard
 from django.contrib.auth.models import User
@@ -720,28 +720,30 @@ class StandardView(TestCase):
         response = self.client.get('/data/standards/')
         self.assertTemplateUsed(response, 'dataview/standardsview.html')
 
-    def test_standards_view_shows_a_standard(self):
+    def test_standards_view_shows_a_semester(self):
         response = self.client.get('/data/standards/')
-        self.assertContains(response, 'INTASC 1')
+        self.assertContains(response, '201530')
+
+    def test_standards_view_shows_rubric_option(self):
+        response = self.client.get('/data/standards/')
+        self.assertContains(response, 'See what rubrics use what standards')
 
     def test_standards_view_can_take_post_request(self):
         request = HttpRequest()
         request.method = "POST"
         request.user = self.test_user
-        request.POST['standardsname'] = "INTASC 1"
+        request.POST['semestername'] = "201530"
         response = standards_view(request)
         self.assertEqual(response.status_code, 302)
 
+    def test_standards_semester_page_uses_correct_function(self):
+        found = resolve('/data/standards/201530/')
+        self.assertEqual(found.func, standards_semester_view)
+
+    def test_standards_semester_page_has_standards(self):
+        response = self.client.get('/data/standards/201530/')
+        self.assertContains(response, "INTASC 1", status_code=200)
+
     #def test_standards_view_redirects to correctpage(self):
 
-
-"""
-    def test_class_page_redirects_to_right_page(self):
-        request = HttpRequest()
-        request.method = "POST"
-        request.user = self.test_user
-        request.POST['assignment'] = "Writing Assignment"
-        response = ed_class_assignment_view(request, "EG500005", "201530")
-        self.assertEqual(response['location'], 'writingassignment1/')
-
-"""
+    ##TODO: Work on standard_rubric_view
