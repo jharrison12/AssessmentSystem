@@ -117,12 +117,32 @@ def standards_view(request):
     standards = Standard.objects.all()
     semesters = Semester.objects.all()
     if request.POST:
-        return redirect('/data/')
+        semester = Semester.objects.get(text=request.POST['semestername'])
+        return redirect(semester.text + '/')
     return render(request, 'dataview/standardsview.html', {"standards": standards, "semesters": semesters})
 
 def standards_semester_view(request, semester):
     standards = Standard.objects.all()
+    if request.POST:
+        logging.info(request.POST['standardsname'])
+        standard = Standard.objects.get(name=request.POST['standardsname'])
+        return redirect(re.sub(' ', '', standard.name).lower() + '/')
     return render(request, 'dataview/standardssemesterview.html', {"standards": standards})
+
+def standards_semester_standard_view(request, semester, standard):
+    standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
+    semestertext = Semester.objects.get(text=semester)
+    rubrics = Rubric.objects.filter(rubricdata__rubriccompleted=True, rubricdata__enrollment__edclass__semester=semestertext)
+    for rubric in rubrics:
+        print(Row.objects.filter(rubric=rubric).values())
+        print()
+    logging.critical("Rubrics that are completed and are in 201530 {}\n\n".format(rubrics))
+    rowsinrubrics = Row.objects.filter(rubric=rubrics)
+    logging.critical("ROWS IN RUBRICS completed in 201530 {}\n {}\n\n".format(rowsinrubrics, rowsinrubrics.values()))
+    standard = Standard.objects.get(name=standardwithspace.upper())
+    rows = Row.objects.filter(standards=standard)
+    logging.critical("The values with INTASC1 as a standard are \n{} the num is {}\n\n".format(rows.values(), len(rows)))
+    return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rows":rows})
 
 # this display what standards are used for what rubric
 def rubric_standard_view(request):

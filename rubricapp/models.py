@@ -58,7 +58,6 @@ class EdClasses(models.Model):
 class Assignment(models.Model):
     assignmentname = models.CharField(default="None", max_length=30)
     edclass = models.ForeignKey(EdClasses, null=False)
-    #semester = models.ForeignKey(Semester, null=False)
     keyrubric = models.ForeignKey(Rubric)
 
     def __str__(self):

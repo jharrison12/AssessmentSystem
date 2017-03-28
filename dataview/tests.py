@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, \
-    semester_ed_class_view, ed_class_assignment_view, standards_view, standards_semester_view
+    semester_ed_class_view, ed_class_assignment_view, standards_view, standards_semester_view, standards_semester_standard_view
 from rubricapp.views import rubric_page
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment, RubricData, Standard
 from django.contrib.auth.models import User
@@ -60,10 +60,6 @@ class StudentView(TestCase):
                                             sectionnumber="01", semester=semester)
         edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", teacher=jacob, crn=3333,
                                             sectionnumber="01", semester=semester)
-  # , semester=semester)
-
-        # semester.classes.add(edclass1)
-        # semester.classes.add(edclass2)
 
         bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
         jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
@@ -693,10 +689,129 @@ class EdClass(TestCase):
 
 class StandardView(TestCase):
 
+    def createrubricrow(self, name, excellenttext, rubric, row_choice, standard):
+        rowname = Row.objects.create(name=name,
+                                     excellenttext=excellenttext,
+                                     proficienttext="THE SECOND BEST!",
+                                     satisfactorytext="THE THIRD BEST!",
+                                     unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice)
+        rowname.standards.add(standard)
+        return rowname
+
+
     def setUp(self):
-        Standard.objects.create(name='INTASC 1')
-        Semester.objects.create(text="201530")
-        Semester.objects.create(text="201610")
+        intasc1 = Standard.objects.create(name='INTASC 1')
+        caep1 = Standard.objects.create(name="CAEP 1")
+        empty = Standard.objects.create(name=" ")
+        semester = Semester.objects.create(text="201530")
+        semester2 = Semester.objects.create(text="201610")
+        Rubric.objects.create(name="Writing Rubric")
+
+        kelly = User.objects.create(username="kelly")
+        EG500005201530 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly,
+                                            crn=2222, semester=semester)
+        EG500005201610 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly,
+                                            crn=9999, semester=semester2)
+        EG600004201610 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly,
+                                            crn=3333, semester=semester2)
+        EG600004201530 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly,
+                                            crn=8888, semester=semester)
+
+        """
+        -->201530
+
+        ---->Eg 5000 05
+
+        ------->Writing Assignment
+        ----------> Bob
+
+        ---->EG 6000 04
+        ------->Loser Paper
+        ----------> Jane
+
+        -->201610
+
+        ---->EG 5000 05
+        ------->Nonleader Ppaer
+        ----------> Jake
+
+
+        ---->EG 6000 04
+        ------->Leader Paper
+        ----------> Bob, Jane
+        """
+
+        bob = Student.objects.create(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
+        jane = Student.objects.create(lastname="Doe", firstname="Jane", lnumber="21743149")
+        jake = Student.objects.create(lastname="The Snake", firstname="Jake", lnumber="0000")
+
+        bobEG500005201530 = Enrollment.objects.create(student=bob, edclass=EG500005201530)  # , semester=semester)
+        bobEG600004201610 = Enrollment.objects.create(student=bob, edclass=EG600004201610)  # , semester=semester)
+        janeEG600004201530 = Enrollment.objects.create(student=jane, edclass=EG600004201530)  # , semester=semester)
+        janeEG600004201610 = Enrollment.objects.create(student=jane, edclass=EG600004201610)  # , semester=semester)
+        jakeEG500005201610 = Enrollment.objects.create(student=jake, edclass=EG500005201610)  # , semester=semester2)
+        writingrubric = Rubric.objects.create(name="writingrubric")
+
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", writingrubric, 0, empty)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", writingrubric, 0,empty)
+
+        writingassignment = Assignment.objects.create(edclass=EG500005201530,
+                                                           assignmentname="Writing Assignment",
+                                                           keyrubric=writingrubric)  # , semester=semester)
+        leaderpaper = Assignment.objects.create(edclass=EG600004201610,
+                                                            assignmentname="Leader Paper",
+                                                            keyrubric=writingrubric)  # , semester=semester)
+        nonleaderpaper = Assignment.objects.create(edclass=EG500005201610,
+                                                           assignmentname="Nonleader paper",
+                                                           keyrubric=writingrubric)  # m semester=semester2)
+        loserpaper = Assignment.objects.create(edclass=EG600004201530,
+                                                            assignmentname="Loser Paper",
+                                                            keyrubric=writingrubric)  # , semester=semester2)
+
+        # Many to many relationship must be added after creation of objects
+        # because the manyto-many relationship is not a column in the database
+
+        # writingassignmentfirst.keyrubric.add(writingrubric)
+        # writingassignmentsecond.keyrubric.add(writingrubric)
+        # writingassignmentthird.keyrubric.add(writingrubric)
+        # writingassignmentfourth.keyrubric.add(writingrubric)
+
+        # Create EG 6000 04 Jane, Leader Paper 201610
+        completedrubricforEG600004Jane = Rubric.objects.create(name="EG60000421743149201610LeaderPaper", template=False)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Jane, 4, intasc1)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Jane, 4, caep1)
+        RubricData.objects.create(enrollment=janeEG600004201610, assignment=leaderpaper, rubriccompleted=True,
+                                  completedrubric=completedrubricforEG600004Jane)
+
+        # Create EG 6000 04 Bob, LeaderPaper 201610
+        completedrubricforEG600004Bob = Rubric.objects.create(name="EG60000421743148201610LeaderPaper", template=False)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Bob, 1, intasc1)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Bob, 3, caep1)
+        RubricData.objects.create(enrollment=bobEG600004201610, assignment=leaderpaper, rubriccompleted=True,
+                                  completedrubric=completedrubricforEG600004Bob)
+
+        # Create EG 5000 05 Bob, Writing Assignment 201530
+        completedrubricforbob = Rubric.objects.create(name="EG50000521743148201530WritingAssignment", template=False)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforbob, 2, intasc1)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforbob, 4, caep1)
+        RubricData.objects.create(enrollment=bobEG500005201530, assignment=writingassignment, rubriccompleted=True,
+                                  completedrubric=completedrubricforbob)
+
+        # Create EG 6000 04 Loser Paper 201530
+        completedrubricforjaneeg6000 = Rubric.objects.create(name="EG60000421743149201530LoserPaper", template=False)
+        row1 = self.createrubricrow("THIS", "THE BEST!", completedrubricforjaneeg6000, 1, intasc1)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforjaneeg6000, 1, caep1)
+        RubricData.objects.create(enrollment=janeEG600004201530, assignment=loserpaper, rubriccompleted=True,
+                                  completedrubric=completedrubricforjaneeg6000)
+
+
+        # Create EG 5000 05 201610
+        completedrubricforjake = Rubric.objects.create(name="EG5000050000201610", template=False)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjake, 4, intasc1)
+        row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjake, 4, caep1)
+        RubricData.objects.create(enrollment=jakeEG500005201610, assignment=nonleaderpaper, rubriccompleted=True,
+                                  completedrubric=completedrubricforjake)
+
         self.client = Client()
         self.username = 'bob'
         self.email = 'test@test.com'
@@ -743,6 +858,39 @@ class StandardView(TestCase):
     def test_standards_semester_page_has_standards(self):
         response = self.client.get('/data/standards/201530/')
         self.assertContains(response, "INTASC 1", status_code=200)
+
+    def test_standard_view_uses_correct_template(self):
+        response = self.client.get('/data/standards/201530/')
+        self.assertTemplateUsed(response, 'dataview/standardssemesterview.html')
+
+    def test_standards_semester_page_takes_post(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_user
+        request.POST['standardsname'] = "INTASC 1"
+        response = standards_semester_view(request, "201530")
+        self.assertEqual(response.status_code, 302)
+
+    def test_semester_standards_redirects_correctly(self):
+        response = self.client.post('/data/standards/201530/',{'standardsname': "INTASC 1"})
+        self.assertRedirects(response, '/data/standards/201530/intasc1/')
+
+    def test_standards_semester_standard_view_uses_correct_template(self):
+        response = self.client.get('/data/standards/201530/intasc1/')
+        self.assertTemplateUsed(response, 'dataview/standardssemesterstandardview.html')
+
+    def test_standards_semester_standard_view_uses_correct_function(self):
+        found = resolve('/data/standards/201530/intasc1/')
+        self.assertEqual(found.func, standards_semester_standard_view)
+
+    def test_sss_page_has_standard_name(self):
+        response = self.client.get('/data/standards/201530/intasc1/')
+        self.assertIn("INTASC 1",response.content.decode())
+
+    def test_sss_page_shows_rubric(self):
+        response = self.client.get('/data/standards/201530/intasc1/')
+        self.assertIn("Writing Rubric", response.content.decode())
+
 
     #def test_standards_view_redirects to correctpage(self):
 
