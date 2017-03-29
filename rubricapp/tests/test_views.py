@@ -1,5 +1,5 @@
 from unittest import skip
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment,RubricData
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment,RubricData, Standard
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase, Client
@@ -438,6 +438,7 @@ class StudentandRubricViewTest(TestCase):
         self.test_user = User.objects.create_superuser(self.username, self.email, self.password)
         login = self.client.login(username=self.username, password = self.password)
         jane = User.objects.create(username="Jane")
+        intasc1 = Standard.objects.create(name="INTASC 1")
 
         semester = Semester.objects.create(text="201530")
         edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222, semester=semester)
@@ -462,6 +463,7 @@ class StudentandRubricViewTest(TestCase):
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
                                   unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+        row1.standards.add(intasc1)
 
         row2 = Row.objects.create(excellenttext="THE GREATEST!",
                                   proficienttext="THE SECOND BEST!",
@@ -586,8 +588,6 @@ class StudentandRubricViewTest(TestCase):
 
     def test_post_request_updates_correct_model(self):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
-
-        #Why do you need to get the response before you can post it?????
         response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
         data ={"form-TOTAL_FORMS": "2",
                "form-INITIAL_FORMS": "2",
@@ -701,6 +701,26 @@ class StudentandRubricViewTest(TestCase):
         newgeorgeenrollment = Enrollment.objects.create(student=george, edclass=edclass)#,semester=newsemester)
         response = self.client.get('/assessment/201530/EG500001/writingassignment1/21743148/')
         self.assertNotContains(response, "STOP")
+
+    def test_rubric_created_also_copies_standards(self):
+        self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+        response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
+        data = {"form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "2",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-row_choice": "1",
+                "form-1-row_choice": "2",
+                "form-0-id": "3",
+                "form-1-id": "4"}
+
+        response = self.client.post("/assessment/201530/EG500001/writingassignment1/21743148/", data)
+        edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+        bobdabuilder = Student.objects.get(lastname="DaBuilder")
+        bobdabuilderenroll = Enrollment.objects.get(student=bobdabuilder, edclass=edclass)
+        bobrubricdata = RubricData.objects.get(enrollment=bobdabuilderenroll)
+        row = Row.objects.get(excellenttext="THE BEST!", rubric=bobrubricdata.completedrubric)
+        self.assertEquals("INTASC 1", row.standards.name)
 
 class UserLoginTest(TestCase):
 

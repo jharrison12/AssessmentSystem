@@ -706,7 +706,6 @@ class StandardView(TestCase):
         empty = Standard.objects.create(name=" ")
         semester = Semester.objects.create(text="201530")
         semester2 = Semester.objects.create(text="201610")
-        Rubric.objects.create(name="Writing Rubric")
 
         kelly = User.objects.create(username="kelly")
         EG500005201530 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly,
@@ -751,10 +750,10 @@ class StandardView(TestCase):
         janeEG600004201530 = Enrollment.objects.create(student=jane, edclass=EG600004201530)  # , semester=semester)
         janeEG600004201610 = Enrollment.objects.create(student=jane, edclass=EG600004201610)  # , semester=semester)
         jakeEG500005201610 = Enrollment.objects.create(student=jake, edclass=EG500005201610)  # , semester=semester2)
-        writingrubric = Rubric.objects.create(name="writingrubric")
+        writingrubric = Rubric.objects.create(name="Writing Rubric")
 
-        row1 = self.createrubricrow("Fortitude", "THE BEST!", writingrubric, 0, empty)
-        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", writingrubric, 0,empty)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", writingrubric, 0, intasc1)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", writingrubric, 0,caep1)
 
         writingassignment = Assignment.objects.create(edclass=EG500005201530,
                                                            assignmentname="Writing Assignment",
@@ -884,6 +883,7 @@ class StandardView(TestCase):
 
     def test_sss_page_shows_rubric(self):
         response = self.client.get('/data/standards/201530/intasc1/')
+        print(response.content.decode())
         self.assertIn("Writing Rubric", response.content.decode())
 
 

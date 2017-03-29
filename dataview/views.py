@@ -131,22 +131,25 @@ def standards_semester_view(request, semester):
 
 def standards_semester_standard_view(request, semester, standard):
     standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
+    standard = Standard.objects.get(name=standardwithspace.upper())
     semestertext = Semester.objects.get(text=semester)
-	##This works if iterated over
-    rubrics = Rubric.objects.filter(rubricdata__rubriccompleted=True, rubricdata__enrollment__edclass__semester=semestertext)
-    for rubric in rubrics:
+    ##COMPLETED RUBRICS IN 201530
+    rubricscompletedinsemester = Rubric.objects.filter(rubricdata__rubriccompleted=True, rubricdata__enrollment__edclass__semester=semestertext)
+    for rubric in rubricscompletedinsemester:
         print(Row.objects.filter(rubric=rubric).values())
         print()
-	#Returns correct rubrics below. Two rubrics.
-    logging.critical("Rubrics that are completed and are in 201530 {} Num of rubrics: {}. Should be 2\n\n".format(rubrics, len(rubrics)))
-	#But when you filter the rows based upon the rubrics above, it only returns rubric id
-    rowsinrubrics = Row.objects.filter(rubric=rubrics)
-    logging.critical("SQL: {}\n\n".format(Row.objects.filter(rubric=rubrics).query))
-    logging.critical("ROWS IN RUBRICS completed in 201530 {}\n {} Should be 4 {}\n\n".format(rowsinrubrics, rowsinrubrics.values(), len(rowsinrubrics)))
-    standard = Standard.objects.get(name=standardwithspace.upper())
+    #Returns correct rubrics below. Two rubrics.
+    logging.critical("Rubrics that are completed and are in 201530 {} Num of rubrics: {}. Should be 2\n\n".format(rubricscompletedinsemester, len(rubricscompletedinsemester)))
+    #But when you filter the rows based upon the rubrics above, it only returns rubric id
+    rowsinrubricssemester = Row.objects.filter(rubric=rubricscompletedinsemester)
+    logging.critical("ROWS IN RUBRICS completed in 201530 {}\n {} Should be 4 {}\n\n".format(rowsinrubricssemester, rowsinrubricssemester.values(), len(rowsinrubricssemester)))
+    #Templates that use STandards
+    templates = Rubric.objects.filter(template=True, row__standards=standard)
+    logging.critical("The templates are {}".format(templates))
     rows = Row.objects.filter(standards=standard)
-    logging.critical("The values with INTASC1 as a standard are \n{} the num is {}\n\n".format(rows.values(), len(rows)))
-    return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rows":rows})
+    rowswithstandards = rows.filter(rubric=rubricscompletedinsemester)
+    logging.critical("The values with INTASC1 as a standard are \n{} the num is {}\n\n {}".format(rows.values(), len(rows),rowswithstandards))
+    return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rows":rows, "rubrics": templates})
 
 # this display what standards are used for what rubric
 def rubric_standard_view(request):

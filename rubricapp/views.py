@@ -208,7 +208,6 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         rubricforclass.id = None
         rubricforclass.name = "{}{}{}{}".format(edclass, studentname, semester, re.sub(' ', '', classassignment.assignmentname))
         logging.warning("The rubriclass.template value is {}".format(rubricforclass.template))
-        logging.warning("The rubriclass.template value is {}".format(rubricforclass.template))
         rubricforclass.template = False
         try:
             logging.warning("First part of try statement")
@@ -216,9 +215,13 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             rubricforclass.save()
             logging.warning("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
             for row in rows:
+                standard = row.standards.all()
+                logging.critical("Standards is {}".format(standard))
                 row.pk = None
                 row.rubric = rubricforclass
                 logging.warning("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
+                row.save()
+                row.standards.set(standard)
                 row.save()
             RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
             rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)
