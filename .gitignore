@@ -9,3 +9,5 @@ rubricapp.json
 dataviewerrors
 test
 migrations/
+rubricapp/fixtures/initial.json
+dataview/trying

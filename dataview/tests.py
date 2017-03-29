@@ -696,6 +696,7 @@ class StandardView(TestCase):
                                      satisfactorytext="THE THIRD BEST!",
                                      unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice)
         rowname.standards.add(standard)
+        rowname.save()
         return rowname
 
 
@@ -771,10 +772,12 @@ class StandardView(TestCase):
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
 
-        # writingassignmentfirst.keyrubric.add(writingrubric)
-        # writingassignmentsecond.keyrubric.add(writingrubric)
-        # writingassignmentthird.keyrubric.add(writingrubric)
-        # writingassignmentfourth.keyrubric.add(writingrubric)
+        # Create EG 5000 05 201610
+        completedrubricforjake = Rubric.objects.create(name="EG5000050000201610", template=False)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjake, 4, intasc1)
+        row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjake, 4, caep1)
+        RubricData.objects.create(enrollment=jakeEG500005201610, assignment=nonleaderpaper, rubriccompleted=True,
+                                  completedrubric=completedrubricforjake)
 
         # Create EG 6000 04 Jane, Leader Paper 201610
         completedrubricforEG600004Jane = Rubric.objects.create(name="EG60000421743149201610LeaderPaper", template=False)
@@ -799,18 +802,10 @@ class StandardView(TestCase):
 
         # Create EG 6000 04 Loser Paper 201530
         completedrubricforjaneeg6000 = Rubric.objects.create(name="EG60000421743149201530LoserPaper", template=False)
-        row1 = self.createrubricrow("THIS", "THE BEST!", completedrubricforjaneeg6000, 1, intasc1)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjaneeg6000, 1, intasc1)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforjaneeg6000, 1, caep1)
         RubricData.objects.create(enrollment=janeEG600004201530, assignment=loserpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforjaneeg6000)
-
-
-        # Create EG 5000 05 201610
-        completedrubricforjake = Rubric.objects.create(name="EG5000050000201610", template=False)
-        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjake, 4, intasc1)
-        row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjake, 4, caep1)
-        RubricData.objects.create(enrollment=jakeEG500005201610, assignment=nonleaderpaper, rubriccompleted=True,
-                                  completedrubric=completedrubricforjake)
 
         self.client = Client()
         self.username = 'bob'
