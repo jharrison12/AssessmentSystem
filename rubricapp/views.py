@@ -215,13 +215,13 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             rubricforclass.save()
             logging.warning("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
             for row in rows:
-                standard = row.standards.all()
-                logging.critical("Standards is {}".format(standard))
+                standards = row.standards.all()
+                logging.critical("Standards is {}".format(standards))
                 row.pk = None
                 row.rubric = rubricforclass
                 logging.warning("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
                 row.save()
-                row.standards.set(standard)
+                row.standards.set(standards)
                 row.save()
             RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
             rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)

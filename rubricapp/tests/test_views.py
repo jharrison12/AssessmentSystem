@@ -439,6 +439,7 @@ class StudentandRubricViewTest(TestCase):
         login = self.client.login(username=self.username, password = self.password)
         jane = User.objects.create(username="Jane")
         intasc1 = Standard.objects.create(name="INTASC 1")
+        caep1 = Standard.objects.create(name="CAEP 1")
 
         semester = Semester.objects.create(text="201530")
         edclass1 = EdClasses.objects.create(sectionnumber="01",subject="EG", coursenumber="5000", teacher=self.test_user, crn=2222, semester=semester)
@@ -466,9 +467,10 @@ class StudentandRubricViewTest(TestCase):
         row1.standards.add(intasc1)
 
         row2 = Row.objects.create(excellenttext="THE GREATEST!",
-                                  proficienttext="THE SECOND BEST!",
+                                  proficienttext="THE 2nd BEST!",
                                   satisfactorytext="THE THIRD BEST!",
                                   unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+        row2.standards.add(caep1)
 
 
 
@@ -719,8 +721,80 @@ class StudentandRubricViewTest(TestCase):
         bobdabuilder = Student.objects.get(lastname="DaBuilder")
         bobdabuilderenroll = Enrollment.objects.get(student=bobdabuilder, edclass=edclass)
         bobrubricdata = RubricData.objects.get(enrollment=bobdabuilderenroll)
+        row1 = Row.objects.get(rubric__name="writingrubric", excellenttext="THE BEST!")
         row = Row.objects.get(excellenttext="THE BEST!", rubric=bobrubricdata.completedrubric)
-        self.assertEquals("INTASC 1", row.standards.name)
+        self.assertEquals("INTASC 1", row.standards.all()[0].name)
+
+    def test_rubric_created_also_copies_two_standards(self):
+        self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+        response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
+        data = {"form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "2",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-row_choice": "1",
+                "form-1-row_choice": "2",
+                "form-0-id": "3",
+                "form-1-id": "4"}
+
+        response = self.client.post("/assessment/201530/EG500001/writingassignment1/21743148/", data)
+        bobdabuilder = Student.objects.get(lastname="DaBuilder")
+        edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+        bobdabuilderenroll = Enrollment.objects.get(student=bobdabuilder, edclass=edclass)
+        bobrubricdata = RubricData.objects.get(enrollment=bobdabuilderenroll)
+        row = Row.objects.get(excellenttext="THE BEST!", rubric=bobrubricdata.completedrubric)
+        row2 = Row.objects.get(excellenttext="THE GREATEST!", rubric=bobrubricdata.completedrubric)
+        self.assertEquals("INTASC 1", row.standards.all()[0].name)
+        self.assertEquals("CAEP 1", row2.standards.all()[0].name)
+
+    def test_rubric_copies_multiple_standards(self):
+        self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+        rowbeforepost = Row.objects.get(excellenttext="THE BEST!", rubric__name="writingrubric")
+        intasc2 = Standard.objects.create(name="Intasc 2")
+        rowbeforepost.standards.add(intasc2)
+        response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
+        data = {"form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "2",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-row_choice": "1",
+                "form-1-row_choice": "2",
+                "form-0-id": "3",
+                "form-1-id": "4"}
+        self.client.post("/assessment/201530/EG500001/writingassignment1/21743148/", data)
+        bobdabuilder = Student.objects.get(lastname="DaBuilder")
+        edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+        bobdabuilderenroll = Enrollment.objects.get(student=bobdabuilder, edclass=edclass)
+        bobrubricdata = RubricData.objects.get(enrollment=bobdabuilderenroll)
+        row = Row.objects.get(excellenttext="THE BEST!", rubric=bobrubricdata.completedrubric)
+        self.assertEquals(2, row.standards.count())
+
+    def test_rubric_copies_same_standard_different_rows(self):
+        self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+        rowbeforepost = Row.objects.get(proficienttext="THE 2nd BEST!", rubric__name="writingrubric")
+        intasc1 = Standard.objects.get(name="INTASC 1")
+        rowbeforepost.standards.add(intasc1)
+        response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
+        data = {"form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "2",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-row_choice": "1",
+                "form-1-row_choice": "2",
+                "form-0-id": "3",
+                "form-1-id": "4"}
+        self.client.post("/assessment/201530/EG500001/writingassignment1/21743148/", data)
+        bobdabuilder = Student.objects.get(lastname="DaBuilder")
+        edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+        bobdabuilderenroll = Enrollment.objects.get(student=bobdabuilder, edclass=edclass)
+        bobrubricdata = RubricData.objects.get(enrollment=bobdabuilderenroll)
+        row2 = Row.objects.get(proficienttext="THE 2nd BEST!", rubric=bobrubricdata.completedrubric)
+        row1 = Row.objects.get(excellenttext="THE BEST!", rubric=bobrubricdata.completedrubric)
+        self.assertEquals(2, row2.standards.count())
+        self.assertEquals("INTASC 1", row2.standards.all()[0].name)
+        self.assertEquals("CAEP 1", row2.standards.all()[1].name)
+        self.assertEquals("INTASC 1", row1.standards.all()[0].name)
+
 
 class UserLoginTest(TestCase):
 
