@@ -704,18 +704,18 @@ class StandardView(TestCase):
         intasc1 = Standard.objects.create(name='INTASC 1')
         caep1 = Standard.objects.create(name="CAEP 1")
         empty = Standard.objects.create(name=" ")
-        semester = Semester.objects.create(text="201530")
-        semester2 = Semester.objects.create(text="201610")
+        semester201530 = Semester.objects.create(text="201530")
+        semester201610 = Semester.objects.create(text="201610")
 
         kelly = User.objects.create(username="kelly")
         EG500005201530 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly,
-                                            crn=2222, semester=semester)
+                                            crn=2222, semester=semester201530)
         EG500005201610 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="5000", teacher=kelly,
-                                            crn=9999, semester=semester2)
+                                            crn=9999, semester=semester201610)
         EG600004201610 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly,
-                                            crn=3333, semester=semester2)
+                                            crn=3333, semester=semester201610)
         EG600004201530 = EdClasses.objects.create(sectionnumber="04", subject="EG", coursenumber="6000", teacher=kelly,
-                                            crn=8888, semester=semester)
+                                            crn=8888, semester=semester201530)
 
         """
         -->201530
@@ -779,6 +779,7 @@ class StandardView(TestCase):
                                   completedrubric=completedrubricforjake)
 
         # Create EG 6000 04 Jane, Leader Paper 201610
+
         completedrubricforEG600004Jane = Rubric.objects.create(name="EG60000421743149201610LeaderPaper", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Jane, 4, intasc1)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Jane, 4, caep1)
@@ -883,8 +884,12 @@ class StandardView(TestCase):
 
     def test_sss_page_shows_rubric(self):
         response = self.client.get('/data/standards/201530/intasc1/')
-        print(response.content.decode())
         self.assertIn("Writing Rubric", response.content.decode())
+
+    def test_sss_page_shows_scores(self):
+        response = self.client.get('/data/standards/201530/intasc1/')
+        self.assertIn("1.5", response.content.decode())
+
 
 
     #def test_standards_view_redirects to correctpage(self):
