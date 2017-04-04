@@ -222,6 +222,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                 logging.warning("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
                 row.save()
                 row.standards.set(standards)
+                row.templatename = oldrubricname
                 row.save()
             RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
             rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)

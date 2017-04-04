@@ -92,9 +92,14 @@ class Row(models.Model):
     satisfactorytext = models.TextField(default="", blank=True)
     unsatisfactorytext = models.TextField(default="", blank=True)
     standards = models.ManyToManyField(Standard)
+    templatename= models.CharField(default="", max_length=100)
 
     def __str__(self):
         return self.row_choice
+
+    class Meta:
+        unique_together = ("templatename", "name")
+
 
 
 class Enrollment(models.Model):

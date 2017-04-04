@@ -135,11 +135,10 @@ def standards_semester_standard_view(request, semester, standard):
     semestertext = Semester.objects.get(text=semester)
     ##COMPLETED RUBRICS IN 201530
     semesterrubric = Rubric.objects.filter(rubricdata__rubriccompleted=True, rubricdata__enrollment__edclass__semester=semestertext)
-    print(type(semesterrubric))
     #Returns correct rubrics below. Two rubrics.
     logging.warning("Rubrics that are completed and are in 201530 {} Num of rubrics: {}. Should be 2\n\n".format(semesterrubric.values(), len(semesterrubric)))
     #But when you filter the rows based upon the rubrics above, it only returns bob's rubric and not both
-    logging.critical("THE PROBLEM IS HERE "
+    logging.warning("THE PROBLEM IS HERE "
 					 "ROWS IN RUBRICS completed in 201530 {}\n "
 					 "This returns the correct amount {}\n\n".format(Row.objects.filter(rubric__in=semesterrubric).all()
 																   ,[rubric.row_set.all() for rubric in semesterrubric]))
@@ -148,9 +147,15 @@ def standards_semester_standard_view(request, semester, standard):
     logging.warning("The templates are {}".format(templates))
     rows = Row.objects.filter(standards=standard)
     rowswithstandards = rows.filter(rubric__in=semesterrubric).all()
-    logging.critical(rowswithstandards)
-    #for row in rowswithstandards:
-        #if row.name
+    logging.critical("Rows with standards are {}".format(rowswithstandards.values()))
+    rowdata = {}
+    for row in rowswithstandards:
+         if row.templatename not in rowdata:
+             rowdata[row.templatename] = {}
+             if row.name not in rowdata[row.templatename]:
+                 rowdata[row.templatename][row.name] = row.row_choice
+    logging.critical("Rowdata iha {}".format(rowdata))
+    """
     for key, rowscores in enumerate(rowswithstandards):
         try:
             logging.critical("Rowscores processed {}:{}".format(key, rowscores))
@@ -161,8 +166,9 @@ def standards_semester_standard_view(request, semester, standard):
             logging.info("Rowscores now " + str(rowscores))
         except ValueError:
             pass
-    logging.critical("The values with INTASC1 as a standard are \n{} the num is {}\n\n Rows returned {}".format(rows.values(), len(rows),rowswithstandards))
-    return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rows":rowscores, "rubrics": templates})
+	"""
+    logging.warning("The values with INTASC1 as a standard are \n{} the num is {}\n\n Rows returned {}".format(rows.values(), len(rows),rowswithstandards))
+    return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rows":[1,2], "rubrics": templates})
 
 # this display what standards are used for what rubric
 def rubric_standard_view(request):

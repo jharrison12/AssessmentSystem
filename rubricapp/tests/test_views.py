@@ -795,6 +795,24 @@ class StudentandRubricViewTest(TestCase):
         self.assertEquals("CAEP 1", row2.standards.all()[1].name)
         self.assertEquals("INTASC 1", row1.standards.all()[0].name)
 
+    def test_rubric_copies_template_name(self):
+        self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+        response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
+        data = {"form-TOTAL_FORMS": "2",
+                "form-INITIAL_FORMS": "2",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-row_choice": "1",
+                "form-1-row_choice": "2",
+                "form-0-id": "3",
+                "form-1-id": "4"}
+        self.client.post("/assessment/201530/EG500001/writingassignment1/21743148/", data)
+        bobdabuilder = Student.objects.get(lastname="DaBuilder")
+        edclass = EdClasses.objects.get(subject="EG", coursenumber="5000")
+        bobdabuilderenroll = Enrollment.objects.get(student=bobdabuilder, edclass=edclass)
+        bobrubricdata = RubricData.objects.get(enrollment=bobdabuilderenroll)
+        row2 = Row.objects.get(proficienttext="THE 2nd BEST!", rubric=bobrubricdata.completedrubric)
+        self.assertEquals("writingrubric", row2.templatename)
 
 class UserLoginTest(TestCase):
 
