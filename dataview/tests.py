@@ -689,12 +689,12 @@ class EdClass(TestCase):
 
 class StandardView(TestCase):
 
-    def createrubricrow(self, name, excellenttext, rubric, row_choice, standard):
+    def createrubricrow(self, name, excellenttext, rubric, row_choice, standard, templatename):
         rowname = Row.objects.create(name=name,
                                      excellenttext=excellenttext,
                                      proficienttext="THE SECOND BEST!",
                                      satisfactorytext="THE THIRD BEST!",
-                                     unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice)
+                                     unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice, templatename=templatename.name)
         rowname.standards.add(standard)
         rowname.save()
         return rowname
@@ -752,8 +752,8 @@ class StandardView(TestCase):
         jakeEG500005201610 = Enrollment.objects.create(student=jake, edclass=EG500005201610)  # , semester=semester2)
         writingrubric = Rubric.objects.create(name="Writing Rubric")
 
-        row1 = self.createrubricrow("Fortitude", "THE BEST!", writingrubric, 0, intasc1)
-        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", writingrubric, 0,caep1)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", writingrubric, 0, intasc1, writingrubric)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", writingrubric, 0,caep1,writingrubric)
 
         writingassignment = Assignment.objects.create(edclass=EG500005201530,
                                                            assignmentname="Writing Assignment",
@@ -773,37 +773,37 @@ class StandardView(TestCase):
 
         # Create EG 5000 05 201610
         completedrubricforjake = Rubric.objects.create(name="EG5000050000201610", template=False)
-        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjake, 4, intasc1)
-        row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjake, 4, caep1)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjake, 4, intasc1, writingrubric)
+        row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjake, 4, caep1,writingrubric)
         RubricData.objects.create(enrollment=jakeEG500005201610, assignment=nonleaderpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforjake)
 
         # Create EG 6000 04 Jane, Leader Paper 201610
 
         completedrubricforEG600004Jane = Rubric.objects.create(name="EG60000421743149201610LeaderPaper", template=False)
-        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Jane, 4, intasc1)
-        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Jane, 4, caep1)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Jane, 4, intasc1,writingrubric)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Jane, 4, caep1,writingrubric)
         RubricData.objects.create(enrollment=janeEG600004201610, assignment=leaderpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforEG600004Jane)
 
         # Create EG 6000 04 Bob, LeaderPaper 201610
         completedrubricforEG600004Bob = Rubric.objects.create(name="EG60000421743148201610LeaderPaper", template=False)
-        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Bob, 1, intasc1)
-        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Bob, 3, caep1)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Bob, 1, intasc1,writingrubric)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Bob, 3, caep1,writingrubric)
         RubricData.objects.create(enrollment=bobEG600004201610, assignment=leaderpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforEG600004Bob)
 
         # Create EG 5000 05 Bob, Writing Assignment 201530
         completedrubricforbob = Rubric.objects.create(name="EG50000521743148201530WritingAssignment", template=False)
-        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforbob, 2, intasc1)
-        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforbob, 4, caep1)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforbob, 2, intasc1,writingrubric)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforbob, 4, caep1,writingrubric)
         RubricData.objects.create(enrollment=bobEG500005201530, assignment=writingassignment, rubriccompleted=True,
                                   completedrubric=completedrubricforbob)
 
         # Create EG 6000 04 Loser Paper 201530
         completedrubricforjaneeg6000 = Rubric.objects.create(name="EG60000421743149201530LoserPaper", template=False)
-        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjaneeg6000, 1, intasc1)
-        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforjaneeg6000, 1, caep1)
+        row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjaneeg6000, 1, intasc1,writingrubric)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforjaneeg6000, 1, caep1,writingrubric)
         RubricData.objects.create(enrollment=janeEG600004201530, assignment=loserpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforjaneeg6000)
 
@@ -888,6 +888,7 @@ class StandardView(TestCase):
 
     def test_sss_page_shows_scores(self):
         response = self.client.get('/data/standards/201530/intasc1/')
+        print(response.content.decode())
         self.assertIn("1.5", response.content.decode())
 
 

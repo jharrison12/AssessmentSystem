@@ -3,18 +3,15 @@
 		{% block header_text %}Standards View! {{ standard.name }}{% endblock %}
 
 		{% block form %}
-			{% if rubrics.values|length == 0 %}
-				<p>No rubrics associated with this standard</p>
-			{% else %}
-			{% for rubric in rubrics %}
-				{{ rubric.name }}
-
-				{% for row in rows %}
-					{{ row.row_choice }}
+			{% for rubric, row in rubrics.items %}
+				{{ rubric }}
+				{% for r,value in row.items %}
+					{{ r }} {{ value }}
 				{% endfor %}
-				<p></p>
-			{% endfor %}
-			{% endif %}
 
+				<p></p>
+			{% empty %}
+				<p>No rubrics associated with this standard</p>
+			{% endfor %}
 
 		{% endblock %}

@@ -148,27 +148,26 @@ def standards_semester_standard_view(request, semester, standard):
     rows = Row.objects.filter(standards=standard)
     rowswithstandards = rows.filter(rubric__in=semesterrubric).all()
     logging.critical("Rows with standards are {}".format(rowswithstandards.values()))
-    rowdata = {}
+    #Default dict creates default value if there isn't one, so you don't have to
+    rowdata = collections.defaultdict(dict)
     for row in rowswithstandards:
          if row.templatename not in rowdata:
-             rowdata[row.templatename] = {}
-             if row.name not in rowdata[row.templatename]:
-                 rowdata[row.templatename][row.name] = row.row_choice
+            rowdata[row.templatename][row.name] = [int(row.row_choice)]
+         else:
+             logging.critical("Made it to else statement.  Adding {}".format(int(row.row_choice)))
+             rowdata[row.templatename][row.name].append(int(row.row_choice))
     logging.critical("Rowdata iha {}".format(rowdata))
-    """
-    for key, rowscores in enumerate(rowswithstandards):
-        try:
-            logging.critical("Rowscores processed {}:{}".format(key, rowscores))
-            rowscores = [int(x) for x in rowscores]
-            rowscores = sum(rowscores) / len(rowscores)
-            rowscores = '{:03.2f}'.format(rowscores)
-            scores[key] = rowscores
-            logging.info("Rowscores now " + str(rowscores))
-        except ValueError:
-            pass
-	"""
+    # This averages the row for each rubric.
+    # This is probably not the best way to do this.
+    for rubricname,rowname in rowdata.items():
+        for rowname, score in rowname.items():
+            rowdata[rubricname][rowname] = sum(score)/len(score)
+
+    logging.critical("Did the average work {}".format(rowdata))
     logging.warning("The values with INTASC1 as a standard are \n{} the num is {}\n\n Rows returned {}".format(rows.values(), len(rows),rowswithstandards))
-    return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rows":[1,2], "rubrics": templates})
+    #this isn't very efficient
+    rowdata = dict(rowdata)
+    return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rubrics":rowdata})
 
 # this display what standards are used for what rubric
 def rubric_standard_view(request):
