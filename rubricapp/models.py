@@ -52,7 +52,7 @@ class EdClasses(models.Model):
     teacher = models.ForeignKey(User)
 
     def __str__(self):
-        return self.subject + " " + self.coursenumber + " " + self.sectionnumber
+        return self.subject + " " + self.coursenumber + " " + self.sectionnumber + " " + self.semester
 
 
 class Assignment(models.Model):
@@ -96,10 +96,6 @@ class Row(models.Model):
 
     def __str__(self):
         return self.row_choice
-
-    class Meta:
-        unique_together = ("templatename", "name")
-
 
 
 class Enrollment(models.Model):

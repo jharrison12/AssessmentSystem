@@ -888,11 +888,45 @@ class StandardView(TestCase):
 
     def test_sss_page_shows_scores(self):
         response = self.client.get('/data/standards/201530/intasc1/')
-        print(response.content.decode())
         self.assertIn("1.5", response.content.decode())
 
+    def test_sss_page_works_with_multiple_rubrics(self):
+        intasc1 = Standard.objects.get(name='INTASC 1')
+        caep1 = Standard.objects.get(name="CAEP 1")
+        semester201530 = Semester.objects.get(text="201530")
+        semester201610 = Semester.objects.get(text="201610")
+        kelly = User.objects.get(username="kelly")
+        EG700005201530 = EdClasses.objects.create(sectionnumber="05", subject="EG", coursenumber="7000", teacher=kelly,
+                                                  crn=5555, semester=semester201530)
+
+        bob = Student.objects.get(lastname="DaBuilder", firstname="Bob", lnumber="21743148")
+
+        bobEG700005201530 = Enrollment.objects.create(student=bob, edclass=EG700005201530)  # , semester=semester)
+        unitrubric = Rubric.objects.create(name="Unit Rubric")
+
+        unitassignment = Assignment.objects.create(edclass=EG700005201530,
+                                                      assignmentname="Unit Assignment",
+                                                      keyrubric=unitrubric)  # , semester=semester)
+
+        # Create EG 7000 05 201530
+        completedrubricforbob = Rubric.objects.create(name="EG70000521743148201530", template=False)
+        self.createrubricrow("Fortitude", "THE BEST!", completedrubricforbob, 3, intasc1, unitrubric)
+        self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforbob, 4, caep1,
+                                    unitrubric)
+        RubricData.objects.create(enrollment=bobEG700005201530, assignment=unitassignment, rubriccompleted=True,
+                                     completedrubric=completedrubricforbob)
+
+        response = self.client.get('/data/standards/201530/intasc1/')
+        print(response.content.decode())
+        self.assertIn("Unit Rubric", response.content.decode())
+        self.assertIn("3.0", response.content.decode())
 
 
-    #def test_standards_view_redirects to correctpage(self):
+
+
+
+
+
+        #def test_standards_view_redirects to correctpage(self):
 
     ##TODO: Work on standard_rubric_view

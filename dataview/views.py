@@ -147,7 +147,7 @@ def standards_semester_standard_view(request, semester, standard):
     logging.warning("The templates are {}".format(templates))
     rows = Row.objects.filter(standards=standard)
     rowswithstandards = rows.filter(rubric__in=semesterrubric).all()
-    logging.critical("Rows with standards are {}".format(rowswithstandards.values()))
+    logging.warning("Rows with standards are {}".format(rowswithstandards.values()))
     #Default dict creates default value if there isn't one, so you don't have to
     rowdata = collections.defaultdict(dict)
     for row in rowswithstandards:
@@ -161,11 +161,11 @@ def standards_semester_standard_view(request, semester, standard):
     # This is probably not the best way to do this.
     for rubricname,rowname in rowdata.items():
         for rowname, score in rowname.items():
-            rowdata[rubricname][rowname] = sum(score)/len(score)
+            rowdata[rubricname][rowname] = '{:03.2f}'.format(sum(score)/len(score))
 
     logging.critical("Did the average work {}".format(rowdata))
     logging.warning("The values with INTASC1 as a standard are \n{} the num is {}\n\n Rows returned {}".format(rows.values(), len(rows),rowswithstandards))
-    #this isn't very efficient
+    #this isn't very efficient with large data set (although it works)
     rowdata = dict(rowdata)
     return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rubrics":rowdata})
 
