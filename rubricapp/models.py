@@ -52,7 +52,7 @@ class EdClasses(models.Model):
     teacher = models.ForeignKey(User)
 
     def __str__(self):
-        return self.subject + " " + self.coursenumber + " " + self.sectionnumber + " " + self.semester
+        return "{} {} {} {}".format(self.subject,self.coursenumber, self.sectionnumber, self.semester)
 
 
 class Assignment(models.Model):
@@ -61,7 +61,7 @@ class Assignment(models.Model):
     keyrubric = models.ForeignKey(Rubric)
 
     def __str__(self):
-        return "%s%s%s%s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.assignmentname)
+        return "{}{}{}{}".format(self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.assignmentname)
       
     class Meta:
         unique_together = ("edclass",  "assignmentname")

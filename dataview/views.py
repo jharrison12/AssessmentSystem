@@ -154,16 +154,16 @@ def standards_semester_standard_view(request, semester, standard):
          if row.templatename not in rowdata:
             rowdata[row.templatename][row.name] = [int(row.row_choice)]
          else:
-             logging.critical("Made it to else statement.  Adding {}".format(int(row.row_choice)))
+             logging.warning("Made it to else statement.  Adding {}".format(int(row.row_choice)))
              rowdata[row.templatename][row.name].append(int(row.row_choice))
-    logging.critical("Rowdata iha {}".format(rowdata))
+    logging.warning("Rowdata iha {}".format(rowdata))
     # This averages the row for each rubric.
     # This is probably not the best way to do this.
     for rubricname,rowname in rowdata.items():
         for rowname, score in rowname.items():
             rowdata[rubricname][rowname] = '{:03.2f}'.format(sum(score)/len(score))
 
-    logging.critical("Did the average work {}".format(rowdata))
+    logging.warning("Did the average work {}".format(rowdata))
     logging.warning("The values with INTASC1 as a standard are \n{} the num is {}\n\n Rows returned {}".format(rows.values(), len(rows),rowswithstandards))
     #this isn't very efficient with large data set (although it works)
     rowdata = dict(rowdata)
@@ -171,4 +171,8 @@ def standards_semester_standard_view(request, semester, standard):
 
 # this display what standards are used for what rubric
 def rubric_standard_view(request):
-	pass
+	standards = Standard.objects.all()
+	if request.POST:
+		standard = Standard.objects.get(name=request.POST['standardselect'])
+		return redirect(re.sub(' ', '',standard.name).lower() + '/')
+	return render(request, 'dataview/rubricstandardview.html', {'standards': standards})

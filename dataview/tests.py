@@ -2,7 +2,8 @@ from django.test import TestCase, Client
 from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, \
-    semester_ed_class_view, ed_class_assignment_view, standards_view, standards_semester_view, standards_semester_standard_view
+    semester_ed_class_view, ed_class_assignment_view, standards_view, standards_semester_view, standards_semester_standard_view,\
+    rubric_standard_view
 from rubricapp.views import rubric_page
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment, RubricData, Standard
 from django.contrib.auth.models import User
@@ -474,7 +475,7 @@ class EdClass(TestCase):
     def test_class_assignment_page_uses_correct_template(self):
         edclass = EdClasses.objects.get(subject="EG", coursenumber="5000", sectionnumber="05", semester__text="201530")
         edclass = re.sub('[\s+]', '', str(edclass))
-        response = self.client.get("/data/class/201530/%s/" % (edclass))
+        response = self.client.get("/data/class/201530/EG500005/")
         self.assertTemplateUsed(response, 'dataview/classassignmentdataview.html')
 
     def test_class_data_page_uses_correct_template(self):
@@ -482,7 +483,7 @@ class EdClass(TestCase):
         edclass = re.sub('[\s+]', '', str(edclass))
         assignment = Assignment.objects.get(assignmentname="Writing Assignment")
         response = self.client.get(
-            "/data/class/201530/%s/%s%s/" % (edclass, assignment.assignmentname.replace(' ', ''), assignment.pk))
+            "/data/class/201530/EG500005/{}{}/".format(assignment.assignmentname.replace(' ', ''), assignment.pk))
         self.assertTemplateUsed(response, 'dataview/classdataview.html')
 
     def test_class_assignment_page_requires_login(self):
@@ -917,16 +918,45 @@ class StandardView(TestCase):
                                      completedrubric=completedrubricforbob)
 
         response = self.client.get('/data/standards/201530/intasc1/')
-        print(response.content.decode())
         self.assertIn("Unit Rubric", response.content.decode())
         self.assertIn("3.0", response.content.decode())
 
+    def test_standards_rubric_view_uses_correct_view_function(self):
+        found = resolve('/data/standards/rubricview/')
+        self.assertEqual(found.func, rubric_standard_view)
+
+    def test_standards_rubric_view_shows_standard(self):
+        response = self.client.get('/data/standards/rubricview/')
+        self.assertContains(response, 'INTASC 1', status_code=200)
+
+    def test_standard_rubric_view_uses_correct_template(self):
+        response = self.client.get('/data/standards/rubricview/')
+        self.assertTemplateUsed(response, 'dataview/rubricstandardview.html')
+
+    def test_standard_rubric_view_takes_post(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_user
+        request.POST['standardselect'] = "INTASC 1"
+        response = rubric_standard_view(request)
+        self.assertEqual(response.status_code, 302)
+
+    def test_standard_rubric_view_redirects_to_correct_page(self):
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = self.test_user
+        request.POST["standardselect"] = "INTASC 1"
+        response = rubric_standard_view(request)
+        self.assertEqual(response['location'], 'intasc1/')
+
+    def test_intasc_rubric_view_uses_correct_function(self):
+        found = resolve('/data/standards/rubricview/instasc1')
+        self.assertEqual(found.func, rubric_standard_individual_view)
 
 
 
 
 
-
-        #def test_standards_view_redirects to correctpage(self):
+            #def test_standards_view_redirects to correctpage(self):
 
     ##TODO: Work on standard_rubric_view
