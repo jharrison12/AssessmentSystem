@@ -176,3 +176,18 @@ def rubric_standard_view(request):
 		standard = Standard.objects.get(name=request.POST['standardselect'])
 		return redirect(re.sub(' ', '',standard.name).lower() + '/')
 	return render(request, 'dataview/rubricstandardview.html', {'standards': standards})
+
+def rubric_standard_individual_view(request, standard):
+	standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
+	standard = Standard.objects.filter(name__iexact=standardwithspace)
+	rows = Row.objects.filter(standards=standard, rubric__template=True)
+	#Set object keeps the list of row names immutable
+	rowdata = collections.defaultdict(list)
+	for row in rows:
+		if row.templatename not in rowdata:
+			rowdata[row.templatename] = set([row.name])
+		else:
+			rowdata[row.templatename].add(row.name)
+	logging.critical("Does this work? {}".format(rowdata))
+	rowdata = dict(rowdata)
+	return render(request, 'dataview/rubricstandardindividual.html', {'rubrics':rowdata})

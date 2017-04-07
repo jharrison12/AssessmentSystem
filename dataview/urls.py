@@ -19,4 +19,5 @@ urlpatterns = [
 	 url(r'^standards/(?P<semester>[0-9]{6})/$', views.standards_semester_view, name="standards_semester_view"),
 	 url(r'^standards/(?P<semester>[0-9]{6})/(?P<standard>\w+)/$', views.standards_semester_standard_view, name="standards_semester_standards_view"),
 	 url(r'^standards/rubricview/$', views.rubric_standard_view, name='rubric_standard_view'),
+	 url(r'^standards/rubricview/(?P<standard>\w+)/$', views.rubric_standard_individual_view, name="rubric_standard_individual_view")
 	 ]

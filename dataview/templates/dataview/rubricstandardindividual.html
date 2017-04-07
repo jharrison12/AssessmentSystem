@@ -1,0 +1,18 @@
+{% extends 'dataview/base.html' %}
+		{% block headerid %}studentchoice{% endblock %}
+		{% block header_text %}Standards View! {{ standard.name }}{% endblock %}
+
+		{% block form %}
+			{% for rubric, row in rubrics.items %}
+				{{ rubric }}
+				{% for r in row %}
+					{{ r }}
+				{% endfor %}
+
+				<p></p>
+			{% empty %}
+				<p>No rubrics associated with this standard</p>
+			{% endfor %}
+
+
+		{% endblock %}

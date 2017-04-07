@@ -3,7 +3,8 @@ from unittest import skip
 from django.core.urlresolvers import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, \
     semester_ed_class_view, ed_class_assignment_view, standards_view, standards_semester_view, standards_semester_standard_view,\
-    rubric_standard_view
+    rubric_standard_view, rubric_standard_individual_view
+
 from rubricapp.views import rubric_page
 from rubricapp.models import Semester, Student, Enrollment, EdClasses, Rubric, Row, Assignment, RubricData, Standard
 from django.contrib.auth.models import User
@@ -950,8 +951,32 @@ class StandardView(TestCase):
         self.assertEqual(response['location'], 'intasc1/')
 
     def test_intasc_rubric_view_uses_correct_function(self):
-        found = resolve('/data/standards/rubricview/instasc1')
+        found = resolve('/data/standards/rubricview/instasc1/')
         self.assertEqual(found.func, rubric_standard_individual_view)
+
+    def test_intasc_rubric_view_uses_correct_template(self):
+        response = self.client.get('/data/standards/rubricview/instasc1/')
+        self.assertTemplateUsed(response, 'dataview/rubricstandardindividual.html')
+
+    def test_intasc_rubric_view_shows_writing(self):
+        response = self.client.get('/data/standards/rubricview/intasc1/')
+        self.assertIn("Writing Rubric", response.content.decode())
+
+    def test_intasc_rubric_view_with_more_rubrics(self):
+        intasc1 = Standard.objects.get(name="INTASC 1")
+        newrubric = Rubric.objects.create(name="Unit Rubric", template=True)
+        self.createrubricrow("Excellence is a Habit", "THE BEST!", newrubric, 0, intasc1, newrubric)
+        response = self.client.get("/data/standards/rubricview/intasc1/")
+        self.assertIn("Unit Rubric", response.content.decode())
+        self.assertIn("Excellence is a Habit", response.content.decode())
+
+    def test_intasc_rubric_view_with_more_rubrics_with_multiple_rows(self):
+        intasc1 = Standard.objects.get(name="INTASC 1")
+        newrubric = Rubric.objects.create(name="Unit Rubric", template=True)
+        self.createrubricrow("Excellence is a Habit", "THE BEST!", newrubric, 0, intasc1, newrubric)
+        self.createrubricrow("Mediocrity is a habit", "THE BEST!", newrubric, 0, intasc1, newrubric)
+        response = self.client.get("/data/standards/rubricview/intasc1/")
+        self.assertIn("Mediocrity is a habit", response.content.decode())
 
 
 
