@@ -114,7 +114,7 @@ class RowAdminInline(admin.TabularInline):
     model = Row
     extra = 0
     readonly_fields = ['name', 'row_choice', 'excellenttext', 'proficienttext', 'satisfactorytext',
-                       'unsatisfactorytext', ]
+                       'unsatisfactorytext', 'standards' ]
     can_delete = False
 
     def has_add_permission(self, request):
@@ -124,7 +124,7 @@ class RowAdminInline(admin.TabularInline):
 class AddRowAdminInline(admin.TabularInline):
     model = Row
     extra = 0
-    fields = ['name', 'row_choice', 'excellenttext', 'proficienttext', 'satisfactorytext', 'unsatisfactorytext', ]
+    fields = ['name', 'row_choice', 'excellenttext', 'proficienttext', 'satisfactorytext', 'unsatisfactorytext', 'standards']
 
     def has_change_permission(self, request, obj=None):
         return False

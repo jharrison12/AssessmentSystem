@@ -978,6 +978,16 @@ class StandardView(TestCase):
         response = self.client.get("/data/standards/rubricview/intasc1/")
         self.assertIn("Mediocrity is a habit", response.content.decode())
 
+    def test_rubric_with_row_with_multi_standards_works(self):
+        #add intasc to second row
+        intasc1 = Standard.objects.get(name="INTASC 1")
+        caeprow = Row.objects.get(name="Excellenceisahabit", rubric__template=True)
+        caeprow.standards.add(intasc1)
+        response = self.client.get("/data/standards/rubricview/intasc1/")
+        print(response.content.decode())
+        self.assertIn("Excellenceisahabit", response.content.decode())
+
+
 
 
 

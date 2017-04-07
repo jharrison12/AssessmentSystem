@@ -312,6 +312,15 @@ class StandardsTest(TestCase):
         row1.standards.add(standard1)
         self.assertEqual(row1.standards.count(),1)
 
+    def test_multi_standard_aligns_to_rubric(self):
+        self.create_rubric_and_row()
+        standard1 = Standard.objects.create(name="INTASC 1.0")
+        standard2 = Standard.objects.create(name="INTASC 2.0")
+        row1 = Row.objects.get(name="ROW 1")
+        row1.standards.add(standard1)
+        row1.standards.add(standard2)
+        self.assertEqual(row1.standards.count(),2)
+
 
     def test_standards_align_to_more_than_one_rubric(self):
         self.create_rubric_and_row()
