@@ -238,3 +238,19 @@ class DataView(FunctionalTest):
         self.assertIn("Karate", bodytext.text)
         self.assertIn("3.0", bodytext.text)
 
+        # Professor returns to the main data page and clicks on standards link
+        self.browser.get("{}{}".format(self.server_url, '/data/'))
+        standardslink = self.browser.find_element_by_id('standardslink')
+        standardslink.click()
+
+        #
+        bodytext = self.browser.find_element_by_tag_name('body')
+        self.assertIn('201530', bodytext.text)
+        sleep(40)
+        submit = self.browser.find_element_by_id('standardsubmit')
+
+        submit.click()
+        sleep(20)
+
+
+
