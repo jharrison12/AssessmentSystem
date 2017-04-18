@@ -820,6 +820,11 @@ class StandardView(TestCase):
         response = self.client.get('/data/')
         self.assertContains(response, "standards data", status_code=200)
 
+    def test_standard_view_requires_login(self):
+        self.client.logout()
+        response = self.client.get('/data/standards/')
+        self.assertRedirects(response, '/login/?next=/data/standards/', status_code=302)
+
     def test_standard_view_uses_standard_view_function(self):
         found = resolve('/data/standards/')
         self.assertEqual(found.func, standards_view)
@@ -847,6 +852,11 @@ class StandardView(TestCase):
         request.POST['semestername'] = "201530"
         response = standards_view(request)
         self.assertEqual(response.status_code, 302)
+
+    def test_standards_semester_requires_loing(self):
+        self.client.logout()
+        response = self.client.get('/data/standards/201530/')
+        self.assertRedirects(response, '/login/?next=/data/standards/201530/', status_code=302)
 
     def test_standards_semester_page_uses_correct_function(self):
         found = resolve('/data/standards/201530/')
@@ -879,6 +889,11 @@ class StandardView(TestCase):
     def test_standards_semester_standard_view_uses_correct_function(self):
         found = resolve('/data/standards/201530/intasc1/')
         self.assertEqual(found.func, standards_semester_standard_view)
+
+    def test_standards_semester_standard_view_requires_loing(self):
+        self.client.logout()
+        response = self.client.get('/data/standards/201530/intasc1/')
+        self.assertRedirects(response, '/login/?next=/data/standards/201530/intasc1/', status_code=302)
 
     def test_sss_page_has_standard_name(self):
         response = self.client.get('/data/standards/201530/intasc1/')
@@ -930,6 +945,11 @@ class StandardView(TestCase):
         response = self.client.get('/data/standards/rubricview/')
         self.assertContains(response, 'INTASC 1', status_code=200)
 
+    def test_standards_rubric_view_requires_login(self):
+        self.client.logout()
+        response = self.client.get('/data/standards/rubricview/')
+        self.assertRedirects(response, '/login/?next=/data/standards/rubricview/', status_code=302)
+
     def test_standard_rubric_view_uses_correct_template(self):
         response = self.client.get('/data/standards/rubricview/')
         self.assertTemplateUsed(response, 'dataview/rubricstandardview.html')
@@ -953,6 +973,11 @@ class StandardView(TestCase):
     def test_intasc_rubric_view_uses_correct_function(self):
         found = resolve('/data/standards/rubricview/instasc1/')
         self.assertEqual(found.func, rubric_standard_individual_view)
+
+    def test_instasc_standards_rubric_view_requires_login(self):
+        self.client.logout()
+        response = self.client.get('/data/standards/rubricview/intasc1/')
+        self.assertRedirects(response, '/login/?next=/data/standards/rubricview/intasc1/', status_code=302)
 
     def test_intasc_rubric_view_uses_correct_template(self):
         response = self.client.get('/data/standards/rubricview/instasc1/')

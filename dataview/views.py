@@ -113,6 +113,8 @@ def ed_class_data_view(request, edclass, semester, assignmentname):
 			pass
 	return render(request, 'dataview/classdataview.html', {'rows': templaterows, 'scores':rows, 'finalscores': scores, 'test':scores1})
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def standards_view(request):
     standards = Standard.objects.all()
     semesters = Semester.objects.all()
@@ -121,6 +123,8 @@ def standards_view(request):
         return redirect(semester.text + '/')
     return render(request, 'dataview/standardsview.html', {"standards": standards, "semesters": semesters})
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def standards_semester_view(request, semester):
     standards = Standard.objects.all()
     if request.POST:
@@ -129,6 +133,8 @@ def standards_semester_view(request, semester):
         return redirect(re.sub(' ', '', standard.name).lower() + '/')
     return render(request, 'dataview/standardssemesterview.html', {"standards": standards})
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def standards_semester_standard_view(request, semester, standard):
     standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
     standard = Standard.objects.get(name=standardwithspace.upper())
@@ -172,6 +178,9 @@ def standards_semester_standard_view(request, semester, standard):
     return render(request, 'dataview/standardssemesterstandardview.html', {"standard": standard, "rubrics":rowdata})
 
 # this display what standards are used for what rubric
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def rubric_standard_view(request):
 	standards = Standard.objects.all()
 	if request.POST:
@@ -179,6 +188,8 @@ def rubric_standard_view(request):
 		return redirect(re.sub(' ', '',standard.name).lower() + '/')
 	return render(request, 'dataview/rubricstandardview.html', {'standards': standards})
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def rubric_standard_individual_view(request, standard):
 	standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
 	standard = Standard.objects.filter(name__iexact=standardwithspace)
@@ -190,6 +201,6 @@ def rubric_standard_individual_view(request, standard):
 			rowdata[row.templatename] = set([row.name])
 		else:
 			rowdata[row.templatename].add(row.name)
-	logging.critical("Does this work? {}".format(rowdata))
+	logging.warning("Does this work? {}".format(rowdata))
 	rowdata = dict(rowdata)
 	return render(request, 'dataview/rubricstandardindividual.html', {'rubrics':rowdata})

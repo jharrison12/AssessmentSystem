@@ -94,6 +94,13 @@ class Row(models.Model):
     standards = models.ManyToManyField(Standard)
     templatename= models.CharField(default="", max_length=100)
 
+    def save(self, *args, **kwargs):
+        if self.rubric.template == "True":
+            self.templatename = self.rubric.name
+            super(Row, self).save(*args,**kwargs)
+        else:
+            super(Row, self).save(*args,**kwargs)
+
     def __str__(self):
         return self.row_choice
 
@@ -121,6 +128,9 @@ class RubricData(models.Model):
     enrollment = models.ForeignKey(Enrollment)
     assignment = models.ForeignKey(Assignment)
     completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
+
+    def __str__(self):
+        return "{} {}".format(self.enrollment, self.assignment)
 
     class Meta:
         unique_together = ("enrollment", "assignment")
