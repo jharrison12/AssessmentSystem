@@ -1,0 +1,16 @@
+{% extends 'dataview/base.html' %}
+		{% block headerid %}studentchoice{% endblock %}
+		{% block header_text %}Rubric Rows Associated with Standards{{ standard.name }}{% endblock %}
+
+		{% block form %}
+			<form method="POST" action="">
+				<select name="standardselect" id="standardselect">
+					{% for standard in standards %}
+						<option value="{{ standard.name }}">{{ standard }}</option>
+					{% endfor %}
+				</select>
+				<input name="submitbutton" type="submit" name="submit" value="submit" id="standardsubmit">
+				{% csrf_token %}
+			</form>
+
+		{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'dataview/base.html' %}
+		{% block headerid %}studentchoice{% endblock %}
+		{% block header_text %} Rubric Row Associated with Standard {{ standard.name }}{% endblock %}
+
+		{% block form %}
+			{% for rubric, row in rubrics.items %}
+				<h3>{{ rubric }}</h3>
+				{% for r in row %}
+					<p>Row name: {{ r }}</p>
+				{% endfor %}
+				<p></p>
+			{% empty %}
+				<p>No rubrics associated with this standard</p>
+			{% endfor %}
+
+
+		{% endblock %}

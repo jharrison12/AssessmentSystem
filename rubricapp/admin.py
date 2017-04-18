@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import models
 
-from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, Assignment, RubricData
+from .models import Semester, EdClasses, Student, Rubric, Row, Enrollment, Assignment, RubricData, Standard
 
 
 # For user creation
@@ -23,6 +23,10 @@ class RubricDataAdmin(admin.TabularInline):
 
     def has_add_permission(self, request):
         return False
+
+
+#class AssignmentAdmin(admin.ModelAdmin):
+
 
 
 class EnrollmentAdmin(admin.ModelAdmin):
@@ -91,13 +95,15 @@ class EdClassAdmin(admin.ModelAdmin):
         return False
 
 
-class EdClassSemesterAdmin(admin.ModelAdmin):
+class AssignmentAdmin(admin.ModelAdmin):
     actions = None
 
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "keyrubric":
             kwargs["queryset"] = Rubric.objects.filter(template=True)
-            return super(EdClassSemesterAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+            return super(AssignmentAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "edclass":
+            return super(AssignmentAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
@@ -114,7 +120,8 @@ class RowAdminInline(admin.TabularInline):
     model = Row
     extra = 0
     readonly_fields = ['name', 'row_choice', 'excellenttext', 'proficienttext', 'satisfactorytext',
-                       'unsatisfactorytext', ]
+                       'unsatisfactorytext', 'standards', ]
+    exclude = ['templatename']
     can_delete = False
 
     def has_add_permission(self, request):
@@ -124,7 +131,10 @@ class RowAdminInline(admin.TabularInline):
 class AddRowAdminInline(admin.TabularInline):
     model = Row
     extra = 0
-    fields = ['name', 'row_choice', 'excellenttext', 'proficienttext', 'satisfactorytext', 'unsatisfactorytext', ]
+    fields = ['name', 'row_choice', 'excellenttext', 'proficienttext', 'satisfactorytext', 'unsatisfactorytext', 'standards']
+
+    #def templatename(self,templatename):
+
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -150,9 +160,10 @@ class SemesterAdmin(admin.ModelAdmin):
 
 # Register your models here.
 
-admin.site.register(Assignment, EdClassSemesterAdmin)
+admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(EdClasses, EdClassAdmin)
 admin.site.register(Student)
 admin.site.register(Rubric, RubricAdmin)
 admin.site.register(Enrollment, EnrollmentAdmin)
+admin.site.register(Standard)

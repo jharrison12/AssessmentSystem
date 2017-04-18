@@ -52,22 +52,29 @@ class EdClasses(models.Model):
     teacher = models.ForeignKey(User)
 
     def __str__(self):
-        return self.subject + " " + self.coursenumber + " " + self.sectionnumber
+        return "{} {} {} {}".format(self.subject,self.coursenumber, self.sectionnumber, self.semester)
 
 
 class Assignment(models.Model):
     assignmentname = models.CharField(default="None", max_length=30)
     edclass = models.ForeignKey(EdClasses, null=False)
-    #semester = models.ForeignKey(Semester, null=False)
     keyrubric = models.ForeignKey(Rubric)
 
     def __str__(self):
-        return "%s%s%s%s" % (self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.assignmentname)
+        return "{}{}{}{}".format(self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.assignmentname)
       
     class Meta:
         unique_together = ("edclass",  "assignmentname")
 
+class Standard(models.Model):
+    name = models.CharField(null=False, max_length=50)
+    detail = models.TextField(null=False)
 
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        unique_together = ("name", "detail")
 
 class Row(models.Model):
     CHOICES = (
@@ -84,6 +91,15 @@ class Row(models.Model):
     proficienttext = models.TextField(default="", blank=True)
     satisfactorytext = models.TextField(default="", blank=True)
     unsatisfactorytext = models.TextField(default="", blank=True)
+    standards = models.ManyToManyField(Standard)
+    templatename= models.CharField(default="", max_length=100)
+
+    def save(self, *args, **kwargs):
+        if self.rubric.template == "True":
+            self.templatename = self.rubric.name
+            super(Row, self).save(*args,**kwargs)
+        else:
+            super(Row, self).save(*args,**kwargs)
 
     def __str__(self):
         return self.row_choice
@@ -113,5 +129,10 @@ class RubricData(models.Model):
     assignment = models.ForeignKey(Assignment)
     completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
 
+    def __str__(self):
+        return "{} {}".format(self.enrollment, self.assignment)
+
     class Meta:
         unique_together = ("enrollment", "assignment")
+
+

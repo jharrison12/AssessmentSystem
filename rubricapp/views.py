@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.CRITICAL)
 
 
 
@@ -118,7 +118,7 @@ def student_page(request, edclass, semester, assignmentname):
         #Delete below
         enrollmentsfalse = Enrollment.objects.filter(rubricdata__rubriccompleted=False)
         #logging.warning("How many enrollments when filtered? {} and they are {}".format(len(enrollmentsfalse), enrollmentsfalse.values()))
-        students = Student.objects.filter(enrollment__rubricdata__rubriccompleted=False, edclasses=edclassesPulled)
+        students = Student.objects.filter(enrollment__rubricdata__rubriccompleted=False, edclasses=edclassesPulled, enrollment__rubricdata__assignment=assignment).distinct()
         #students = Student.objects.filter(enrollment=enrollmentsfalse, edclasses=edclassesPulled)
         logging.warning("Students pulled {}\n Their data {}\n".format(students, students.values()))
         return render(request, 'rubricapp/student.html', {'students': students, 'semester': semester})
@@ -207,7 +207,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
         rubricforclass.pk = None
         rubricforclass.id = None
         rubricforclass.name = "{}{}{}{}".format(edclass, studentname, semester, re.sub(' ', '', classassignment.assignmentname))
-        logging.critical("The rubriclass.template value is {}".format(rubricforclass.template))
+        logging.warning("The rubriclass.template value is {}".format(rubricforclass.template))
         rubricforclass.template = False
         try:
             logging.warning("First part of try statement")
@@ -215,9 +215,14 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             rubricforclass.save()
             logging.warning("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
             for row in rows:
+                standards = row.standards.all()
+                logging.critical("Standards is {}".format(standards))
                 row.pk = None
                 row.rubric = rubricforclass
                 logging.warning("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
+                row.save()
+                row.standards.set(standards)
+                row.templatename = oldrubricname
                 row.save()
             RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
             rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)

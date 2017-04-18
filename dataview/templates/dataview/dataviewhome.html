@@ -7,4 +7,5 @@
 		<p>You got this far.  Take the day off</p>
 		<a href={% url 'dataview:student_view' %} id="studentlink">Look at one student's rubrics</a>
 		<a href={% url 'dataview:edclass_view' %} id="classlink">Look at aggregated class data</a>
-		{% endblock %}
+		<a href={% url 'dataview:standards_view' %} id="standardslink">Look at the standards data</a>
+{% endblock %}
