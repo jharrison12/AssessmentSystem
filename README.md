@@ -13,7 +13,9 @@ Accessing the /assessment/ page requires a login for the application
 
 <h2>/data/</h2>
 
-The application's data page gives the user two viewing options.  The first option allows the user to choose a student and then choose the course for which a professor or teacher has completed a rubric.  The second option allows the user to choose a semester and then choose class associated with that semester.  The class page will show aggregated rubric data and will show how many data points the aggregated rubric data represents. Access to the data view requires an administrative account.
+The application's data page gives the user three viewing options.  The first option allows the user to choose a student and then choose the course for which a professor or teacher has completed a rubric.  The second option allows the user to choose a semester and then choose class associated with that semester.  The class page will show aggregated rubric data and will show how many data points the aggregated rubric data represents. Access to the data view requires an administrative account.
+
+The third viewing option gives the user the ability to see which standards are associated with which rubric row.  If the user would like to see scores for the row, they will have to choose a semester and a standard.  However, if the user wants to see which rows in which rubrics are associated with which standards, they will need to choose the link "See what rubrics use what standards".
 
 <h2>/admin</h2>
 
@@ -48,3 +50,7 @@ A model that represents a particular semester.
 <h3>Students</h3>
 
 A model that represents a student instance. The student model includes a first name, last name and a student identification number (i.e. Lnumber).  Student instances can be deleted or edited, but this is highly discouraged. 
+
+<h3>Standards</h3> 
+
+A model that represents standards associated with rubric rows.  The user can choose more than one standard per row or they can choose none.  
