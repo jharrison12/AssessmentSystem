@@ -15,7 +15,6 @@ def home_page(request):
 def student_view(request):
 	#enrollmentstrue = Enrollment.objects.filter(rubricdata__rubriccompleted=True)
 	students = Student.objects.filter(enrollment__dataforrubric__rubricdata__rubriccompleted=True).distinct()
-	logging.warning("Students filtered {}".format(students))
 	if request.method == "POST":
 		return redirect(request.POST['studentnames']+ '/')
 	return render(request, 'dataview/studentview.html', {"students": students})
