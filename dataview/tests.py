@@ -984,14 +984,6 @@ class StandardView(TestCase):
         caeprow = Row.objects.get(name="Excellenceisahabit", rubric__template=True)
         caeprow.standards.add(intasc1)
         response = self.client.get("/data/standards/rubricview/intasc1/")
-        print(response.content.decode())
         self.assertIn("Excellenceisahabit", response.content.decode())
 
 
-
-
-
-
-            #def test_standards_view_redirects to correctpage(self):
-
-    ##TODO: Work on standard_rubric_view

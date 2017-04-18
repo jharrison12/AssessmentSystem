@@ -118,7 +118,7 @@ def student_page(request, edclass, semester, assignmentname):
         #Delete below
         enrollmentsfalse = Enrollment.objects.filter(rubricdata__rubriccompleted=False)
         #logging.warning("How many enrollments when filtered? {} and they are {}".format(len(enrollmentsfalse), enrollmentsfalse.values()))
-        students = Student.objects.filter(enrollment__rubricdata__rubriccompleted=False, edclasses=edclassesPulled)
+        students = Student.objects.filter(enrollment__rubricdata__rubriccompleted=False, edclasses=edclassesPulled, enrollment__rubricdata__assignment=assignment).distinct()
         #students = Student.objects.filter(enrollment=enrollmentsfalse, edclasses=edclassesPulled)
         logging.warning("Students pulled {}\n Their data {}\n".format(students, students.values()))
         return render(request, 'rubricapp/student.html', {'students': students, 'semester': semester})

@@ -153,6 +153,8 @@ def standards_semester_standard_view(request, semester, standard):
     for row in rowswithstandards:
          if row.templatename not in rowdata:
             rowdata[row.templatename][row.name] = [int(row.row_choice)]
+         elif row.name not in rowdata[row.templatename]:
+             rowdata[row.templatename][row.name] = [int(row.row_choice)]
          else:
              logging.warning("Made it to else statement.  Adding {}".format(int(row.row_choice)))
              rowdata[row.templatename][row.name].append(int(row.row_choice))

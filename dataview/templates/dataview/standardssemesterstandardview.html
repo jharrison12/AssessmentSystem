@@ -4,9 +4,9 @@
 
 		{% block form %}
 			{% for rubric, row in rubrics.items %}
-				{{ rubric }}
+				<h3>{{ rubric }}</h3>
 				{% for r,value in row.items %}
-					{{ r }} : {{ value }}
+					<p>{{ r }} : {{ value }}</p>
 				{% endfor %}
 
 				<p></p>

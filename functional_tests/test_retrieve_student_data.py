@@ -2,9 +2,11 @@ from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment, RubricData
+from rubricapp.models import Semester, EdClasses, Student, Enrollment, Rubric, Row, Assignment, RubricData,Standard
 from time import sleep
 from django.contrib.auth.models import User
+from django.test.utils import override_settings
+from django.conf import settings
 
 
 class DataView(FunctionalTest):
@@ -14,12 +16,14 @@ class DataView(FunctionalTest):
             edclassobj = EdClasses.objects.get(crn=i)
             Enrollment.objects.create(student=student, edclass=edclassobj)
 
-    def createrubricrow(self, name,excellenttext, rubric, row_choice):
+    def createrubricrow(self, name,excellenttext, rubric, row_choice, standardpassed):
         rowname = Row.objects.create(name=name,
                                      excellenttext=excellenttext,
                                      proficienttext="THE SECOND BEST!",
                                      satisfactorytext="THE THIRD BEST!",
-                                     unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice )
+                                     unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice)
+        rowname.standards.add(standardpassed)
+
         return rowname
 
 
@@ -39,10 +43,13 @@ class DataView(FunctionalTest):
         self.create_enrollment_for_student([2222, 3333], "21743148")
         self.create_enrollment_for_student([2222, 3333], "21743149")
 
+        intasc1 = Standard.objects.create(name="INTASC 1")
+        caep1 = Standard.objects.create(name="CAEP 1")
+
         writingrubric = Rubric.objects.create(name="writingrubric")
 
-        row1 = self.createrubricrow("Excellence","THE BEST!",writingrubric, 0)
-        row2 = self.createrubricrow("NONE", "THE GREATEST!", writingrubric,0)
+        row1 = self.createrubricrow("Excellence","THE BEST!",writingrubric, 0, intasc1)
+        row2 = self.createrubricrow("NONE", "THE GREATEST!", writingrubric,0, caep1)
 
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
@@ -52,12 +59,12 @@ class DataView(FunctionalTest):
         unitplan = Assignment.objects.create(edclass=edclass1, assignmentname="Unit Plan", keyrubric=writingrubric)
 
         completedrubricforbobwriting = Rubric.objects.create(name="EG50000121743148201530WritingAssignment4", template=False)
-        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 1)
-        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 1)
+        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 1, intasc1)
+        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 1, caep1)
 
         completedrubricforbobunit = Rubric.objects.create(name="EG50000121743148201530UnitPlan5", template=False)
-        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobunit, 4)
-        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobunit, 4)
+        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobunit, 4, intasc1)
+        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobunit, 4, caep1)
 
         bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
         RubricData.objects.create(assignment=writingassignment, enrollment=bobenrollment, rubriccompleted=True, completedrubric=completedrubricforbobwriting)
@@ -70,22 +77,24 @@ class DataView(FunctionalTest):
 
         communicationrubric = Rubric.objects.create(name="communicationrubric")
         communicationplan = Assignment.objects.create(edclass=EG9000201610,assignmentname="Communication Plan", keyrubric=communicationrubric)
+        intasc1 = Standard.objects.get(name="INTASC 1")
+        caep1 = Standard.objects.get(name="CAEP 1")
 
-        row1 = self.createrubricrow("Skills","STUPDENDOUS!",communicationrubric, 0)
-        row2 = self.createrubricrow("Karate", "AMAZING!", communicationrubric,0)
-        #communicationplan.keyrubric.add(communicationrubric)
+        row1 = self.createrubricrow("Skills","STUPDENDOUS!",communicationrubric, 0, intasc1)
+        row2 = self.createrubricrow("Karate", "AMAZING!", communicationrubric, 0, intasc1)
 
         jake = Student.objects.get(lastname="The Snake")
 
         jakeenrollment = Enrollment.objects.create(edclass=EG9000201610, student=jake)
         completedrubricforjakecommunication = Rubric.objects.create(name="EG9000010000CommunicationPlan6", template=False)
-        row1 = self.createrubricrow("Skills","STUPDENDOUS!",completedrubricforjakecommunication, 3)
-        row2 = self.createrubricrow("Karate", "AMAZING!", completedrubricforjakecommunication,3)
+        row1 = self.createrubricrow("Skills","STUPDENDOUS!",completedrubricforjakecommunication, 3, intasc1)
+        row2 = self.createrubricrow("Karate", "AMAZING!", completedrubricforjakecommunication, 3, intasc1)
 
         RubricData.objects.create(assignment=communicationplan, enrollment=jakeenrollment,rubriccompleted=True, completedrubric=completedrubricforjakecommunication)
 
 
     def test_professor_visits_the_main_page(self):
+
         # Professor pulls up the data view
         self.create_two_classes_for_unit_tests()
         self.browser.get("%s%s" % (self.server_url, '/data/'))
@@ -243,14 +252,52 @@ class DataView(FunctionalTest):
         standardslink = self.browser.find_element_by_id('standardslink')
         standardslink.click()
 
-        #
-        bodytext = self.browser.find_element_by_tag_name('body')
-        self.assertIn('201530', bodytext.text)
-        sleep(40)
+        #Professor checks to see if the 201530 Intasc Page has
+        #Correct numbers
+        bodyofpage = self.browser.find_element_by_tag_name('body')
+        self.assertIn('201530', bodyofpage.text)
         submit = self.browser.find_element_by_id('standardsubmit')
-
         submit.click()
-        sleep(20)
+        bodyofpage = self.browser.find_element_by_tag_name('body')
+        self.assertIn('INTASC 1', bodyofpage.text)
+        submit = self.browser.find_element_by_id('standardsubmit')
+        submit.click()
+        bodyofpage = self.browser.find_element_by_tag_name('body')
+        self.assertIn("Excellence", bodyofpage.text)
+        self.assertIn("2.5", bodyofpage.text)
+
+        #Professor visits the 201530 caep page.
+        self.browser.get("{}{}".format(self.server_url, '/data/standards/'))
+        submit = self.browser.find_element_by_id("standardsubmit")
+        submit.click()
+        caep1 = self.browser.find_element_by_xpath('//*[@id="standardsname"]/option[2]')
+        self.assertIn("CAEP 1", caep1.text)
+        caep1.click()
+        submit = self.browser.find_element_by_id('standardsubmit')
+        submit.click()
+        body = self.browser.find_element_by_tag_name('body')
+        self.assertIn("None", body.text)
+        self.assertIn("2.50", body.text)
+
+        #Professor visits 20160 page
+        self.browser.get("{}{}".format(self.server_url, '/data/standards/'))
+        semester2016 = self.browser.find_element_by_xpath('//*[@id="semestername"]/option[2]')
+        self.assertIn("201610", semester2016.text)
+        semester2016.click()
+        submit = self.browser.find_element_by_id('standardsubmit')
+        submit.click()
+        intasc1 = self.browser.find_element_by_xpath('//*[@id="standardsname"]/option[1]')
+        self.assertIn("INTASC 1", intasc1.text)
+        submit = self.browser.find_element_by_id('standardsubmit')
+        submit.click()
+        self.browser.get("{}{}".format(self.server_url, '/data/standards/201610/intasc1/'))
+        body = self.browser.find_element_by_tag_name("body")
+        self.assertIn('3.0',body.text)
+        self.assertIn("Karate",body.text)
+        self.assertIn("Skills", body.text)
+
+
+
 
 
 

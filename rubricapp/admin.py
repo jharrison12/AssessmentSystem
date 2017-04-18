@@ -25,6 +25,10 @@ class RubricDataAdmin(admin.TabularInline):
         return False
 
 
+#class AssignmentAdmin(admin.ModelAdmin):
+
+
+
 class EnrollmentAdmin(admin.ModelAdmin):
     inlines = (RubricDataAdmin,)
     model = Enrollment
@@ -91,13 +95,15 @@ class EdClassAdmin(admin.ModelAdmin):
         return False
 
 
-class EdClassSemesterAdmin(admin.ModelAdmin):
+class AssignmentAdmin(admin.ModelAdmin):
     actions = None
 
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "keyrubric":
             kwargs["queryset"] = Rubric.objects.filter(template=True)
-            return super(EdClassSemesterAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+            return super(AssignmentAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == "edclass":
+            return super(AssignmentAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
@@ -126,6 +132,9 @@ class AddRowAdminInline(admin.TabularInline):
     extra = 0
     fields = ['name', 'row_choice', 'excellenttext', 'proficienttext', 'satisfactorytext', 'unsatisfactorytext', 'standards']
 
+#    def templatename(self,templatename):
+
+
     def has_change_permission(self, request, obj=None):
         return False
 
@@ -150,7 +159,7 @@ class SemesterAdmin(admin.ModelAdmin):
 
 # Register your models here.
 
-admin.site.register(Assignment, EdClassSemesterAdmin)
+admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(EdClasses, EdClassAdmin)
 admin.site.register(Student)
