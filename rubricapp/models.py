@@ -91,10 +91,13 @@ class Row(models.Model):
     proficienttext = models.TextField(default="", blank=True)
     satisfactorytext = models.TextField(default="", blank=True)
     unsatisfactorytext = models.TextField(default="", blank=True)
-    standards = models.ManyToManyField(Standard)
+    standards = models.ManyToManyField(Standard, blank=True)
     templatename= models.CharField(default="", max_length=100)
 
     def save(self, *args, **kwargs):
+        #If the template is a rubric, the template name will update accordingly
+        #otherwise the logic defaults to the logic in the view which updates based upon the template name
+        #Potential TODO: Update logic view so it doesn't do the below
         if self.rubric.template == "True":
             self.templatename = self.rubric.name
             super(Row, self).save(*args,**kwargs)
