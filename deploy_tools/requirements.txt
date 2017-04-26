@@ -1,5 +1,0 @@
-Django==1.10.1
-django-debug-toolbar==1.7
-gunicorn==19.6.0
-selenium==2.53.6
-virtualenv==1.11.5
