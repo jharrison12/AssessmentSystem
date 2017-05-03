@@ -17,11 +17,13 @@ def home_page(request):
     semester = Semester.objects.all()
     # TODO CHANGE So that the view doesn't need to check for semester
     # Objects
+    """
     if Semester.objects.all().exists():
         pass
     else:
         Semester.objects.create(text="201530")
         Semester.objects.create(text="201610")
+    """
     if request.method == "POST":
         return redirect(request.POST['semester'] + '/')
     return render(request, 'rubricapp/home.html', {'semestercode': semester})
