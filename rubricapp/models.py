@@ -8,7 +8,7 @@ class Student(models.Model):
     lnumber = models.CharField(default="", unique=True, max_length=4)
 
     def __str__(self):
-        return self.firstname + " " + self.lastname
+        return self.firstname + " " + self.lastname + " " + self.lnumber
 
 
 
