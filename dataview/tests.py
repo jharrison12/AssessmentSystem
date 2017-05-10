@@ -704,7 +704,7 @@ class StandardView(TestCase):
 
     def setUp(self):
         intasc1 = Standard.objects.create(name='INTASC 1')
-        caep1 = Standard.objects.create(name="CAEP 1")
+        caep1 = Standard.objects.create(name="CAEP 1.2")
         empty = Standard.objects.create(name=" ")
         semester201530 = Semester.objects.create(text="201530")
         semester201610 = Semester.objects.create(text="201610")
@@ -907,9 +907,17 @@ class StandardView(TestCase):
         response = self.client.get('/data/standards/201530/intasc1/')
         self.assertIn("1.5", response.content.decode())
 
+    def test_sss_page_shows_scores(self):
+        response  = self.client.get('/data/standards/201530/caep1.2/')
+        self.assertIn("2.50", response.content.decode())
+
+    def test_sss_page_shows_scores(self):
+        response  = self.client.get('/data/standards/201610/caep1.2/')
+        self.assertIn("3.67", response.content.decode())
+
     def test_sss_page_works_with_multiple_rubrics(self):
         intasc1 = Standard.objects.get(name='INTASC 1')
-        caep1 = Standard.objects.get(name="CAEP 1")
+        caep1 = Standard.objects.get(name="CAEP 1.2")
         semester201530 = Semester.objects.get(text="201530")
         semester201610 = Semester.objects.get(text="201610")
         kelly = User.objects.get(username="kelly")
@@ -1010,5 +1018,9 @@ class StandardView(TestCase):
         caeprow.standards.add(intasc1)
         response = self.client.get("/data/standards/rubricview/intasc1/")
         self.assertIn("Excellenceisahabit", response.content.decode())
+
+    def test_caep_standard_with_period_works(self):
+        response = self.client.get('/data/standards/rubricview/caep1.2/')
+        self.assertContains(response, 'Excellenceisahabit', status_code=200)
 
 
