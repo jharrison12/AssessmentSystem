@@ -114,8 +114,8 @@ class NewVisitorTest(FunctionalTest):
         studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
         self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
         studentname = self.browser.find_elements_by_tag_name('option')
-        self.assertIn("Bob DaBuilder", [i.text for i in studentname])
-        self.assertIn("Jane Doe", [i.text for i in studentname])
+        self.assertIn("Bob DaBuilder 21743148", [i.text for i in studentname])
+        self.assertIn("Jane Doe 21743149", [i.text for i in studentname])
         submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 

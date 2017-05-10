@@ -7,7 +7,7 @@
 		<form method="POST" action={{ student.lnumber }}>
 			<select name="studentnames" id="studentdropdown">
 					{% for student in students %}
-					<option value="{{ student.lnumber }}" id={{ student.lnumber }}>{{ student.firstname }} {{ student.lastname }}</option>
+					<option value="{{ student.lnumber }}" id={{ student.lnumber }}>{{ student.firstname }} {{ student.lastname }} {{ student.lnumber }}</option>
 					{% endfor %}	
 			</select>
 			<input name="submitbutton" type="submit" name="submit" value="Submit" id="studentsubmit">
