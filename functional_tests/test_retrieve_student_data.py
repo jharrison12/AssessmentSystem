@@ -296,6 +296,13 @@ class DataView(FunctionalTest):
         self.assertIn("Karate",body.text)
         self.assertIn("Skills", body.text)
 
+        #Professor wonders what rubric rows are associated with which standard
+        self.browser.get("{}{}".format(self.server_url, '/data/standards/rubricview'))
+        intasc1 = self.browser.find_element_by_tag_name('body')
+        self.assertIn("INTASC 1", intasc1.text)
+        ubmit = self.browser.find_element_by_id('standardsubmit')
+        submit.click()
+
 
 
 

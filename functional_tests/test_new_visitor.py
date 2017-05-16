@@ -34,12 +34,12 @@ class NewVisitorTest(FunctionalTest):
         row1 = Row.objects.create(excellenttext="THE BEST!",
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
+                                  unsatisfactorytext="YOU'RE LAST", rubric=writingrubric, name="Excellence is a habit")
 
         row2 = Row.objects.create(excellenttext="THE GREATEST!",
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST", rubric=writingrubric)
+                                  unsatisfactorytext="YOU'RE LAST", rubric=writingrubric, name="Mediocrity is a habit")
 
         row3 = Row.objects.create(excellenttext="AMAZING!",
                                   proficienttext="THE SECOND BEST!",
@@ -109,7 +109,6 @@ class NewVisitorTest(FunctionalTest):
         submitbutton.send_keys(Keys.ENTER)
 
         chooseAStudent = self.browser.find_element_by_id('choosename')
-
         # Dr. chooses a student name from a drop down list of student names
         studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
         self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
@@ -119,13 +118,17 @@ class NewVisitorTest(FunctionalTest):
         submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 
-        # A new page should appear with the students name
+        # A new page should appear with the student's name
         studentnameheader = self.browser.find_element_by_id('studentheader')
         self.assertIn("DaBuilder, Bob", studentnameheader.text)
 
-        # A rubric should appear based upon the key assignment
+        # A rubric should appear based upon the key assignment with row names
         rubricheader = self.browser.find_element_by_id('rubricheader')
         self.assertIn("Writing Rubric", rubricheader.text)
+        bodytext = self.browser.find_element_by_tag_name('body')
+        self.assertIn("Excellence is a habit", bodytext.text)  # row name should stil be there
+        self.assertIn("THE BEST!", bodytext.text)
+
         # The rubric should allow the professor to click on a matrix of rows
 
         row1dropdown = self.browser.find_element_by_id('id_form-0-row_choice')
@@ -143,6 +146,8 @@ class NewVisitorTest(FunctionalTest):
         submitbutton = self.browser.find_element_by_id('rubricsubmit')
         submitbutton.send_keys(Keys.ENTER)
         bodytext = self.browser.find_element_by_tag_name('body')
+        sleep(60)
+        self.assertIn("Excellence is a habit", bodytext.text) #row name should stil be there
         self.assertIn("THE BEST!", bodytext.text)
 
         # Dr. discoveres that empty values are not accepted in the rubric
