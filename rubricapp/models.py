@@ -84,7 +84,7 @@ class Row(models.Model):
     ('2','Partially Proficient'),
     ('1','Incomplete'),
     )
-    name = models.CharField(default="None", max_length=100)
+    name = models.CharField(default="None", max_length=100,blank=True)
     rubric = models.ForeignKey(Rubric)
     row_choice = models.CharField(max_length=20,choices=CHOICES, default="0")
     excellenttext = models.TextField(default="", blank=True)

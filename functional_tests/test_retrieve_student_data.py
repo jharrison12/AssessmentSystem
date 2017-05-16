@@ -124,7 +124,7 @@ class DataView(FunctionalTest):
         studentdropdown = self.browser.find_element_by_id('studentnames')
         self.assertEqual(studentdropdown.get_attribute('name'), 'studentnames')
         studentname = self.browser.find_elements_by_tag_name('option')
-        self.assertIn("Bob DaBuilder", [i.text for i in studentname])
+        self.assertIn("Bob DaBuilder 21743148", [i.text for i in studentname])
         submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
         submitbuttonstudent.send_keys(Keys.ENTER)
 
@@ -300,8 +300,9 @@ class DataView(FunctionalTest):
         self.browser.get("{}{}".format(self.server_url, '/data/standards/rubricview'))
         intasc1 = self.browser.find_element_by_tag_name('body')
         self.assertIn("INTASC 1", intasc1.text)
-        ubmit = self.browser.find_element_by_id('standardsubmit')
+        submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
+        ##TODO FINISH
 
 
 

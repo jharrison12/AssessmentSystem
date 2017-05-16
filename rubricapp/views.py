@@ -152,13 +152,16 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     rows = Row.objects.filter(rubric=rubricforclass)
     greatEnrollment = Enrollment.objects.get(student=student, edclass=edclassenrolled)#, rubricdata__rubricdata__rubriccompleted=False)
     rubricdata = RubricData.objects.get_or_create(enrollment=greatEnrollment, assignment=classassignment)
-    if request.method == 'POST':
+    if request.method == "POST":
         # this should return a single Enrollment object
-        logging.info("Posting")
+        logging.critical("Posting")
+        logging.critical("{}".format(request.POST))
         RowFormSetWeb = RowFormSet(request.POST)
         try:
             RowFormSetWeb.clean()
+            logging.critical("MADE IT HERE {}".format(RowFormSetWeb))
             savedFormset = RowFormSetWeb.save(commit=False)
+            logging.critical("MADE IT HERE1")
             # Not sure if the below is necessary.  But it works!
             for i in savedFormset:
                 # i.rubric = rubricafterpost
@@ -178,10 +181,10 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             #greatEnrollment.save()
             logging.info("Great enrollment id is %d" % greatEnrollment.pk)
             return redirect('/assessment/' + semester + '/' + edclass + '/' + assignmentname + '/')
-        except ValidationError:
+        except ValidationError as e:
             # Hard coding error message not ideal, but I was having real issues
             # with having the RowFormSet to post an error message.
-            logging.info("You reached validation error")
+            logging.info("You reached validation error{}".format(e))
             errorrow = "You must choose a value for all rows!"
             RowsForCompletedRubric = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
             # Zipping the two lists allows you to iterate both the RowFormSet and the rows once

@@ -95,7 +95,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertEqual(dropdown_list.get_attribute('name'), "edClass")
         classchoice = self.browser.find_elements_by_tag_name('option')
         self.assertIn("EG 5000 01", [i.text for i in classchoice])
-
+        #sleep(60)
         # Dr. clicks on a "Choose" button and is taken to a new page
         submitbutton = self.browser.find_element_by_id('classubmit')
         submitbutton.send_keys(Keys.ENTER)
@@ -146,7 +146,6 @@ class NewVisitorTest(FunctionalTest):
         submitbutton = self.browser.find_element_by_id('rubricsubmit')
         submitbutton.send_keys(Keys.ENTER)
         bodytext = self.browser.find_element_by_tag_name('body')
-        sleep(60)
         self.assertIn("Excellence is a habit", bodytext.text) #row name should stil be there
         self.assertIn("THE BEST!", bodytext.text)
 
@@ -198,8 +197,8 @@ class NewVisitorTest(FunctionalTest):
         studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
         self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
         studentname = self.browser.find_elements_by_tag_name('option')
-        self.assertIn("Bob DaBuilder", [i.text for i in studentname])
-        self.assertIn("Jane Doe", [i.text for i in studentname])
+        self.assertIn("Bob DaBuilder 21743148", [i.text for i in studentname])
+        self.assertIn("Jane Doe 21743149", [i.text for i in studentname])
 
         # Dr. chooses a student
         bob = self.browser.find_element_by_id('21743148')
@@ -220,8 +219,8 @@ class NewVisitorTest(FunctionalTest):
         studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
         self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
         studentname = self.browser.find_elements_by_tag_name('option')
-        self.assertNotIn("Bob DaBuilder", [i.text for i in studentname])
-        self.assertIn("Jane Doe", [i.text for i in studentname])
+        self.assertNotIn("Bob DaBuilder 21743148", [i.text for i in studentname])
+        self.assertIn("Jane Doe 21743149", [i.text for i in studentname])
 
         # Dr. chooses Jane Doe
         jane = self.browser.find_element_by_id('21743149')
