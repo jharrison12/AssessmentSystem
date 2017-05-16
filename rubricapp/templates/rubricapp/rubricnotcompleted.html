@@ -12,6 +12,7 @@
 						{{ error }}
 				{% else %}
 				<tr>
+					<th>Row Name</th>
 					<th></th>
 					<th>Excellent</th>
 					<th>Proficient</th>
@@ -22,6 +23,7 @@
 								{{ RowFormSetWeb.management_form }}
 								{{ form.id }}				
 					<tr>
+						<td>{{ form.name }}</td>
 						<td>{{ form.row_choice }}</td>
 
 						<td>{{ row.excellenttext }}</td>

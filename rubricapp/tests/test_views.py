@@ -393,7 +393,9 @@ class AssignmentViewTest(TestCase):
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"2",
+               "form-1-name": "None",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -417,7 +419,9 @@ class AssignmentViewTest(TestCase):
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"2",
+               "form-1-name": "None",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -463,7 +467,7 @@ class StudentandRubricViewTest(TestCase):
         row1 = Row.objects.create(excellenttext="THE BEST!",
                                   proficienttext="THE SECOND BEST!",
                                   satisfactorytext="THE THIRD BEST!",
-                                  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric)
+                                  unsatisfactorytext="YOU'RE LAST",rubric=writingrubric, name="Excellence is a habit")
         row1.standards.add(intasc1)
 
         row2 = Row.objects.create(excellenttext="THE GREATEST!",
@@ -477,16 +481,6 @@ class StudentandRubricViewTest(TestCase):
         edclasssemester = Assignment.objects.create( edclass=edclass, assignmentname="Writing Assignment", keyrubric=writingrubric)
         edclasssemester1 = Assignment.objects.create( edclass=edclass1, assignmentname="Writing Assignment", keyrubric=writingrubric)
         edclasssemester2 = Assignment.objects.create(edclass=edclass2, assignmentname="Writing Assignment", keyrubric=writingrubric)
-        #edclasssemester.keyrubric.add(writingrubric)
-        #edclasssemester1.keyrubric.add(writingrubric)
-        #edclasssemester2.keyrubric.add(writingrubric)
-
-
-        #Many to many relationship must be added after creation of objects
-        #because the manyto-many relationship is not a column in the database
-        #edclass1.keyrubric.add(writingrubric)
-        #edclass2.keyrubric.add(writingrubric)
-        #edclass.keyrubric.add(writingrubric)
 
 
     def test_rubric_page_not_viewable_by_dasterdaly_bob(self):
@@ -507,6 +501,11 @@ class StudentandRubricViewTest(TestCase):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
         response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
         self.assertContains(response, "DaBuilder, Bob")
+
+    def test_student_and_rubric_view_shows_row_name(self):
+        self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
+        response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
+        self.assertContains(response, "Excellence is a habit")
 
     def test_student_and_rubric_view_has_excellent_grade(self):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
@@ -530,11 +529,14 @@ class StudentandRubricViewTest(TestCase):
         #soup = BeautifulSoup(response.content)
         #form = soup.find('form')
         #print(form)
-        data ={"form-TOTAL_FORMS": "2",
+        data ={"form-0-name": "Excellence is a habit",
+               "form-TOTAL_FORMS": "2",
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"1",
+               "form-1-name": "None",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -551,11 +553,14 @@ class StudentandRubricViewTest(TestCase):
         self.assertEqual(row.count(), 2)
         #Why do you need to get the response before you can post it?????
         response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
-        data ={"form-TOTAL_FORMS": "2",
+        data ={"form-0-name": "Excellence is a habit",
+               "form-TOTAL_FORMS": "2",
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"1",
+               "form-1-name": "None",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -580,7 +585,9 @@ class StudentandRubricViewTest(TestCase):
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"1",
+               "form-1-name": "NONE",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -595,7 +602,9 @@ class StudentandRubricViewTest(TestCase):
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"1",
+               "form-1-name": "None",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -616,7 +625,9 @@ class StudentandRubricViewTest(TestCase):
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"0",
+               "form-1-name": "None",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -632,7 +643,9 @@ class StudentandRubricViewTest(TestCase):
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"0",
+               "form-1-name": "None",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -648,7 +661,9 @@ class StudentandRubricViewTest(TestCase):
                "form-INITIAL_FORMS": "2",
                "form-MIN_NUM_FORMS": "0",
                "form-MAX_NUM_FORMS": "1000",
+               "form-0-name": "Excellence is a habit",
                "form-0-row_choice":"0",
+               "form-1-name": "None",
                "form-1-row_choice":"2",
                "form-0-id": "3",
                "form-1-id": "4"}
@@ -711,7 +726,9 @@ class StudentandRubricViewTest(TestCase):
                 "form-INITIAL_FORMS": "2",
                 "form-MIN_NUM_FORMS": "0",
                 "form-MAX_NUM_FORMS": "1000",
+                "form-0-name": "Excellence is a habit",
                 "form-0-row_choice": "1",
+                "form-1-name": "None",
                 "form-1-row_choice": "2",
                 "form-0-id": "3",
                 "form-1-id": "4"}
@@ -732,7 +749,9 @@ class StudentandRubricViewTest(TestCase):
                 "form-INITIAL_FORMS": "2",
                 "form-MIN_NUM_FORMS": "0",
                 "form-MAX_NUM_FORMS": "1000",
+                "form-0-name": "Excellence is a habit",
                 "form-0-row_choice": "1",
+                "form-1-name": "None",
                 "form-1-row_choice": "2",
                 "form-0-id": "3",
                 "form-1-id": "4"}
@@ -757,7 +776,9 @@ class StudentandRubricViewTest(TestCase):
                 "form-INITIAL_FORMS": "2",
                 "form-MIN_NUM_FORMS": "0",
                 "form-MAX_NUM_FORMS": "1000",
+                "form-0-name": "Excellence is a habit",
                 "form-0-row_choice": "1",
+                "form-1-name": "None",
                 "form-1-row_choice": "2",
                 "form-0-id": "3",
                 "form-1-id": "4"}
@@ -779,7 +800,9 @@ class StudentandRubricViewTest(TestCase):
                 "form-INITIAL_FORMS": "2",
                 "form-MIN_NUM_FORMS": "0",
                 "form-MAX_NUM_FORMS": "1000",
+                "form-0-name": "Excellence is a habit",
                 "form-0-row_choice": "1",
+                "form-1-name": "None",
                 "form-1-row_choice": "2",
                 "form-0-id": "3",
                 "form-1-id": "4"}
@@ -802,7 +825,9 @@ class StudentandRubricViewTest(TestCase):
                 "form-INITIAL_FORMS": "2",
                 "form-MIN_NUM_FORMS": "0",
                 "form-MAX_NUM_FORMS": "1000",
+                "form-0-name": "Excellence is a habit",
                 "form-0-row_choice": "1",
+                "form-1-name": "None",
                 "form-1-row_choice": "2",
                 "form-0-id": "3",
                 "form-1-id": "4"}

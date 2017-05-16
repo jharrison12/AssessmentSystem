@@ -199,7 +199,6 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     else:
         # This view returns a brandnew copy of the rubric based upon
         # the rubric associated with the edclass
-        # rubricforclass = edclassenrolled.keyrubric.get()
         classassignment = Assignment.objects.get(pk=assignmentpk)#edclass=edclassenrolled,  assignmentname=assignmentname)
         rubricforclass = classassignment.keyrubric
         oldrubricname = rubricforclass.name
@@ -218,7 +217,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
             logging.warning("DID THE RUBRIC UDPATE? %s" % rubricforclass.pk)
             for row in rows:
                 standards = row.standards.all()
-                logging.critical("Standards is {}".format(standards))
+                logging.info("Standards is {}".format(standards))
                 row.pk = None
                 row.rubric = rubricforclass
                 logging.warning("THE RUBRIC FOR CLASS IS: %d" % rubricforclass.id)
@@ -227,6 +226,7 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
                 row.templatename = oldrubricname
                 row.save()
             RowFormSetWeb = RowFormSet(queryset=Row.objects.filter(rubric=rubricforclass))
+            logging.info("{}\n\n".format(RowFormSetWeb))
             rubricForClassText = re.sub('rubric', ' rubric', oldrubricname)
             logging.info("At the end of the long view, the rubric is %s" % rubricforclass.pk)
             return render(request, 'rubricapp/rubric.html', {'studentlnumber': student.lnumber,

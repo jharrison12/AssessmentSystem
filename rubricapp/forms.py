@@ -45,7 +45,7 @@ class BaseRowFormSet(BaseModelFormSet):
 		return row_choice_data
 				
 		
-RowFormSet = modelformset_factory(Row, fields=('row_choice','excellenttext','proficienttext','satisfactorytext', 'unsatisfactorytext'), formset=BaseRowFormSet, extra=0) #extra=0 keeps the formset from creating new form
+RowFormSet = modelformset_factory(Row, fields=('name','row_choice','excellenttext','proficienttext','satisfactorytext', 'unsatisfactorytext'), formset=BaseRowFormSet, extra=0) #extra=0 keeps the formset from creating new form
 
 class PwordChangeForm(PasswordChangeForm):
 	pass

@@ -12,6 +12,7 @@
     {{ error }}
     {% else %}
     <tr>
+        <th>Row name</th>
         <th></th>
         <th>Excellent</th>
         <th>Proficient</th>
@@ -20,14 +21,15 @@
     </tr>
 
     {{ RowFormSetWeb.management_form }}
-    {% for form in RowFormSetWeb %}
-    {{ form.id }}
+    {% for formrow in RowFormSetWeb %}
+    {{ formrow.id }}
     <tr>
-        <td>{{ form.row_choice }}</td>
-        <td>{{ form.excellenttext.value }}</td>
-        <td>{{ form.proficienttext.value }}</td>
-        <td>{{ form.satisfactorytext.value }}</td>
-        <td>{{ form.unsatisfactorytext.value }}</td>
+        <td>{{ formrow.name.value }}</td>
+        <td>{{ formrow.row_choice }} </td>
+        <td>{{ formrow.excellenttext.value }}</td>
+        <td>{{ formrow.proficienttext.value }}</td>
+        <td>{{ formrow.satisfactorytext.value }}</td>
+        <td>{{ formrow.unsatisfactorytext.value }}</td>
 
     </tr>
     <!---
