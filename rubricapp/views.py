@@ -154,14 +154,12 @@ def rubric_page(request, edclass, studentname, semester, assignmentname):
     rubricdata = RubricData.objects.get_or_create(enrollment=greatEnrollment, assignment=classassignment)
     if request.method == "POST":
         # this should return a single Enrollment object
-        logging.critical("Posting")
-        logging.critical("{}".format(request.POST))
+        logging.info("Posting")
+        logging.info("{}".format(request.POST))
         RowFormSetWeb = RowFormSet(request.POST)
         try:
             RowFormSetWeb.clean()
-            logging.critical("MADE IT HERE {}".format(RowFormSetWeb))
             savedFormset = RowFormSetWeb.save(commit=False)
-            logging.critical("MADE IT HERE1")
             # Not sure if the below is necessary.  But it works!
             for i in savedFormset:
                 # i.rubric = rubricafterpost

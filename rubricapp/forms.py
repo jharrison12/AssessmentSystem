@@ -41,7 +41,7 @@ class BaseRowFormSet(BaseModelFormSet):
 		
 		for form in self.forms:
 			row_choice_data = form.cleaned_data['row_choice']
-			logging.critical(" THE CLEANED DATA {}".format(form.cleaned_data))
+			logging.info(" THE CLEANED DATA {}".format(form.cleaned_data))
 			#note: line below does not work for None.  Must be 0. 
 			if form.cleaned_data['row_choice'] == '0':
 				raise forms.ValidationError('You must make a choice')

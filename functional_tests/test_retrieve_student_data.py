@@ -16,12 +16,12 @@ class DataView(FunctionalTest):
             edclassobj = EdClasses.objects.get(crn=i)
             Enrollment.objects.create(student=student, edclass=edclassobj)
 
-    def createrubricrow(self, name,excellenttext, rubric, row_choice, standardpassed):
+    def createrubricrow(self, name,excellenttext, rubric, row_choice, standardpassed, templatename):
         rowname = Row.objects.create(name=name,
                                      excellenttext=excellenttext,
                                      proficienttext="THE SECOND BEST!",
                                      satisfactorytext="THE THIRD BEST!",
-                                     unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice)
+                                     unsatisfactorytext="YOU'RE LAST", rubric=rubric, row_choice=row_choice, templatename=templatename)
         rowname.standards.add(standardpassed)
 
         return rowname
@@ -48,8 +48,8 @@ class DataView(FunctionalTest):
 
         writingrubric = Rubric.objects.create(name="writingrubric")
 
-        row1 = self.createrubricrow("Excellence","THE BEST!",writingrubric, 0, intasc1)
-        row2 = self.createrubricrow("NONE", "THE GREATEST!", writingrubric,0, caep1)
+        row1 = self.createrubricrow("Excellence","THE BEST!",writingrubric, 0, intasc1, "writingrubric")
+        row2 = self.createrubricrow("NONE", "THE GREATEST!", writingrubric,0, caep1, "writingrubric")
 
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
@@ -58,13 +58,13 @@ class DataView(FunctionalTest):
         writingassignment = Assignment.objects.create(edclass=edclass1, assignmentname="Writing Assignment", keyrubric=writingrubric)
         unitplan = Assignment.objects.create(edclass=edclass1, assignmentname="Unit Plan", keyrubric=writingrubric)
 
-        completedrubricforbobwriting = Rubric.objects.create(name="EG50000121743148201530WritingAssignment4", template=False)
-        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 1, intasc1)
-        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 1, caep1)
+        completedrubricforbobwriting = Rubric.objects.create( name="EG50000121743148201530WritingAssignment4", template=False)
+        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 1, intasc1, "writingrubric")
+        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 1, caep1, "writingrubric")
 
         completedrubricforbobunit = Rubric.objects.create(name="EG50000121743148201530UnitPlan5", template=False)
-        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobunit, 4, intasc1)
-        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobunit, 4, caep1)
+        row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobunit, 4, intasc1, "writingrubric")
+        row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobunit, 4, caep1, "writingrubric")
 
         bobenrollment = Enrollment.objects.get(edclass=edclass1, student=bob)
         RubricData.objects.create(assignment=writingassignment, enrollment=bobenrollment, rubriccompleted=True, completedrubric=completedrubricforbobwriting)
@@ -80,15 +80,15 @@ class DataView(FunctionalTest):
         intasc1 = Standard.objects.get(name="INTASC 1")
         caep1 = Standard.objects.get(name="CAEP 1")
 
-        row1 = self.createrubricrow("Skills","STUPDENDOUS!",communicationrubric, 0, intasc1)
-        row2 = self.createrubricrow("Karate", "AMAZING!", communicationrubric, 0, intasc1)
+        row1 = self.createrubricrow("Skills","STUPDENDOUS!",communicationrubric, 0, intasc1, "communicationrubric")
+        row2 = self.createrubricrow("Karate", "AMAZING!", communicationrubric, 0, intasc1, "communicationrubric")
 
         jake = Student.objects.get(lastname="The Snake")
 
         jakeenrollment = Enrollment.objects.create(edclass=EG9000201610, student=jake)
         completedrubricforjakecommunication = Rubric.objects.create(name="EG9000010000CommunicationPlan6", template=False)
-        row1 = self.createrubricrow("Skills","STUPDENDOUS!",completedrubricforjakecommunication, 3, intasc1)
-        row2 = self.createrubricrow("Karate", "AMAZING!", completedrubricforjakecommunication, 3, intasc1)
+        row1 = self.createrubricrow("Skills","STUPDENDOUS!",completedrubricforjakecommunication, 3, intasc1,"communicationrubric")
+        row2 = self.createrubricrow("Karate", "AMAZING!", completedrubricforjakecommunication, 3, intasc1, "communicationrubric")
 
         RubricData.objects.create(assignment=communicationplan, enrollment=jakeenrollment,rubriccompleted=True, completedrubric=completedrubricforjakecommunication)
 
@@ -258,8 +258,9 @@ class DataView(FunctionalTest):
         self.assertIn('201530', bodyofpage.text)
         submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
-        bodyofpage = self.browser.find_element_by_tag_name('body')
-        self.assertIn('INTASC 1', bodyofpage.text)
+        intascinpage = self.browser.find_element_by_xpath('//*[@id="INTASC"]')
+        self.assertIn('INTASC 1', intascinpage.text)
+        intascinpage.click()
         submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
         bodyofpage = self.browser.find_element_by_tag_name('body')
@@ -270,7 +271,7 @@ class DataView(FunctionalTest):
         self.browser.get("{}{}".format(self.server_url, '/data/standards/'))
         submit = self.browser.find_element_by_id("standardsubmit")
         submit.click()
-        caep1 = self.browser.find_element_by_xpath('//*[@id="standardsname"]/option[2]')
+        caep1 = self.browser.find_element_by_xpath('//*[@id="standardsname"]/option[1]')
         self.assertIn("CAEP 1", caep1.text)
         caep1.click()
         submit = self.browser.find_element_by_id('standardsubmit')
@@ -286,7 +287,7 @@ class DataView(FunctionalTest):
         semester2016.click()
         submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
-        intasc1 = self.browser.find_element_by_xpath('//*[@id="standardsname"]/option[1]')
+        intasc1 = self.browser.find_element_by_xpath('//*[@id="INTASC"]')
         self.assertIn("INTASC 1", intasc1.text)
         submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
@@ -302,6 +303,8 @@ class DataView(FunctionalTest):
         self.assertIn("INTASC 1", intasc1.text)
         submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
+        body = self.browser.find_element_by_tag_name('body')
+        self.assertIn("writingrubric", body.text)
         ##TODO FINISH
 
 

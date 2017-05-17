@@ -75,6 +75,7 @@ class Standard(models.Model):
 
     class Meta:
         unique_together = ("name", "detail")
+        ordering = ['name']
 
 class Row(models.Model):
     CHOICES = (

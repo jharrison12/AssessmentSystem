@@ -200,6 +200,6 @@ def rubric_standard_individual_view(request, standard):
 			rowdata[row.templatename] = set([row.name])
 		else:
 			rowdata[row.templatename].add(row.name)
-	logging.critical("Does this work? {}".format(rowdata))
 	rowdata = dict(rowdata)
+	logging.critical("Does this work? SHOULD HAVE RUBRIC NAME{}".format(rowdata))
 	return render(request, 'dataview/rubricstandardindividual.html', {'rubrics':rowdata})

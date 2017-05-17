@@ -526,9 +526,6 @@ class StudentandRubricViewTest(TestCase):
         self.add_two_classes_to_semester_add_two_students_to_class_add_one_row()
 
         response = self.client.get("/assessment/201530/EG500001/writingassignment1/21743148/")
-        #soup = BeautifulSoup(response.content)
-        #form = soup.find('form')
-        #print(form)
         data ={"form-0-name": "Excellence is a habit",
                "form-TOTAL_FORMS": "2",
                "form-INITIAL_FORMS": "2",
@@ -650,7 +647,6 @@ class StudentandRubricViewTest(TestCase):
                "form-1-id": "4"}
 
         response = self.client.post("/assessment/201530/EG500001/writingassignment1/21743148/", data)
-        print(response.content.decode())
         self.assertContains(response, "You must choose a value for all rows!")
         self.assertContains(response, "Excellence is a habit" )
 
@@ -832,8 +828,8 @@ class StudentandRubricViewTest(TestCase):
         row2 = Row.objects.get(proficienttext="THE 2nd BEST!", rubric=bobrubricdata.completedrubric)
         row1 = Row.objects.get(excellenttext="THE BEST!", rubric=bobrubricdata.completedrubric)
         self.assertEquals(2, row2.standards.count())
-        self.assertEquals("INTASC 1", row2.standards.all()[0].name)
-        self.assertEquals("CAEP 1", row2.standards.all()[1].name)
+        self.assertEquals("CAEP 1", row2.standards.all()[0].name)
+        self.assertEquals("INTASC 1", row2.standards.all()[1].name)
         self.assertEquals("INTASC 1", row1.standards.all()[0].name)
 
     def test_rubric_copies_template_name(self):
