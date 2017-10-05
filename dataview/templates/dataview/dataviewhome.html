@@ -5,7 +5,9 @@
 		{% block header_text %}Choose a data retrieval method{% endblock %}
 		{% block form %}
 		<p>You got this far.  Take the day off</p>
-		<a href={% url 'dataview:student_view' %} id="studentlink">Look at one student's rubrics</a>
-		<a href={% url 'dataview:edclass_view' %} id="classlink">Look at aggregated class data</a>
-		<a href={% url 'dataview:standards_view' %} id="standardslink">Look at the standards data</a>
+		<ul style="list-style-type:none">
+		<li><a href={% url 'dataview:student_view' %} id="studentlink">Look at one student's rubrics</a></li>
+		<li><a href={% url 'dataview:edclass_view' %} id="classlink">Look at aggregated class data</a></li>
+		<li><a href={% url 'dataview:standards_view' %} id="standardslink">Look at the standards data</a></li>
+		</ul>
 {% endblock %}
