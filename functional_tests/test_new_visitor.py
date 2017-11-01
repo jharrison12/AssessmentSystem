@@ -251,5 +251,9 @@ class NewVisitorTest(FunctionalTest):
         home.click()
         semester_header_text = self.browser.find_element_by_id('semester').text
         self.assertIn("Choose a Semester!", semester_header_text)
+		
+		#
+        self.browser.get(self.server_url + '/user/')
+        sleep(60)
 
 
