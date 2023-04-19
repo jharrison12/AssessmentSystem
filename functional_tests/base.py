@@ -4,7 +4,6 @@ import sys
 from django.test import LiveServerTestCase, Client
 from django.contrib.auth.models import User
 
-
 class FunctionalTest(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -21,7 +20,7 @@ class FunctionalTest(StaticLiveServerTestCase):
             super().tearDownClass()
 
     def setUp(self):
-        self.browser = webdriver.Chrome()
+        self.browser = webdriver.Chrome("C:\\Users\\jharrison\\Desktop\\chromedriver_win32\\chromedriver.exe")
         self.client = Client()
         self.username = 'bob'
         self.email = 'test@test.com'
