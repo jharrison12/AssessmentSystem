@@ -48,8 +48,8 @@ class EdClasses(models.Model):
     sectionnumber = models.CharField(max_length=2, blank=False)
     students = models.ManyToManyField(Student, through="Enrollment")
     #keyrubric = models.ManyToManyField(Rubric)
-    semester = models.ForeignKey(Semester)
-    teacher = models.ForeignKey(User)
+    semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self):
         return "{} {} {} {}".format(self.subject,self.coursenumber, self.sectionnumber, self.semester)
@@ -57,8 +57,8 @@ class EdClasses(models.Model):
 
 class Assignment(models.Model):
     assignmentname = models.CharField(default="None", max_length=30)
-    edclass = models.ForeignKey(EdClasses, null=False)
-    keyrubric = models.ForeignKey(Rubric)
+    edclass = models.ForeignKey(EdClasses, null=False,on_delete=models.CASCADE)
+    keyrubric = models.ForeignKey(Rubric,on_delete=models.CASCADE)
 
     def __str__(self):
         return "{}{}{}{}".format(self.edclass.subject, self.edclass.coursenumber, self.edclass.sectionnumber, self.assignmentname)
@@ -86,7 +86,7 @@ class Row(models.Model):
     ('1','Incomplete'),
     )
     name = models.CharField(default="None", max_length=100,blank=True)
-    rubric = models.ForeignKey(Rubric)
+    rubric = models.ForeignKey(Rubric,on_delete=models.CASCADE)
     row_choice = models.CharField(max_length=20,choices=CHOICES, default="0")
     excellenttext = models.TextField(default="", blank=True)
     proficienttext = models.TextField(default="", blank=True)
@@ -110,8 +110,8 @@ class Row(models.Model):
 
 
 class Enrollment(models.Model):
-    student = models.ForeignKey(Student, null=False)
-    edclass = models.ForeignKey(EdClasses, null=False)
+    student = models.ForeignKey(Student, null=False,on_delete=models.CASCADE)
+    edclass = models.ForeignKey(EdClasses, null=False,on_delete=models.CASCADE)
     #semester = models.ForeignKey(Semester)
     #Will need to change completedrubric editable to False
     #completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
@@ -129,9 +129,9 @@ class Enrollment(models.Model):
 
 class RubricData(models.Model):
     rubriccompleted = models.BooleanField(default=False)
-    enrollment = models.ForeignKey(Enrollment)
-    assignment = models.ForeignKey(Assignment)
-    completedrubric = models.OneToOneField(Rubric, null=True, editable=False)
+    enrollment = models.ForeignKey(Enrollment,on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment,on_delete=models.CASCADE)
+    completedrubric = models.OneToOneField(Rubric, null=True, editable=False,on_delete=models.CASCADE)
 
     def __str__(self):
         return "{} {}".format(self.enrollment, self.assignment)
