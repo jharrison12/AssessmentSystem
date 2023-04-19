@@ -16,6 +16,8 @@ class NewVisitorTest(FunctionalTest):
                                             teacher=self.test_user, crn=2222, semester=semester)
         edclass2 = EdClasses.objects.create(subject="EG", coursenumber="6000", sectionnumber="01",
                                             teacher=self.test_user, crn=3333, semester=semester)
+        edclass3 = EdClasses.objects.create(subject="ED", coursenumber="2000", sectionnumber="01",
+                                            teacher=self.test_user, crn=4444, semester=semester)
         # semester.classes.add(edclass1)
         # semester.classes.add(edclass2)
 
@@ -28,6 +30,7 @@ class NewVisitorTest(FunctionalTest):
         bobenrollment1 = Enrollment.objects.create(student=bob, edclass=edclass2)
         janeenrollment = Enrollment.objects.create(student=jane, edclass=edclass1)
         janeenrollment2 = Enrollment.objects.create(student=jane, edclass=edclass2)
+        jakeenrollment = Enrollment.objects.create(student=jake, edclass=edclass3)
         writingrubric = Rubric.objects.create(name="writingrubric")
         unitrubric = Rubric.objects.create(name="unitrubric")
 
@@ -57,6 +60,8 @@ class NewVisitorTest(FunctionalTest):
         edclasssemester1assignment2 = Assignment.objects.create(edclass=edclass1,
                                                                 assignmentname="Unit Assignment", keyrubric=unitrubric)
         edclasssemester2 = Assignment.objects.create(edclass=edclass2, keyrubric=writingrubric)
+
+        edclasssemester2 = Assignment.objects.create(edclass=edclass3, keyrubric=writingrubric)
 
     def test_user_visits_inital_page(self):
         # Dr. visits the webpage
