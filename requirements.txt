@@ -1,4 +1,4 @@
-Django==1.10.1
+Django==2.2.25
 django-debug-toolbar==1.7
 gunicorn==19.6.0
 requests==2.10.0
