@@ -61,7 +61,7 @@ class NewVisitorTest(FunctionalTest):
                                                                 assignmentname="Unit Assignment", keyrubric=unitrubric)
         edclasssemester2 = Assignment.objects.create(edclass=edclass2, keyrubric=writingrubric)
 
-        edclasssemester2 = Assignment.objects.create(edclass=edclass3, keyrubric=writingrubric)
+        edclasssemester2 = Assignment.objects.create(edclass=edclass3,assignmentname="Writing Assignment", keyrubric=writingrubric)
 
     def test_user_visits_inital_page(self):
         # Dr. visits the webpage
@@ -256,8 +256,64 @@ class NewVisitorTest(FunctionalTest):
         home.click()
         semester_header_text = self.browser.find_element_by_id('semester').text
         self.assertIn("Choose a Semester!", semester_header_text)
-		
-		#
+
+        # Dr. chooses a semester from a drop down list
+        semester_dropdown = self.browser.find_element_by_id('semesterdropdown')
+        self.assertEqual(semester_dropdown.get_attribute('name'), "semester")
+        semesterchoice = self.browser.find_elements_by_tag_name('option')
+        self.assertIn('201530', [i.text for i in semesterchoice])
+
+        # Dr. clicks submit to send a post request to a server
+        submitbutton = self.browser.find_element_by_id('semestersubmit')
+        self.assertEqual(submitbutton.get_attribute('value'), "Submit")
+        submitbutton.send_keys(Keys.ENTER)
+
+        # Dr. is given the option to choose a class
+        header_text = self.browser.find_element_by_id('edclass').text
+        self.assertIn("Choose a Class!", header_text)
+
+        # Dr. Chooses an ED class from a list of classes
+        dropdown_list = self.browser.find_element_by_id('classdropdown')
+        self.assertEqual(dropdown_list.get_attribute('name'), "edClass")
+        classchoice = self.browser.find_elements_by_tag_name('option')
+        self.assertIn("ED 2000 01", [i.text for i in classchoice])
+
+        #Dr. Chooses the new class
+        undergrad_course = self.browser.find_element_by_xpath('//*[@id="classdropdown"]/option[3]')
+        undergrad_course.click()
+
+        # Dr. clicks on a "Choose" button and is taken to a new page
+        submitbutton = self.browser.find_element_by_id('classubmit')
+        submitbutton.send_keys(Keys.ENTER)
+
+        # Dr. confirms availability of writing assignment
+        assignmentchoice = self.browser.find_elements_by_tag_name('option')
+        self.assertIn("Writing Assignment", [i.text for i in assignmentchoice])
+        writingassignment = self.browser.find_element_by_id('Writing Assignment')
+        writingassignment.click()
+        submitbutton = self.browser.find_element_by_id('assignmentsubmit')
+        submitbutton.send_keys(Keys.ENTER)
+
+        # Dr. chooses a student name from a drop down list of student names
+        studentnamedropdown = self.browser.find_element_by_id('studentdropdown')
+        self.assertEqual(studentnamedropdown.get_attribute('name'), 'studentnames')
+        studentname = self.browser.find_elements_by_tag_name('option')
+        self.assertIn("Jake The Snake 0000", [i.text for i in studentname])
+        self.assertNotIn("Bob DaBuilder 21743148", [i.text for i in studentname])
+        submitbuttonstudent = self.browser.find_element_by_id('studentsubmit')
+        submitbuttonstudent.send_keys(Keys.ENTER)
+
+        # A new page with a rubric should appear with the student's name
+        studentnameheader = self.browser.find_element_by_id('studentheader')
+        self.assertIn("The Snake, Jake", studentnameheader.text)
+
+        # A rubric should appear based upon the key assignment with row names
+        rubricheader = self.browser.find_element_by_id('rubricheader')
+        self.assertIn("Writing Rubric", rubricheader.text)
+        bodytext = self.browser.find_element_by_tag_name('body')
+        self.assertIn("Excellence is a habit", bodytext.text)  # row name should stil be there
+        self.assertIn("THE BEST!", bodytext.text)
+
         self.browser.get(self.server_url + '/user/')
         sleep(60)
 
