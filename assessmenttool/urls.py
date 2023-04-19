@@ -1,4 +1,5 @@
 from django.conf.urls import include, url
+from django.urls import path
 from rubricapp import views
 from django.contrib.auth import views as auth_views
 from rubricapp.forms import PwordChangeForm
@@ -22,7 +23,7 @@ if settings.DEBUG:
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    #url(r'^admin/', include(admin.site.urls)),
 	#url(r'^password_change/$', auth_views.password_change, {'password_change_form': PwordChangeForm}), 
     url('^', include('django.contrib.auth.urls',)),
 ]
@@ -35,7 +36,7 @@ else:
         # Uncomment the admin/doc line below to enable admin documentation:
         # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
         # Uncomment the next line to enable the admin:
-        url(r'^admin/', include(admin.site.urls)),
+        path('admin/', admin.site.urls),
         # url(r'^password_change/$', auth_views.password_change, {'password_change_form': PwordChangeForm}),
         url('^', include('django.contrib.auth.urls', )),
 ]
