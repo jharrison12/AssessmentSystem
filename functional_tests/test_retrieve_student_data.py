@@ -304,6 +304,7 @@ class DataView(FunctionalTest):
         submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
         body = self.browser.find_element_by_tag_name('body')
+        sleep(60)
         self.assertIn("writingrubric", body.text)
         ##TODO FINISH
 

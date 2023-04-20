@@ -315,6 +315,4 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn("THE BEST!", bodytext.text)
 
         self.browser.get(self.server_url + '/user/')
-        sleep(60)
-
 
