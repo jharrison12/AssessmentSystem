@@ -242,8 +242,8 @@ class EnrollmentModelTest(TestCase):
         jane = Student.objects.get(lnumber="21743149")
         bob = Student.objects.get(lnumber="21743148")
 
-        self.assertQuerysetEqual(oneclass.students.filter(lnumber="21743149"), [repr(jane)])
-        self.assertQuerysetEqual(twoclass.students.filter(lnumber="21743148"), [repr(bob)])
+        self.assertQuerysetEqual(oneclass.students.filter(lnumber="21743149"), [jane])
+        self.assertQuerysetEqual(twoclass.students.filter(lnumber="21743148"), [bob])
 
     def test_enrollment_model_creates_correct_number_of_enrollments(self):
         self.add_two_classes_to_semester_add_two_students_to_class()
