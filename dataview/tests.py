@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from unittest import skip
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 from dataview.views import home_page, student_view, student_data_view, ed_class_view, ed_class_data_view, \
     semester_ed_class_view, ed_class_assignment_view, standards_view, standards_semester_view, standards_semester_standard_view,\
     rubric_standard_view, rubric_standard_individual_view

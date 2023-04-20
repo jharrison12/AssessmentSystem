@@ -191,7 +191,7 @@ def rubric_standard_view(request):
 @user_passes_test(lambda u: u.is_superuser)
 def rubric_standard_individual_view(request, standard):
 	standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
-	standard = Standard.objects.filter(name__iexact=standardwithspace)
+	standard = Standard.objects.get(name__iexact=standardwithspace)
 	rows = Row.objects.filter(standards=standard, rubric__template=True)
 	#Set object keeps the list of row names immutable
 	rowdata = collections.defaultdict(list)
@@ -201,5 +201,5 @@ def rubric_standard_individual_view(request, standard):
 		else:
 			rowdata[row.templatename].add(row.name)
 	rowdata = dict(rowdata)
-	logging.critical("Does this work? SHOULD HAVE RUBRIC NAME{}".format(rowdata))
+	logging.debug("Does this work? SHOULD HAVE RUBRIC NAME{}".format(rowdata))
 	return render(request, 'dataview/rubricstandardindividual.html', {'rubrics':rowdata})
