@@ -4,7 +4,6 @@ from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase
 from rubricapp.views import home_page, semester_page, student_page, rubric_page
-from django.core.urlresolvers import resolve
 from django.db import IntegrityError
 from django.contrib.auth.models import User
 

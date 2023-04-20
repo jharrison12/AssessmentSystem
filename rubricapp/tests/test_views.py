@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from django.http import HttpRequest
 from django.test import TestCase, Client
 from rubricapp.views import home_page, semester_page, student_page, rubric_page, user_page, assignment_page
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 from django.contrib.auth.models import UserManager, User
 
 class HomePageTest(TestCase):
