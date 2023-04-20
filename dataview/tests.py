@@ -988,7 +988,7 @@ class StandardView(TestCase):
         self.assertRedirects(response, '/login/?next=/data/standards/rubricview/intasc1/', status_code=302)
 
     def test_intasc_rubric_view_uses_correct_template(self):
-        response = self.client.get('/data/standards/rubricview/instasc1/')
+        response = self.client.get('/data/standards/rubricview/intasc1/')
         self.assertTemplateUsed(response, 'dataview/rubricstandardindividual.html')
 
     def test_intasc_rubric_view_shows_writing(self):
