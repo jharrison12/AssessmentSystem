@@ -21,7 +21,7 @@ class RubricDataAdmin(admin.TabularInline):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request,obj=None):
         return False
 
 
@@ -124,7 +124,7 @@ class RowAdminInline(admin.TabularInline):
     exclude = ['templatename']
     can_delete = False
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request,obj=None):
         return False
 
 
