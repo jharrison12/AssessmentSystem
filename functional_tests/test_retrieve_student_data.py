@@ -273,6 +273,7 @@ class DataView(FunctionalTest):
         submit.click()
         caep1 = self.browser.find_element_by_xpath('//*[@id="standardsname"]/option[1]')
         self.assertIn("CAEP 1", caep1.text)
+        sleep(60)
         caep1.click()
         submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
