@@ -247,6 +247,18 @@ class DataView(FunctionalTest):
         self.assertIn("Karate", bodytext.text)
         self.assertIn("3.0", bodytext.text)
 
+    def test_professor_looks_at_standards_data(self):
+        self.create_two_classes_for_unit_tests()
+        self.create_more_student_data_for_second_test()
+        self.browser.get("%s%s" % (self.server_url, '/data/'))
+        # Prof must first login to the assessment system
+        idusername = self.browser.find_element_by_id('id_username')
+        idusername.send_keys('bob')
+        passwordbox = self.browser.find_element_by_id('id_password')
+        passwordbox.send_keys('bob')
+        submitbutton = self.browser.find_element_by_xpath('/html/body/div[1]/div/div/div/h3[2]/form/input[2]')
+        submitbutton.send_keys(Keys.ENTER)
+
         # Professor returns to the main data page and clicks on standards link
         self.browser.get("{}{}".format(self.server_url, '/data/'))
         standardslink = self.browser.find_element_by_id('standardslink')
@@ -273,7 +285,6 @@ class DataView(FunctionalTest):
         submit.click()
         caep1 = self.browser.find_element_by_xpath('//*[@id="standardsname"]/option[1]')
         self.assertIn("CAEP 1", caep1.text)
-        sleep(60)
         caep1.click()
         submit = self.browser.find_element_by_id('standardsubmit')
         submit.click()
