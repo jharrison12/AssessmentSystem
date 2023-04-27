@@ -129,15 +129,16 @@ def standards_semester_view(request, semester):
     if request.POST:
         logging.info(request.POST['standardsname'])
         standard = Standard.objects.get(name=request.POST['standardsname'])
-        return redirect(re.sub(' ', '', standard.name).lower() + '/')
+        logging.debug(f"Standard id {standard.id}")
+        return redirect(f"{standard.id}/")
     return render(request, 'dataview/standardssemesterview.html', {"standards": standards})
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def standards_semester_standard_view(request, semester, standard):
-    standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
-    logging.critical(standardwithspace)
-    standard = Standard.objects.get(name=standardwithspace.upper())
+    #standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
+    #logging.critical(standardwithspace)
+    standard = Standard.objects.get(id=standard)
     semestertext = Semester.objects.get(text=semester)
     ##COMPLETED RUBRICS IN 201530
     semesterrubric = Rubric.objects.filter(rubricdata__rubriccompleted=True, rubricdata__enrollment__edclass__semester=semestertext)
@@ -151,7 +152,7 @@ def standards_semester_standard_view(request, semester, standard):
     #Templates that use Standards
     templates = Rubric.objects.filter(template=True, row__standards=standard)
     logging.warning("The templates are {}".format(templates))
-    rows = Row.objects.filter(standards=standard)
+    rows = Row.objects.filter(standards=standard.id)
     rowswithstandards = rows.filter(rubric__in=semesterrubric).all()
     logging.warning("Rows with standards are {}".format(rowswithstandards.values()))
     #Default dict creates default value if there isn't one, so you don't have to
@@ -185,14 +186,14 @@ def rubric_standard_view(request):
     standards = Standard.objects.all()
     if request.POST:
         standard = Standard.objects.get(name=request.POST['standardselect'])
-        return redirect(re.sub(' ', '',standard.name).lower() + '/')
+        return redirect(f"{standard.id}/")
     return render(request, 'dataview/rubricstandardview.html', {'standards': standards})
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def rubric_standard_individual_view(request, standard):
-    standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
-    standard = Standard.objects.get(name__iexact=standardwithspace)
+    #standardwithspace = re.sub(r'([a-z]+)', r"\1 ", standard)
+    standard = Standard.objects.get(id=standard)
     rows = Row.objects.filter(standards=standard, rubric__template=True)
     #Set object keeps the list of row names immutable
     rowdata = collections.defaultdict(list)
