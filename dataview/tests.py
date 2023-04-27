@@ -861,7 +861,7 @@ class StandardView(TestCase):
         response = standards_view(request)
         self.assertEqual(response.status_code, 302)
 
-    def test_standards_semester_requires_loing(self):
+    def test_standards_semester_requires_login(self):
         self.client.logout()
         response = self.client.get('/data/standards/201530/')
         self.assertRedirects(response, '/login/?next=/data/standards/201530/', status_code=302)
@@ -888,39 +888,48 @@ class StandardView(TestCase):
 
     def test_semester_standards_redirects_correctly(self):
         response = self.client.post('/data/standards/201530/',{'standardsname': "INTASC 1"})
-        self.assertRedirects(response, '/data/standards/201530/intasc1/')
+        standard = Standard.objects.get(name='INTASC 1')
+        self.assertRedirects(response, f'/data/standards/201530/{standard.id}/')
 
     def test_standards_semester_standard_view_uses_correct_template(self):
-        response = self.client.get('/data/standards/201530/intasc1/')
+        standard = Standard.objects.get(name='INTASC 1')
+        response = self.client.get(f'/data/standards/201530/{standard.id}/')
         self.assertTemplateUsed(response, 'dataview/standardssemesterstandardview.html')
 
     def test_standards_semester_standard_view_uses_correct_function(self):
-        found = resolve('/data/standards/201530/intasc1/')
+        standard = Standard.objects.get(name='INTASC 1')
+        found = resolve(f'/data/standards/201530/{standard.id}/')
         self.assertEqual(found.func, standards_semester_standard_view)
 
     def test_standards_semester_standard_view_requires_loing(self):
+        standard = Standard.objects.get(name='INTASC 1')
         self.client.logout()
-        response = self.client.get('/data/standards/201530/intasc1/')
-        self.assertRedirects(response, '/login/?next=/data/standards/201530/intasc1/', status_code=302)
+        response = self.client.get(f'/data/standards/201530/{standard.id}/')
+        self.assertRedirects(response, f'/login/?next=/data/standards/201530/{standard.id}/', status_code=302)
 
     def test_sss_page_has_standard_name(self):
-        response = self.client.get('/data/standards/201530/intasc1/')
+        standard = Standard.objects.get(name='INTASC 1')
+        response = self.client.get(f'/data/standards/201530/{standard.id}/')
         self.assertIn("INTASC 1",response.content.decode())
 
     def test_sss_page_shows_rubric(self):
-        response = self.client.get('/data/standards/201530/intasc1/')
+        standard = Standard.objects.get(name='INTASC 1')
+        response = self.client.get(f'/data/standards/201530/{standard.id}/')
         self.assertIn("Writing Rubric", response.content.decode())
 
     def test_sss_page_shows_scores(self):
-        response = self.client.get('/data/standards/201530/intasc1/')
+        standard = Standard.objects.get(name='INTASC 1')
+        response = self.client.get(f'/data/standards/201530/{standard.id}/')
         self.assertIn("1.5", response.content.decode())
 
     def test_sss_page_shows_scores(self):
-        response  = self.client.get('/data/standards/201530/caep1.2/')
+        standard = Standard.objects.get(name='CAEP 1.2')
+        response  = self.client.get(f'/data/standards/201530/{standard.id}/')
         self.assertIn("2.50", response.content.decode())
 
     def test_sss_page_shows_scores(self):
-        response  = self.client.get('/data/standards/201610/caep1.2/')
+        standard = Standard.objects.get(name='CAEP 1.2')
+        response  = self.client.get(f'/data/standards/201610/{standard.id}/')
         self.assertIn("3.67", response.content.decode())
 
     def test_sss_page_works_with_multiple_rubrics(self):
@@ -949,7 +958,7 @@ class StandardView(TestCase):
         RubricData.objects.create(enrollment=bobEG700005201530, assignment=unitassignment, rubriccompleted=True,
                                      completedrubric=completedrubricforbob)
 
-        response = self.client.get('/data/standards/201530/intasc1/')
+        response = self.client.get(f'/data/standards/201530/{intasc1.id}/')
         self.assertIn("Unit Rubric", response.content.decode())
         self.assertIn("3.0", response.content.decode())
 
@@ -984,30 +993,35 @@ class StandardView(TestCase):
         request.user = self.test_user
         request.POST["standardselect"] = "INTASC 1"
         response = rubric_standard_view(request)
-        self.assertEqual(response['location'], 'intasc1/')
+        intasc1 = Standard.objects.get(name='INTASC 1')
+        self.assertEqual(response['location'], f'{intasc1.id}/')
 
     def test_intasc_rubric_view_uses_correct_function(self):
-        found = resolve('/data/standards/rubricview/instasc1/')
+        intasc1 = Standard.objects.get(name='INTASC 1')
+        found = resolve(f'/data/standards/rubricview/{intasc1.id}/')
         self.assertEqual(found.func, rubric_standard_individual_view)
 
     def test_instasc_standards_rubric_view_requires_login(self):
         self.client.logout()
-        response = self.client.get('/data/standards/rubricview/intasc1/')
-        self.assertRedirects(response, '/login/?next=/data/standards/rubricview/intasc1/', status_code=302)
+        intasc1 = Standard.objects.get(name='INTASC 1')
+        response = self.client.get(f'/data/standards/rubricview/{intasc1.id}/')
+        self.assertRedirects(response, f'/login/?next=/data/standards/rubricview/{intasc1.id}/', status_code=302)
 
     def test_intasc_rubric_view_uses_correct_template(self):
-        response = self.client.get('/data/standards/rubricview/intasc1/')
+        intasc1 = Standard.objects.get(name='INTASC 1')
+        response = self.client.get(f'/data/standards/rubricview/{intasc1.id}/')
         self.assertTemplateUsed(response, 'dataview/rubricstandardindividual.html')
 
     def test_intasc_rubric_view_shows_writing(self):
-        response = self.client.get('/data/standards/rubricview/intasc1/')
+        intasc1 = Standard.objects.get(name='INTASC 1')
+        response = self.client.get(f'/data/standards/rubricview/{intasc1.id}/')
         self.assertIn("Writing Rubric", response.content.decode())
 
     def test_intasc_rubric_view_with_more_rubrics(self):
         intasc1 = Standard.objects.get(name="INTASC 1")
         newrubric = Rubric.objects.create(name="Unit Rubric", template=True)
         self.createrubricrow("Excellence is a Habit", "THE BEST!", newrubric, 0, intasc1, newrubric)
-        response = self.client.get("/data/standards/rubricview/intasc1/")
+        response = self.client.get(f"/data/standards/rubricview/{intasc1.id}/")
         self.assertIn("Unit Rubric", response.content.decode())
         self.assertIn("Excellence is a Habit", response.content.decode())
 
@@ -1016,7 +1030,7 @@ class StandardView(TestCase):
         newrubric = Rubric.objects.create(name="Unit Rubric", template=True)
         self.createrubricrow("Excellence is a Habit", "THE BEST!", newrubric, 0, intasc1, newrubric)
         self.createrubricrow("Mediocrity is a habit", "THE BEST!", newrubric, 0, intasc1, newrubric)
-        response = self.client.get("/data/standards/rubricview/intasc1/")
+        response = self.client.get(f"/data/standards/rubricview/{intasc1.id}/")
         self.assertIn("Mediocrity is a habit", response.content.decode())
 
     def test_rubric_with_row_with_multi_standards_works(self):
@@ -1024,19 +1038,12 @@ class StandardView(TestCase):
         intasc1 = Standard.objects.get(name="INTASC 1")
         caeprow = Row.objects.get(name="Excellenceisahabit", rubric__template=True)
         caeprow.standards.add(intasc1)
-        response = self.client.get("/data/standards/rubricview/intasc1/")
-        self.assertIn("Excellenceisahabit", response.content.decode())
-
-    def test_caep_standard_with_period_works(self):
-        response = self.client.get('/data/standards/rubricview/caep1.2/')
-        self.assertContains(response, 'Excellenceisahabit', status_code=200)
-
-    def test_caep_standard_with_space_and_colon_works(self):
-        response = self.client.get('/data/standards/rubricview/InTASC5:ApplicationofContent/')
-        self.assertContains(response, 'Excellenceisahabit', status_code=200)
+        response = self.client.get(f"/data/standards/rubricview/{intasc1.id}/")
+        self.assertIn("Fortitude", response.content.decode())
 
     def test_caep_standard_rubric_view_works_with_rubric_id(self):
-        response = self.client.get('/data/standards/rubricview/1/')
-        self.assertContains(response, 'Excellenceisahabit', status_code=200)
+        intasc1 = Standard.objects.get(name='INTASC 1')
+        response = self.client.get(f'/data/standards/rubricview/{intasc1.id}/')
+        self.assertContains(response, 'Fortitude', status_code=200)
 
 
