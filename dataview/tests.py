@@ -705,7 +705,7 @@ class StandardView(TestCase):
     def setUp(self):
         intasc1 = Standard.objects.create(name='INTASC 1')
         caep1 = Standard.objects.create(name="CAEP 1.2")
-        empty = Standard.objects.create(name=" ")
+        intasc5 = Standard.objects.create(name="InTASC 5: Application of Content")
         semester201530 = Semester.objects.create(text="201530")
         semester201610 = Semester.objects.create(text="201610")
 
@@ -756,6 +756,7 @@ class StandardView(TestCase):
 
         row1 = self.createrubricrow("Fortitude", "THE BEST!", writingrubric, 0, intasc1, writingrubric)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", writingrubric, 0,caep1,writingrubric)
+        row3 = self.createrubricrow("Loveisaverb", "THE GREATEST!", writingrubric, 0,intasc5,writingrubric)
 
         writingassignment = Assignment.objects.create(edclass=EG500005201530,
                                                            assignmentname="Writing Assignment",
@@ -776,7 +777,8 @@ class StandardView(TestCase):
         # Create EG 5000 05 201610
         completedrubricforjake = Rubric.objects.create(name="EG5000050000201610", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjake, 4, intasc1, writingrubric)
-        row1 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjake, 4, caep1,writingrubric)
+        row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!!", completedrubricforjake, 4, caep1,writingrubric)
+        row3 = self.createrubricrow("Loveisaverb", "THE GREATEST!!", completedrubricforjake, 4, intasc5,writingrubric)
         RubricData.objects.create(enrollment=jakeEG500005201610, assignment=nonleaderpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforjake)
 
@@ -785,6 +787,7 @@ class StandardView(TestCase):
         completedrubricforEG600004Jane = Rubric.objects.create(name="EG60000421743149201610LeaderPaper", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Jane, 4, intasc1,writingrubric)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Jane, 4, caep1,writingrubric)
+        row3 = self.createrubricrow("Loveisaverb", "THE GREATEST!!", completedrubricforEG600004Jane, 4, intasc5,writingrubric)
         RubricData.objects.create(enrollment=janeEG600004201610, assignment=leaderpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforEG600004Jane)
 
@@ -792,6 +795,7 @@ class StandardView(TestCase):
         completedrubricforEG600004Bob = Rubric.objects.create(name="EG60000421743148201610LeaderPaper", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforEG600004Bob, 1, intasc1,writingrubric)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforEG600004Bob, 3, caep1,writingrubric)
+        row3 = self.createrubricrow("Loveisaverb", "THE GREATEST!!", completedrubricforEG600004Bob, 4, intasc5,writingrubric)
         RubricData.objects.create(enrollment=bobEG600004201610, assignment=leaderpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforEG600004Bob)
 
@@ -799,6 +803,8 @@ class StandardView(TestCase):
         completedrubricforbob = Rubric.objects.create(name="EG50000521743148201530WritingAssignment", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforbob, 2, intasc1,writingrubric)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforbob, 4, caep1,writingrubric)
+        row3 = self.createrubricrow("Loveisaverb", "THE GREATEST!!", completedrubricforbob, 4, intasc5,
+                                    writingrubric)
         RubricData.objects.create(enrollment=bobEG500005201530, assignment=writingassignment, rubriccompleted=True,
                                   completedrubric=completedrubricforbob)
 
@@ -806,6 +812,8 @@ class StandardView(TestCase):
         completedrubricforjaneeg6000 = Rubric.objects.create(name="EG60000421743149201530LoserPaper", template=False)
         row1 = self.createrubricrow("Fortitude", "THE BEST!", completedrubricforjaneeg6000, 1, intasc1,writingrubric)
         row2 = self.createrubricrow("Excellenceisahabit", "THE GREATEST!", completedrubricforjaneeg6000, 1, caep1,writingrubric)
+        row3 = self.createrubricrow("Loveisaverb", "THE GREATEST!!", completedrubricforjaneeg6000, 4, intasc5,
+                                    writingrubric)
         RubricData.objects.create(enrollment=janeEG600004201530, assignment=loserpaper, rubriccompleted=True,
                                   completedrubric=completedrubricforjaneeg6000)
 
@@ -1021,6 +1029,14 @@ class StandardView(TestCase):
 
     def test_caep_standard_with_period_works(self):
         response = self.client.get('/data/standards/rubricview/caep1.2/')
+        self.assertContains(response, 'Excellenceisahabit', status_code=200)
+
+    def test_caep_standard_with_space_and_colon_works(self):
+        response = self.client.get('/data/standards/rubricview/InTASC5:ApplicationofContent/')
+        self.assertContains(response, 'Excellenceisahabit', status_code=200)
+
+    def test_caep_standard_rubric_view_works_with_rubric_id(self):
+        response = self.client.get('/data/standards/rubricview/1/')
         self.assertContains(response, 'Excellenceisahabit', status_code=200)
 
 

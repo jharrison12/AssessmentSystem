@@ -45,11 +45,13 @@ class DataView(FunctionalTest):
 
         intasc1 = Standard.objects.create(name="INTASC 1")
         caep1 = Standard.objects.create(name="CAEP 1")
+        intasc5 = Standard.objects.create(name="InTASC 5: Application of Content")
 
         writingrubric = Rubric.objects.create(name="writingrubric")
 
         row1 = self.createrubricrow("Excellence","THE BEST!",writingrubric, 0, intasc1, "writingrubric")
         row2 = self.createrubricrow("NONE", "THE GREATEST!", writingrubric,0, caep1, "writingrubric")
+        row3 = self.createrubricrow("NONE", "THE SECOND GREATEST!", writingrubric,0, intasc5, "writingrubric")
 
         # Many to many relationship must be added after creation of objects
         # because the manyto-many relationship is not a column in the database
@@ -61,6 +63,7 @@ class DataView(FunctionalTest):
         completedrubricforbobwriting = Rubric.objects.create( name="EG50000121743148201530WritingAssignment4", template=False)
         row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobwriting, 1, intasc1, "writingrubric")
         row2 = self.createrubricrow("None", "THE GREATEST!", completedrubricforbobwriting, 1, caep1, "writingrubric")
+        row3 = self.createrubricrow("None", "THE SECOND GREATEST!", completedrubricforbobwriting, 1, intasc5, "writingrubric")
 
         completedrubricforbobunit = Rubric.objects.create(name="EG50000121743148201530UnitPlan5", template=False)
         row1 = self.createrubricrow("Excellence", "THE BEST!", completedrubricforbobunit, 4, intasc1, "writingrubric")
@@ -317,7 +320,25 @@ class DataView(FunctionalTest):
         submit.click()
         body = self.browser.find_element_by_tag_name('body')
         self.assertIn("writingrubric", body.text)
-        ##TODO FINISH
+
+        # Professor returns to the main data page and clicks on standards link
+        self.browser.get("{}{}".format(self.server_url, '/data/'))
+        standardslink = self.browser.find_element_by_id('standardslink')
+        standardslink.click()
+
+        # Professor tests the link for intasc 5
+        bodyofpage = self.browser.find_element_by_tag_name('body')
+        self.assertIn('201530', bodyofpage.text)
+        submit = self.browser.find_element_by_id('standardsubmit')
+        submit.click()
+        intasc5inpage = self.browser.find_element_by_xpath('/html/body/div/div/div/div/form/select/option[3]')
+        self.assertIn('InTASC 5: Application of Content', intasc5inpage.text)
+        intasc5inpage.click()
+        #sleep(60)
+        submit = self.browser.find_element_by_id('standardsubmit')
+        submit.click()
+        body = self.browser.find_element_by_tag_name('body')
+        self.assertIn("writingrubric", body.text)
 
 
 

@@ -151,9 +151,7 @@ class ClassAndSemesterModelTest(TestCase):
         edclass1 = EdClasses.objects.get(subject="EG", coursenumber="5000", crn=2222)
         self.assertNotEqual(edclass1, edclass2)
 
-
 class EnrollmentModelTest(TestCase):
-
 
     def add_two_classes_to_semester_add_two_students_to_class(self):
         first_semester = Semester.objects.create(text='201530')
@@ -292,8 +290,6 @@ class EnrollmentModelTest(TestCase):
         studentsinclass = Student.objects.filter(edclasses=edclass)#, enrollment__semester=first_semester)
         self.assertNotIn("21743142", [i for i in studentsinclass])
 
-
-
 class StandardsTest(TestCase):
 
     def create_rubric_and_row(self):
@@ -320,7 +316,6 @@ class StandardsTest(TestCase):
         row1.standards.add(standard2)
         self.assertEqual(row1.standards.count(),2)
 
-
     def test_standards_align_to_more_than_one_rubric(self):
         self.create_rubric_and_row()
         standard1 = Standard.objects.create(name="INTASC 1")
@@ -336,3 +331,10 @@ class StandardsTest(TestCase):
 
         row2.standards.add(standard1)
         self.assertEqual(Row.objects.filter(standards__name="INTASC 1").count(), 2)
+
+    @unittest.skip
+    def test_standards_with_space_enter_in_to_database_without_space(self):
+        self.create_rubric_and_row()
+        standard1 = Standard.objects.create(name="CAEP R1.4 Professional Responsibility")
+        standardcopy = Standard.objects.get(name)
+
